@@ -1,0 +1,243 @@
+/* Style refactored */
+/* Inherit global styles from App.css */
+/* This assumes App.css is already imported in the main styling */
+
+.profile-container {
+  max-width: 800px;
+  width: calc(100% - 40px);
+  margin: -40px auto 30px;
+  position: relative;
+  z-index: 5;
+  box-sizing: border-box;
+}
+
+/* FINANCIAL FORM */
+.financial-form {
+  background-color: var(--background-card);
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 5;
+  animation: slideUp 0.6s ease-out forwards;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* FORM SECTIONS */
+.form-section {
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.section-header {
+  padding: 16px 20px;
+  background-color: var(--background-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.section-header:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+.section-header h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-icon {
+  font-size: 1.4rem;
+}
+
+.toggle-icon {
+  font-size: 1rem;
+  color: var(--text-medium);
+  transition: transform 0.3s ease;
+}
+
+.section-content {
+  padding: 24px;
+  background-color: var(--background-card);
+  border-top: 1px solid var(--border-color);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.section-description {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+/* INPUT STYLES */
+.input-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.textarea-field {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  font-size: 16px;
+  background-color: var(--background-light);
+  color: var(--text-dark);
+  box-shadow: var(--shadow-sm);
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.textarea-field:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-focus);
+}
+
+/* DEBT SECTION */
+.debt-entry {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.debt-entry:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.debt-entry h3 {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+/* FORM ACTIONS */
+.form-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.submit-button {
+  flex: 1;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(99, 102, 241, 0.35);
+}
+
+.reset-button {
+  background-color: var(--background-light);
+  color: var(--text-medium);
+  border: 1px solid var(--border-color);
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.reset-button:hover {
+  background-color: #fee2e2;
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+/* ANIMATION */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .profile-container {
+    width: calc(100% - 30px);
+  }
+  
+  .financial-form {
+    padding: 24px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .section-content {
+    padding: 16px;
+  }
+  
+  .input-group {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    width: calc(100% - 20px);
+    margin-top: -30px;
+  }
+  
+  .financial-form {
+    padding: 20px;
+  }
+  
+  .section-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .debt-entry h3 {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,16 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow public read access to media files (favicon and og-image)
+    match /{filename} {
+      allow read: if filename in ['icons8-money-96.png', 'og-image.png'];
+    }
+    
+    // Default: deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

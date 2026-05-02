@@ -1,0 +1,33 @@
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.offline-banner {
+  background: #f59e0b;
+  color: white;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.offline-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.offline-text {
+  text-align: center;
+}
+
+/* Adjust main content when offline banner is shown */
+.app-layout:has(.offline-indicator .offline-banner) .main-content {
+  padding-top: 40px;
+}
