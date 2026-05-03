@@ -2,8 +2,6 @@
 
 Rational advice on your purchasing decisions. A Next.js + Firebase + OpenAI web app that analyzes proposed purchases against your financial profile and returns a buy / wait / skip recommendation with reasoning.
 
-Live: <https://ducati.kushagragolash.tech>
-
 ## What it does
 
 - **Purchase Analyzer** — describe an item or upload a photo (GPT-4 Vision); receive a multi-factor decision (necessity, timing, affordability) with cheaper-alternative search.
@@ -85,15 +83,3 @@ tests/                  Jest unit + integration suites
 ## Status
 
 The project is under active development. Core features are working in production; an in-flight dependency-modernization effort moves the stack to Node 24 LTS, Next 16, React 19 (with Compiler), Firebase 12, OpenAI v6, Tailwind v4 idiomatic CSS-first config, ESLint 10, and Jest 30. Track progress via release tags.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). Issues and pull requests welcome.
-
-## Security
-
-To report a vulnerability, see [SECURITY.md](SECURITY.md). Please do not file public issues for security disclosures.
-
-## License
-
-MIT — see [LICENSE](LICENSE).
