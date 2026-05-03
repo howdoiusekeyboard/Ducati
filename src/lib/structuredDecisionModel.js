@@ -31,10 +31,18 @@ const classifyItemType = (itemName, purpose) => {
     'app', 'software', 'game', 'ebook', 'digital', 'online', 'download',
     'streaming', 'cloud', 'saas', 'license', 'plugin', 'addon'
   ];
-  
+
+  // Durable physical goods - checked before services so e.g. "gym equipment" wins over "gym"
+  const durableKeywords = [
+    'appliance', 'furniture', 'tool', 'equipment', 'device'
+  ];
+
   // Check classifications
   if (consumableKeywords.some(keyword => lowerItem.includes(keyword))) {
     return 'consumable';
+  }
+  if (durableKeywords.some(keyword => lowerItem.includes(keyword))) {
+    return 'durable';
   }
   if (serviceKeywords.some(keyword => lowerItem.includes(keyword))) {
     return 'service';
@@ -233,8 +241,6 @@ const SCORING_FUNCTIONS = {
     // Academic research suggests purchases under 5% of monthly income are highly affordable
     if (costPercentage <= 5) return 10;
     if (costPercentage <= 10) return 8;
-    if (costPercentage <= 15) return 7;  // Added intermediate bracket for wealthy personas
-    if (costPercentage <= 18) return 7;  // Extended bracket for wealthy personas (17.6% case)
     if (costPercentage <= 20) return 6;
     if (costPercentage <= 30) return 4;
     if (costPercentage <= 50) return 2;
@@ -255,13 +261,17 @@ const SCORING_FUNCTIONS = {
 
   opportunityCost: (cost, financialProfile) => {
     if (!financialProfile || !financialProfile.summary) return 5;
-    
+
     const emergencyFundMonths = financialProfile.summary.emergencyFundMonths || 0;
     const hasDebt = (financialProfile.summary.debtToIncomeRatio || 0) > 0;
-    
+    const monthlyNet = financialProfile.summary.monthlyNetIncome || 0;
+
     // Special case: free items have no opportunity cost
     if (cost === 0) return 10;
-    
+
+    // Zero or negative net income: every dollar has high opportunity cost
+    if (monthlyNet <= 0) return 1;
+
     // Higher opportunity cost if lacking emergency fund or has debt
     if (emergencyFundMonths < 3 && hasDebt) return 2;
     if (emergencyFundMonths < 3) return 4;
@@ -424,10 +434,14 @@ const SCORING_FUNCTIONS = {
 
   financialRisk: (cost, financialProfile) => {
     if (!financialProfile || !financialProfile.summary) return 5;
-    
+
+    const monthlyNet = financialProfile.summary.monthlyNetIncome || 0;
     const emergencyFund = financialProfile.summary.emergencyFundMonths || 0;
     const debtRatio = financialProfile.summary.debtToIncomeRatio || 0;
-    
+
+    // Zero or negative net income with any cost is maximum risk
+    if (monthlyNet <= 0 && cost > 0) return 0;
+
     // Extreme debt scenario - return 0 immediately
     if (debtRatio >= 100) return 0;
     
@@ -442,7 +456,7 @@ const SCORING_FUNCTIONS = {
   },
 
   alternativeAvailability: (alternative) => {
-    return alternative && alternative.price ? 3 : 10; // No alternative is best case
+    return alternative && alternative.price ? 3 : 8; // No alternative is best case
   }
 };
 
