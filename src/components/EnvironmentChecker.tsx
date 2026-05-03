@@ -156,9 +156,9 @@ const EnvironmentChecker: React.FC = () => {
             
             <div className="example">
               <h4>Example of correct format:</h4>
-              <pre>{`NEXT_PUBLIC_FIREBASE_PROJECT_ID=ducati-142e0
+              <pre>{`NEXT_PUBLIC_FIREBASE_PROJECT_ID=ducati-mvp
 NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=ducati-142e0.firebaseapp.com`}</pre>
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=ducati-mvp.firebaseapp.com`}</pre>
             </div>
           </div>
         </div>
