@@ -1,7 +1,7 @@
 {
   "apphosting": {
     "source": ".",
-    "nodeVersion": "18"
+    "nodeVersion": "24"
   },
   "firestore": {
     "rules": "firestore.rules",
