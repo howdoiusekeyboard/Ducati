@@ -12,7 +12,7 @@ describe('Recommendation Flow Integration Tests', () => {
   describe('Persona A: Struggling Student Sarah', () => {
     const persona = personas.STRUGGLING_STUDENT;
     
-    it('should APPROVE essential grocery shopping', () => {
+    it('should reject grocery shopping that exceeds monthly net income', () => {
       const purchase = purchases.getPurchaseById('grocery-weekly');
       
       const result = calculateDecisionScores(
@@ -47,7 +47,7 @@ describe('Recommendation Flow Integration Tests', () => {
       expect(result.finalScore).toBeLessThan(50);
     });
     
-    it('should APPROVE educational textbook despite tight budget', () => {
+    it('should reject educational textbook at 80% of monthly net', () => {
       const purchase = purchases.getPurchaseById('textbook');
       
       const result = calculateDecisionScores(
@@ -178,7 +178,7 @@ describe('Recommendation Flow Integration Tests', () => {
       expect(result.finalScore).toBeGreaterThanOrEqual(70);
     });
     
-    it('should APPROVE designer handbag (has emergency fund)', () => {
+    it('should reject designer handbag at 60% of monthly net despite emergency fund', () => {
       const purchase = purchases.getPurchaseById('designer-handbag');
       
       const result = calculateDecisionScores(
