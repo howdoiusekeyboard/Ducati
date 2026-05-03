@@ -2,7 +2,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getStorage, FirebaseStorage, connectStorageEmulator } from 'firebase/storage';
 
 /**
  * Firebase configuration status and error tracking
@@ -27,7 +26,7 @@ const status: FirebaseStatus = {
  */
 const sanitizeEnvVar = (value: string | undefined): string | undefined => {
   if (!value) return undefined;
-  
+
   // Remove all whitespace characters and control characters
   return value
     .trim()
@@ -40,7 +39,7 @@ const sanitizeEnvVar = (value: string | undefined): string | undefined => {
       }
       return '';
     })
-    .replace(/[\u200B-\u200D\uFEFF]/g, ''); // Remove zero-width spaces
+    .replace(/[​-‍﻿]/g, ''); // Remove zero-width spaces
 };
 
 /**
@@ -64,7 +63,7 @@ const getFirebaseConfig = () => {
   // Validate required fields
   const requiredFields = [
     'apiKey',
-    'authDomain', 
+    'authDomain',
     'projectId',
     'storageBucket',
     'messagingSenderId',
@@ -72,7 +71,7 @@ const getFirebaseConfig = () => {
   ] as const;
 
   const missingFields: string[] = [];
-  
+
   for (const field of requiredFields) {
     if (!config[field]) {
       missingFields.push(`NEXT_PUBLIC_FIREBASE_${field.replace(/([A-Z])/g, '_$1').toUpperCase()}`);
@@ -103,7 +102,6 @@ const getFirebaseConfig = () => {
 let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
 let db: Firestore | undefined;
-let storage: FirebaseStorage | undefined;
 
 // Track emulator connection status
 let emulatorsConnected = false;
@@ -116,11 +114,10 @@ const connectToEmulators = () => {
     return;
   }
 
-  if (auth && db && storage) {
+  if (auth && db) {
     try {
       connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
       connectFirestoreEmulator(db, 'localhost', 8080);
-      connectStorageEmulator(storage, 'localhost', 9199);
       emulatorsConnected = true;
       console.log('✅ Connected to Firebase emulators');
     } catch (error) {
@@ -144,7 +141,7 @@ const initializeFirebase = (): boolean => {
   }
 
   // Check if already initialized
-  if (app && auth && db && storage) {
+  if (app && auth && db) {
     return true;
   }
 
@@ -168,7 +165,6 @@ const initializeFirebase = (): boolean => {
     // Initialize services
     auth = getAuth(app);
     db = getFirestore(app);
-    storage = getStorage(app);
 
     // Connect to emulators if in development
     if (process.env.NODE_ENV === 'development') {
@@ -179,7 +175,7 @@ const initializeFirebase = (): boolean => {
     status.error = null;
 
     console.log('✅ Firebase initialized successfully');
-    console.log('📊 Services ready: Auth:', !!auth, '| Firestore:', !!db, '| Storage:', !!storage);
+    console.log('📊 Services ready: Auth:', !!auth, '| Firestore:', !!db);
 
     // Optional: Test Firestore connection
     if (db && process.env.NODE_ENV === 'development') {
@@ -201,16 +197,15 @@ const initializeFirebase = (): boolean => {
   } catch (error) {
     status.error = error instanceof Error ? error.message : 'Unknown initialization error';
     status.isInitialized = false;
-    
+
     console.error('❌ Firebase initialization failed:', status.error);
     console.error('Full error:', error);
-    
+
     // Reset services on failure
     app = undefined;
     auth = undefined;
     db = undefined;
-    storage = undefined;
-    
+
     return false;
   }
 };
@@ -220,11 +215,11 @@ const initializeFirebase = (): boolean => {
  */
 export const isFirebaseConfigured = (): boolean => {
   if (typeof window === 'undefined') return false;
-  
+
   if (!status.isConfigured) {
     getFirebaseConfig(); // This will update status.isConfigured
   }
-  
+
   return status.isConfigured;
 };
 
@@ -232,7 +227,7 @@ export const isFirebaseConfigured = (): boolean => {
  * Public function to check if Firebase is initialized
  */
 export const isFirebaseInitialized = (): boolean => {
-  return status.isInitialized && !!app && !!auth && !!db && !!storage;
+  return status.isInitialized && !!app && !!auth && !!db;
 };
 
 /**
@@ -250,7 +245,7 @@ if (typeof window !== 'undefined') {
 }
 
 // Export services (may be undefined if initialization fails)
-export { app, auth, db, storage };
+export { app, auth, db };
 
 // Export a function to manually retry initialization
 export const retryFirebaseInit = (): boolean => {
@@ -258,7 +253,7 @@ export const retryFirebaseInit = (): boolean => {
     console.log('ℹ️ Firebase already initialized');
     return true;
   }
-  
+
   console.log('🔄 Retrying Firebase initialization...');
   return initializeFirebase();
 };
