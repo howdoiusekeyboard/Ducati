@@ -27,6 +27,7 @@
     "upload-media": "bun scripts/upload-media.js"
   },
   "dependencies": {
+    "@google/genai": "^1.51.0",
     "@tailwindcss/postcss": "^4.1.11",
     "autoprefixer": "^10.4.21",
     "firebase": "^10.0.0",
@@ -61,6 +62,7 @@
     "typescript": "^5.8.3"
   },
   "trustedDependencies": [
+    "@google/genai",
     "@tailwindcss/oxide",
     "protobufjs"
   ]
