@@ -3,7 +3,7 @@ import { storage } from './firebase';
 import { ref, getDownloadURL } from 'firebase/storage';
 
 // Firebase Storage bucket URL - using the correct format
-const STORAGE_BUCKET_URL = 'https://firebasestorage.googleapis.com/v0/b/denarii-mvp-f5aea.appspot.com';
+const STORAGE_BUCKET_URL = 'https://firebasestorage.googleapis.com/v0/b/ducati-142e0.appspot.com';
 
 /**
  * Get the Firebase Storage URL for a media file

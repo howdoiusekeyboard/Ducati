@@ -51,8 +51,8 @@ async function uploadMediaFiles() {
     console.log('\nNext steps:');
     console.log('1. Deploy storage rules: firebase deploy --only storage');
     console.log('2. Verify files are accessible at:');
-    console.log('   - https://denarii-mvp-f5aea.firebasestorage.app/o/icons8-money-96.png?alt=media');
-    console.log('   - https://denarii-mvp-f5aea.firebasestorage.app/o/og-image.png?alt=media');
+    console.log('   - https://ducati-142e0.firebasestorage.app/o/icons8-money-96.png?alt=media');
+    console.log('   - https://ducati-142e0.firebasestorage.app/o/og-image.png?alt=media');
     
   } catch (error) {
     console.error('Error uploading files:', error);
