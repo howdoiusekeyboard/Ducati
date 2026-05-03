@@ -269,19 +269,19 @@ describe('Chat API Route Logic', () => {
 
   describe('Input Validation Logic', () => {
     it('should validate empty message', () => {
-      const message = '';
+      const message: string = '';
       const isValid = !!(message && typeof message === 'string' && message.trim().length > 0);
       expect(isValid).toBe(false);
     });
 
     it('should validate whitespace-only message', () => {
-      const message = '   ';
+      const message: string = '   ';
       const isValid = !!(message && typeof message === 'string' && message.trim().length > 0);
       expect(isValid).toBe(false);
     });
 
     it('should validate valid message', () => {
-      const message = 'Hello, world!';
+      const message: string = 'Hello, world!';
       const isValid = !!(message && typeof message === 'string' && message.trim().length > 0);
       expect(isValid).toBe(true);
     });
