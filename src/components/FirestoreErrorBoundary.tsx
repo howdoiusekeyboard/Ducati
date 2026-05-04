@@ -22,7 +22,7 @@ export class FirestoreErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Firestore Error Boundary caught an error:', error, errorInfo);
     
     if (this.props.onError) {
@@ -30,7 +30,7 @@ export class FirestoreErrorBoundary extends Component<Props, State> {
     }
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;

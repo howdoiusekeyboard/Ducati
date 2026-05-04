@@ -52,13 +52,13 @@ export const useProfileImage = ({ photoURL, displayName, email }: UseProfileImag
     if (displayName) {
       const names = displayName.trim().split(' ');
       if (names.length >= 2) {
-        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+        return `${names[0]![0]}${names[names.length - 1]![0]}`.toUpperCase();
       }
-      return names[0][0].toUpperCase();
+      return names[0]![0]!.toUpperCase();
     }
     
     if (email) {
-      return email[0].toUpperCase();
+      return email[0]!.toUpperCase();
     }
     
     return 'U';

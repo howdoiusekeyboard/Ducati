@@ -15,7 +15,7 @@ function getAdminApp(): App {
 
   const existing = getApps();
   if (existing.length > 0) {
-    cachedApp = existing[0];
+    cachedApp = existing[0]!;
     return cachedApp;
   }
 
@@ -54,7 +54,7 @@ export async function verifyAuthFromRequest(request: Request): Promise<AuthResul
     return { ok: false, status: 401, error: 'Authorization header must use Bearer format' };
   }
 
-  const token = match[1];
+  const token = match[1]!;
   const auth = getAuth(getAdminApp());
 
   try {

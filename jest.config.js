@@ -6,7 +6,7 @@ module.exports = {
     '**/?(*.)+(spec|test).+(ts|tsx|js)'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: { ignoreDeprecations: '6.0', rootDir: '.' } }],
     '^.+\\.(js|jsx)$': ['babel-jest', { configFile: './.babelrc.test' }],
   },
   moduleNameMapper: {
