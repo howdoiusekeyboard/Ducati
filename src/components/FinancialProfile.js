@@ -377,7 +377,7 @@ const FinancialProfile = () => {
                       name="housingCost"
                       value={formData.housingCost}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -390,7 +390,7 @@ const FinancialProfile = () => {
                       name="utilitiesCost"
                       value={formData.utilitiesCost}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -403,7 +403,7 @@ const FinancialProfile = () => {
                       name="foodCost"
                       value={formData.foodCost}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -416,7 +416,7 @@ const FinancialProfile = () => {
                       name="transportationCost"
                       value={formData.transportationCost}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -429,7 +429,7 @@ const FinancialProfile = () => {
                       name="insuranceCost"
                       value={formData.insuranceCost}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -442,7 +442,7 @@ const FinancialProfile = () => {
                       name="subscriptionsCost"
                       value={formData.subscriptionsCost}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -456,7 +456,7 @@ const FinancialProfile = () => {
                     name="otherExpenses"
                     value={formData.otherExpenses}
                     onChange={handleInputChange}
-                    placeholder="$"
+                    placeholder="AED"
                     className="input-field"
                   />
                 </div>
@@ -496,7 +496,7 @@ const FinancialProfile = () => {
                         name="creditCardDebt"
                         value={formData.creditCardDebt}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -509,7 +509,7 @@ const FinancialProfile = () => {
                         name="creditCardPayment"
                         value={formData.creditCardPayment}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -527,7 +527,7 @@ const FinancialProfile = () => {
                         name="studentLoanDebt"
                         value={formData.studentLoanDebt}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -540,7 +540,7 @@ const FinancialProfile = () => {
                         name="studentLoanPayment"
                         value={formData.studentLoanPayment}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -558,7 +558,7 @@ const FinancialProfile = () => {
                         name="carLoanDebt"
                         value={formData.carLoanDebt}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -571,7 +571,7 @@ const FinancialProfile = () => {
                         name="carLoanPayment"
                         value={formData.carLoanPayment}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -589,7 +589,7 @@ const FinancialProfile = () => {
                         name="mortgageDebt"
                         value={formData.mortgageDebt}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -602,7 +602,7 @@ const FinancialProfile = () => {
                         name="mortgagePayment"
                         value={formData.mortgagePayment}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -620,7 +620,7 @@ const FinancialProfile = () => {
                         name="otherDebt"
                         value={formData.otherDebt}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -633,7 +633,7 @@ const FinancialProfile = () => {
                         name="otherDebtPayment"
                         value={formData.otherDebtPayment}
                         onChange={handleInputChange}
-                        placeholder="$"
+                        placeholder="AED"
                         className="input-field"
                       />
                     </div>
@@ -688,7 +688,7 @@ const FinancialProfile = () => {
                       name="creditLimit"
                       value={formData.creditLimit}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -701,7 +701,7 @@ const FinancialProfile = () => {
                       name="currentCreditBalance"
                       value={formData.currentCreditBalance}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -740,7 +740,7 @@ const FinancialProfile = () => {
                       name="checkingSavingsBalance"
                       value={formData.checkingSavingsBalance}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -753,7 +753,7 @@ const FinancialProfile = () => {
                       name="emergencyFund"
                       value={formData.emergencyFund}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -792,7 +792,7 @@ const FinancialProfile = () => {
                       name="retirementAccounts"
                       value={formData.retirementAccounts}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -805,7 +805,7 @@ const FinancialProfile = () => {
                       name="stocksAndBonds"
                       value={formData.stocksAndBonds}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -820,7 +820,7 @@ const FinancialProfile = () => {
                       name="realEstateValue"
                       value={formData.realEstateValue}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
@@ -833,7 +833,7 @@ const FinancialProfile = () => {
                       name="otherInvestments"
                       value={formData.otherInvestments}
                       onChange={handleInputChange}
-                      placeholder="$"
+                      placeholder="AED"
                       className="input-field"
                     />
                   </div>
