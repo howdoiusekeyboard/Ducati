@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { ErrorType } from '@/types';
+import { verifyAuthFromRequest, getProfileForUid } from '@/lib/firebase-admin';
 
 // Phase 1.7 interim: text-only chat on Gemini 3.1 Flash Lite (preview).
 // Vision, Pro Mode structured output, and Realtime/Live voice defer to Phase 8.
@@ -130,6 +131,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
       );
     }
 
+    // Phase 1.5: Verify Firebase ID token before any Gemini call.
+    const authResult = await verifyAuthFromRequest(request);
+    if (!authResult.ok) {
+      return NextResponse.json(
+        { error: authResult.error, errorType: ErrorType.API_ERROR },
+        { status: authResult.status }
+      );
+    }
+
     let body: ChatRequest;
     try {
       body = await request.json();
@@ -184,7 +194,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
       parts: [{ text: body.message.trim() }],
     });
 
-    const systemInstruction = SYSTEM_INSTRUCTION_BASE + formatProfileContext(body.profile);
+    // Phase 1.5: server-fetched profile defends against client tampering of body.profile.
+    // body.profile is intentionally retained in the interface (FE still sends it for surgical
+    // scope reasons) but ignored here.
+    const profile = await getProfileForUid(authResult.uid);
+    const systemInstruction = SYSTEM_INSTRUCTION_BASE + formatProfileContext(profile);
 
     const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 

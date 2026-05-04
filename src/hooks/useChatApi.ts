@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Message, ErrorType } from '@/types/chat';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ChatError {
   message: string;
@@ -15,6 +16,7 @@ interface UseChatApiReturn {
 }
 
 export const useChatApi = (): UseChatApiReturn => {
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ChatError | null>(null);
   const [lastRequest, setLastRequest] = useState<{ message: string; history: Message[]; profile?: Record<string, unknown> | null } | null>(null);
@@ -28,10 +30,24 @@ export const useChatApi = (): UseChatApiReturn => {
     setIsLoading(true);
     setError(null);
 
+    if (!user) {
+      setError({
+        message: 'Please sign in to chat with Ducati Advisor.',
+        type: ErrorType.API_ERROR,
+      });
+      setIsLoading(false);
+      return null;
+    }
+
     try {
+      const idToken = await user.getIdToken();
+
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           message,
           conversationHistory: history.map(msg => ({
@@ -69,7 +85,7 @@ export const useChatApi = (): UseChatApiReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const retry = useCallback(async (): Promise<string | null> => {
     if (lastRequest) {
