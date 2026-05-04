@@ -55,9 +55,9 @@ export async function verifyAuthFromRequest(request: Request): Promise<AuthResul
   }
 
   const token = match[1];
+  const auth = getAuth(getAdminApp());
 
   try {
-    const auth = getAuth(getAdminApp());
     const decoded = await auth.verifyIdToken(token);
     return { ok: true, uid: decoded.uid };
   } catch {

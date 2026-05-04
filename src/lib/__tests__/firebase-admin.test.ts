@@ -94,6 +94,28 @@ describe('verifyAuthFromRequest', () => {
     }
     expect(mockVerifyIdToken).toHaveBeenCalledWith('valid-token');
   });
+
+  it('throws config error (not 401) when FIREBASE_SERVICE_ACCOUNT_JSON is missing', async () => {
+    await jest.isolateModulesAsync(async () => {
+      jest.doMock('firebase-admin/app', () => ({
+        initializeApp: jest.fn(() => ({})),
+        getApps: jest.fn(() => []),
+        cert: jest.fn((sa) => sa),
+      }));
+      jest.doMock('firebase-admin/auth', () => ({
+        getAuth: jest.fn(() => ({ verifyIdToken: jest.fn() })),
+      }));
+
+      const mod = await import('../firebase-admin');
+      delete process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+
+      const request = new Request('http://localhost/api/chat', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer some-token' },
+      });
+      await expect(mod.verifyAuthFromRequest(request)).rejects.toThrow(/FIREBASE_SERVICE_ACCOUNT_JSON/);
+    });
+  });
 });
 
 describe('getProfileForUid', () => {
