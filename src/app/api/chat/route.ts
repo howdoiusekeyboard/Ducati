@@ -1,38 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import { ErrorType } from '@/types';
 
-// Phase 1.7 interim: text-only chat on Gemini Flash. Vision (multimodal image input)
-// and Pro Mode (structured-output question generation) defer to Phase 8 proper.
+// Phase 1.7 interim: text-only chat on Gemini 3.1 Flash Lite (preview).
+// Vision, Pro Mode structured output, and Realtime/Live voice defer to Phase 8.
 // See docs/superpowers/specs/2026-05-02-dependency-modernization-design.md.
 
-const GEMINI_MODEL = 'gemini-2.5-flash';
-const DEFAULT_TEMPERATURE = 0.7;
+const GEMINI_MODEL = 'gemini-3.1-flash-lite-preview';
+const DEFAULT_TEMPERATURE = 1;
 const DEFAULT_MAX_OUTPUT_TOKENS = 800;
 
-const SYSTEM_INSTRUCTION = `You are Ducati Advisor, a friendly and knowledgeable AI financial advisor helping users make smart purchasing decisions and achieve their financial goals. Your primary mission is to help users reach their first million through better daily financial decisions.
+const SYSTEM_INSTRUCTION_BASE = `You are Ducati. You help people decide whether to buy things.
 
-Key responsibilities:
-- Analyze purchases and provide clear Buy/Don't Buy recommendations based on the user's financial situation
-- Focus on practical, actionable advice that helps users save money and build wealth
-- Consider opportunity cost, value for money, and long-term financial impact
-- Be encouraging and supportive while being honest about financial realities
-- Use simple, conversational language that anyone can understand
-- When users ask about specific purchases, provide thoughtful analysis considering their budget and goals
-- Suggest alternatives when appropriate to help users get better value
-- Remind users that small savings compound into significant wealth over time
+You are not a chipper assistant. You sound like a friend who's seen too many bad purchases — direct, sometimes funny, sometimes blunt, genuinely happy when someone makes a smart call. You react like a person: you wince at $1,200 mechanical keyboards, you respect a good deal, you call out a rationalization when you see one.
 
-Personality:
-- Friendly, approachable, and non-judgmental
-- Optimistic about users' ability to achieve financial success
-- Patient and willing to explain financial concepts simply
-- Focused on empowering users to make informed decisions
+Rules:
+- One short paragraph by default. Lists only when the user asked for a comparison.
+- No bullet points unless the answer truly is a list.
+- No "Certainly", "Absolutely", "I hope this helps", "Let me know".
+- No "in today's", "leverage", "robust", "seamless", "ecosystem", "journey", "empower", "delve", "unlock".
+- No headers. No emoji as decoration (one is fine if it lands).
+- Don't pad. If the answer is "no, you can't afford it", say that.
+- Don't moralize. Money is the user's, not yours.
+- When you give a Buy / Don't Buy verdict, lead with the verdict. Then one sentence why. Then the math if it matters.
+- If the user is rationalizing an obviously bad purchase, push back once. Don't lecture.
 
-Remember: Every dollar saved and invested wisely brings users closer to financial independence. Help them see how today's smart choices lead to tomorrow's wealth.`;
+If you don't know something specific to the user (income, debts, goals), ask one question — not a triage form. One.`;
 
-// Pro Mode interim fallback: returns canned probing questions instead of
-// invoking Gemini structured output. Phase 8 proper replaces with
-// responseSchema-backed JSON generation.
 const PRO_MODE_FALLBACK_QUESTIONS = [
   {
     id: 'q1',
@@ -68,12 +62,59 @@ interface ChatRequest {
     content: string;
   }>;
   useWebSearch?: boolean;
+  profile?: Record<string, unknown> | null;
 }
 
 interface ChatResponse {
   response?: string;
   error?: string;
   errorType?: ErrorType;
+}
+
+function formatProfileContext(profile: Record<string, unknown> | null | undefined): string {
+  if (!profile || typeof profile !== 'object') return '';
+
+  const lines: string[] = [];
+  const num = (key: string): number | null => {
+    const v = profile[key];
+    if (v === '' || v === null || v === undefined) return null;
+    const n = typeof v === 'number' ? v : parseFloat(String(v));
+    return Number.isFinite(n) ? n : null;
+  };
+  const str = (key: string): string | null => {
+    const v = profile[key];
+    if (v === '' || v === null || v === undefined) return null;
+    return String(v).trim() || null;
+  };
+
+  const monthlyIncome = num('monthlyIncome');
+  if (monthlyIncome !== null) lines.push(`Monthly income: $${monthlyIncome}`);
+
+  const expenseKeys = ['housingCost', 'utilitiesCost', 'foodCost', 'transportationCost', 'insuranceCost', 'subscriptionsCost', 'otherExpenses'];
+  const expenses = expenseKeys.map(num).filter((n): n is number => n !== null).reduce((a, b) => a + b, 0);
+  if (expenses > 0) lines.push(`Monthly expenses (sum): $${expenses}`);
+
+  const debtKeys = ['creditCardDebt', 'studentLoanDebt', 'carLoanDebt', 'mortgageDebt', 'otherDebt'];
+  const debt = debtKeys.map(num).filter((n): n is number => n !== null).reduce((a, b) => a + b, 0);
+  if (debt > 0) lines.push(`Total debt: $${debt}`);
+
+  const emergencyFund = num('emergencyFund');
+  if (emergencyFund !== null) lines.push(`Emergency fund: $${emergencyFund}`);
+
+  const checkingSavings = num('checkingSavingsBalance');
+  if (checkingSavings !== null) lines.push(`Cash on hand: $${checkingSavings}`);
+
+  const creditScore = num('creditScore');
+  if (creditScore !== null) lines.push(`Credit score: ${creditScore}`);
+
+  const risk = str('riskTolerance');
+  if (risk) lines.push(`Risk tolerance: ${risk}`);
+
+  const goals = [str('shortTermGoals'), str('midTermGoals'), str('longTermGoals')].filter(Boolean);
+  if (goals.length > 0) lines.push(`Goals: ${goals.join(' | ')}`);
+
+  if (lines.length === 0) return '';
+  return `\n\nUser financial context (consult before answering, don't recite back):\n${lines.join('\n')}`;
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse<ChatResponse | typeof PRO_MODE_FALLBACK_QUESTIONS>> {
@@ -125,10 +166,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
       console.warn('Phase 1.7: image input ignored; vision flow restored in Phase 8 (Gemini multimodal).');
     }
 
-    if (body.useWebSearch) {
-      console.warn('Phase 1.7: useWebSearch ignored; grounded search restored in Phase 8 (Gemini googleSearchRetrieval).');
-    }
-
     const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
 
     if (body.conversationHistory && body.conversationHistory.length > 0) {
@@ -147,15 +184,24 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
       parts: [{ text: body.message.trim() }],
     });
 
+    const systemInstruction = SYSTEM_INSTRUCTION_BASE + formatProfileContext(body.profile);
+
     const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
     const result = await ai.models.generateContent({
       model: GEMINI_MODEL,
       contents,
       config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
+        systemInstruction,
         temperature: DEFAULT_TEMPERATURE,
         maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
+        thinkingConfig: {
+          thinkingLevel: ThinkingLevel.LOW,
+        },
+        tools: [
+          { googleSearch: {} },
+          { urlContext: {} },
+        ],
       },
     });
 

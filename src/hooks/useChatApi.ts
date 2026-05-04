@@ -7,7 +7,7 @@ interface ChatError {
 }
 
 interface UseChatApiReturn {
-  sendMessage: (message: string, history: Message[]) => Promise<string | null>;
+  sendMessage: (message: string, history: Message[], profile?: Record<string, unknown> | null) => Promise<string | null>;
   isLoading: boolean;
   error: ChatError | null;
   clearError: () => void;
@@ -17,14 +17,14 @@ interface UseChatApiReturn {
 export const useChatApi = (): UseChatApiReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ChatError | null>(null);
-  const [lastRequest, setLastRequest] = useState<{ message: string; history: Message[] } | null>(null);
+  const [lastRequest, setLastRequest] = useState<{ message: string; history: Message[]; profile?: Record<string, unknown> | null } | null>(null);
 
   const clearError = useCallback(() => {
     setError(null);
   }, []);
 
-  const sendMessage = useCallback(async (message: string, history: Message[]): Promise<string | null> => {
-    setLastRequest({ message, history });
+  const sendMessage = useCallback(async (message: string, history: Message[], profile?: Record<string, unknown> | null): Promise<string | null> => {
+    setLastRequest({ message, history, profile });
     setIsLoading(true);
     setError(null);
 
@@ -37,7 +37,8 @@ export const useChatApi = (): UseChatApiReturn => {
           conversationHistory: history.map(msg => ({
             role: msg.role,
             content: msg.content
-          }))
+          })),
+          profile: profile ?? null,
         }),
       });
 
@@ -72,7 +73,7 @@ export const useChatApi = (): UseChatApiReturn => {
 
   const retry = useCallback(async (): Promise<string | null> => {
     if (lastRequest) {
-      return await sendMessage(lastRequest.message, lastRequest.history);
+      return await sendMessage(lastRequest.message, lastRequest.history, lastRequest.profile);
     }
     return null;
   }, [lastRequest, sendMessage]);

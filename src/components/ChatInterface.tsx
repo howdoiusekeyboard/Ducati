@@ -126,19 +126,9 @@ const ChatInterface: React.FC = () => {
             const fallbackMessage: Message = {
               id: crypto.randomUUID(),
               role: 'assistant',
-              content: `Hey there! 👋 I'm your Ducati Advisor, and I'm genuinely excited to help you make smarter money decisions.
+              content: `Hey. I'm Ducati. I help you not blow money on things you'll regret.
 
-You know that feeling when you're about to buy something and you're not quite sure if it's the right move? That's exactly where I come in. I'm here to be your financial wingman - whether you're debating a big purchase, trying to figure out your budget, or just want to chat about money stuff.
-
-Here's the cool part - we can talk in two ways:
-
-💬 **Just type away** - Ask me anything! "Should I buy this?" "How much emergency fund do I need?" "Is this a good deal?" I love these conversations.
-
-🎤 **Or let's actually talk** - Hit that voice button and we can have a real conversation. It's like having a financially savvy friend right there with you.
-
-I'm not here to judge your spending (we've all been there with impulse buys 😅). I'm here to help you think through decisions so you feel confident about your choices.
-
-So... what's on your mind? Got a purchase you're considering? Want to talk budgets? Or maybe you just want to see what I'm all about? I'm all ears! 🎧`,
+Tell me what you're thinking of buying — or just ask. The voice button works too if you'd rather talk than type.`,
               timestamp: new Date(),
               isVoice: false
             };
@@ -239,7 +229,7 @@ So... what's on your mind? Got a purchase you're considering? Want to talk budge
       };
       setMessages(prev => [...prev, userMessage]);
 
-      const response = await sendMessage(messageContent, [...messages, userMessage]);
+      const response = await sendMessage(messageContent, [...messages, userMessage], financialProfile);
 
       if (response) {
         const assistantMessage: Message = {
