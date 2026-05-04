@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import { ErrorType } from '@/types';
 import { verifyAuthFromRequest, getProfileForUid } from '@/lib/firebase-admin';
 
-// Phase 1.7 interim: text-only chat on Gemini 3.1 Flash Lite (preview).
+// Phase 1.7 interim: text-only chat on Gemini 2.5 Flash with grounding (search + URL context).
 // Vision, Pro Mode structured output, and Realtime/Live voice defer to Phase 8.
 // See docs/superpowers/specs/2026-05-02-dependency-modernization-design.md.
 
-const GEMINI_MODEL = 'gemini-3.1-flash-lite-preview';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 const DEFAULT_TEMPERATURE = 1;
 const DEFAULT_MAX_OUTPUT_TOKENS = 800;
 
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
         temperature: DEFAULT_TEMPERATURE,
         maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
         thinkingConfig: {
-          thinkingLevel: ThinkingLevel.LOW,
+          thinkingBudget: 256,
         },
         tools: [
           { googleSearch: {} },
