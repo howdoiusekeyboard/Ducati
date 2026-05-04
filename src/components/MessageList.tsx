@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import DOMPurify from 'dompurify';
 import { Message } from '@/types/chat';
 
 interface MessageListProps {
@@ -53,10 +54,10 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
               </strong>
             </div>
             
-            {/* Message Content - Allow HTML for navigation buttons */}
-            <div 
+            {/* Message Content - sanitized via DOMPurify before injection */}
+            <div
               className="message-content"
-              dangerouslySetInnerHTML={{ __html: message.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.content) }}
             />
             
             {/* Message Timestamp */}

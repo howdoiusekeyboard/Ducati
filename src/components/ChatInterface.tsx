@@ -192,12 +192,12 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
         };
         setMessages(prev => [...prev, navigationMessage]);
 
-        // Add navigation button
+        // Add navigation button (rendered as <a>; DOMPurify default policy strips event handlers)
         setTimeout(() => {
           const buttonMessage: Message = {
             id: crypto.randomUUID(),
             role: 'assistant',
-            content: `<button onclick="window.location.href='/';" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin: 8px 0;">Go to Purchase Analyzer →</button>`,
+            content: `<a href="/" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; margin: 8px 0; display: inline-block; text-decoration: none;">Go to Purchase Analyzer →</a>`,
             timestamp: new Date(),
             isVoice: true
           };
