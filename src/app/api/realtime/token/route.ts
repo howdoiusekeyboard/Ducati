@@ -13,15 +13,15 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
-      method: "POST",
+    const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
+      method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-realtime",
-        voice: "alloy",
+        model: 'gpt-realtime',
+        voice: 'alloy',
         instructions: `
 # Personality and Tone
 ## Identity
@@ -152,57 +152,64 @@ Measured and steady, allowing time for the listener to process financial advice.
 ]
                 `,
         input_audio_transcription: {
-          model: "whisper-1"
+          model: 'whisper-1',
         },
         turn_detection: {
-          type: "server_vad",
+          type: 'server_vad',
           threshold: 0.5,
           prefix_padding_ms: 300,
-          silence_duration_ms: 500
+          silence_duration_ms: 500,
         },
         tools: [
           {
-            type: "function",
-            name: "navigate_to_purchase_analyzer",
-            description: "Guide the user to navigate to the Purchase Analyzer tool",
+            type: 'function',
+            name: 'navigate_to_purchase_analyzer',
+            description: 'Guide the user to navigate to the Purchase Analyzer tool',
             parameters: {
-              type: "object",
+              type: 'object',
               properties: {
                 item_name: {
-                  type: "string",
-                  description: "The item the user wants to analyze"
+                  type: 'string',
+                  description: 'The item the user wants to analyze',
                 },
                 estimated_cost: {
-                  type: "number",
-                  description: "The estimated cost of the item if mentioned"
-                }
+                  type: 'number',
+                  description: 'The estimated cost of the item if mentioned',
+                },
               },
-              required: ["item_name"]
-            }
+              required: ['item_name'],
+            },
           },
           {
-            type: "function",
-            name: "get_financial_tip",
-            description: "Provide a relevant financial tip based on the conversation",
+            type: 'function',
+            name: 'get_financial_tip',
+            description: 'Provide a relevant financial tip based on the conversation',
             parameters: {
-              type: "object",
+              type: 'object',
               properties: {
                 topic: {
-                  type: "string",
-                  description: "The financial topic to provide a tip about",
-                  enum: ["saving", "investing", "budgeting", "debt", "emergency_fund", "purchase_decisions"]
-                }
+                  type: 'string',
+                  description: 'The financial topic to provide a tip about',
+                  enum: [
+                    'saving',
+                    'investing',
+                    'budgeting',
+                    'debt',
+                    'emergency_fund',
+                    'purchase_decisions',
+                  ],
+                },
               },
-              required: ["topic"]
-            }
-          }
-        ]
+              required: ['topic'],
+            },
+          },
+        ],
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Token generation error from OpenAI:", errorData);
+      console.error('Token generation error from OpenAI:', errorData);
       return NextResponse.json(
         { error: 'Failed to generate session token from OpenAI.' },
         { status: response.status }
@@ -211,12 +218,8 @@ Measured and steady, allowing time for the listener to process financial advice.
 
     const data = await response.json();
     return NextResponse.json(data);
-
   } catch (error) {
-    console.error("Token generation error:", error);
-    return NextResponse.json(
-      { error: 'Failed to generate session token.' },
-      { status: 500 }
-    );
+    console.error('Token generation error:', error);
+    return NextResponse.json({ error: 'Failed to generate session token.' }, { status: 500 });
   }
 }

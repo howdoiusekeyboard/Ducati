@@ -3,7 +3,12 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth, isFirebaseConfigured, isFirebaseInitialized, retryFirebaseInit } from '@/lib/firebase';
+import {
+  auth,
+  isFirebaseConfigured,
+  isFirebaseInitialized,
+  retryFirebaseInit,
+} from '@/lib/firebase';
 import { createUserDocument } from '@/lib/firestore/services';
 
 interface AuthContextType {

@@ -14,8 +14,8 @@ export const ESSENTIAL_PURCHASES = [
     category: 'ESSENTIAL_DAILY',
     expectedScores: {
       necessity: 9,
-      frequencyOfUse: 8
-    }
+      frequencyOfUse: 8,
+    },
   },
   {
     id: 'medicine',
@@ -26,8 +26,8 @@ export const ESSENTIAL_PURCHASES = [
     category: 'ESSENTIAL_DAILY',
     expectedScores: {
       necessity: 9,
-      frequencyOfUse: 6
-    }
+      frequencyOfUse: 6,
+    },
   },
   {
     id: 'textbook',
@@ -39,9 +39,9 @@ export const ESSENTIAL_PURCHASES = [
     expectedScores: {
       necessity: 9,
       frequencyOfUse: 10,
-      longevity: 6
-    }
-  }
+      longevity: 6,
+    },
+  },
 ];
 
 // Discretionary purchases (mixed recommendations based on profile)
@@ -56,8 +56,8 @@ export const DISCRETIONARY_PURCHASES = [
     expectedScores: {
       necessity: 3,
       frequencyOfUse: 10,
-      emotionalValue: 5
-    }
+      emotionalValue: 5,
+    },
   },
   {
     id: 'nike-shoes',
@@ -69,8 +69,8 @@ export const DISCRETIONARY_PURCHASES = [
     expectedScores: {
       necessity: 6,
       frequencyOfUse: 10,
-      socialFactors: 3
-    }
+      socialFactors: 3,
+    },
   },
   {
     id: 'designer-handbag',
@@ -83,8 +83,8 @@ export const DISCRETIONARY_PURCHASES = [
       necessity: 3,
       frequencyOfUse: 8,
       emotionalValue: 5,
-      socialFactors: 3
-    }
+      socialFactors: 3,
+    },
   },
   {
     id: 'gym-equipment',
@@ -97,9 +97,9 @@ export const DISCRETIONARY_PURCHASES = [
       necessity: 6,
       frequencyOfUse: 10,
       longevity: 9,
-      emotionalValue: 8
-    }
-  }
+      emotionalValue: 8,
+    },
+  },
 ];
 
 // Luxury/Want purchases (typically should be rejected for low-income)
@@ -115,8 +115,8 @@ export const LUXURY_PURCHASES = [
       necessity: 3,
       emotionalValue: 5,
       socialFactors: 3,
-      buyersRemorse: 2
-    }
+      buyersRemorse: 2,
+    },
   },
   {
     id: 'weekend-vacation',
@@ -129,8 +129,8 @@ export const LUXURY_PURCHASES = [
       necessity: 3,
       frequencyOfUse: 2,
       longevity: 3,
-      emotionalValue: 8
-    }
+      emotionalValue: 8,
+    },
   },
   {
     id: 'art-piece',
@@ -143,9 +143,9 @@ export const LUXURY_PURCHASES = [
       necessity: 3,
       frequencyOfUse: 3,
       emotionalValue: 2,
-      buyersRemorse: 0
-    }
-  }
+      buyersRemorse: 0,
+    },
+  },
 ];
 
 // Investment-aligned purchases
@@ -160,8 +160,8 @@ export const INVESTMENT_PURCHASES = [
     expectedScores: {
       necessity: 6,
       frequencyOfUse: 10,
-      financialGoalAlignment: 9
-    }
+      financialGoalAlignment: 9,
+    },
   },
   {
     id: 'professional-course',
@@ -174,9 +174,9 @@ export const INVESTMENT_PURCHASES = [
       necessity: 6,
       frequencyOfUse: 10,
       longevity: 9,
-      financialGoalAlignment: 8
-    }
-  }
+      financialGoalAlignment: 8,
+    },
+  },
 ];
 
 // Special test cases with alternatives
@@ -191,12 +191,12 @@ export const PURCHASES_WITH_ALTERNATIVES = [
     alternative: {
       name: 'Budget Laptop',
       price: 800,
-      description: 'Similar specs but less premium brand'
+      description: 'Similar specs but less premium brand',
     },
     expectedScores: {
       valueForMoney: 2,
-      alternativeAvailability: 3
-    }
+      alternativeAvailability: 3,
+    },
   },
   {
     id: 'brand-clothes',
@@ -208,13 +208,13 @@ export const PURCHASES_WITH_ALTERNATIVES = [
     alternative: {
       name: 'Generic Brand Clothing',
       price: 60,
-      description: 'Similar style without the brand'
+      description: 'Similar style without the brand',
     },
     expectedScores: {
       valueForMoney: 2,
-      alternativeAvailability: 3
-    }
-  }
+      alternativeAvailability: 3,
+    },
+  },
 ];
 
 // Edge case purchases for boundary testing
@@ -225,7 +225,7 @@ export const EDGE_CASE_PURCHASES = [
     cost: 0,
     purpose: 'Free promotional item',
     frequency: 'One-time',
-    category: 'ESSENTIAL_DAILY'
+    category: 'ESSENTIAL_DAILY',
   },
   {
     id: 'extremely-expensive',
@@ -233,7 +233,7 @@ export const EDGE_CASE_PURCHASES = [
     cost: 100000,
     purpose: 'Dream car purchase',
     frequency: 'Daily',
-    category: 'HIGH_VALUE'
+    category: 'HIGH_VALUE',
   },
   {
     id: 'undefined-frequency',
@@ -241,8 +241,8 @@ export const EDGE_CASE_PURCHASES = [
     cost: 50,
     purpose: 'Surprise contents',
     frequency: undefined,
-    category: 'DISCRETIONARY_SMALL'
-  }
+    category: 'DISCRETIONARY_SMALL',
+  },
 ];
 
 // Export all purchase collections
@@ -252,15 +252,15 @@ export const ALL_PURCHASES = [
   ...LUXURY_PURCHASES,
   ...INVESTMENT_PURCHASES,
   ...PURCHASES_WITH_ALTERNATIVES,
-  ...EDGE_CASE_PURCHASES
+  ...EDGE_CASE_PURCHASES,
 ];
 
 // Helper function to get purchase by ID
 export const getPurchaseById = (id) => {
-  return ALL_PURCHASES.find(p => p.id === id);
+  return ALL_PURCHASES.find((p) => p.id === id);
 };
 
 // Helper function to get purchases by category
 export const getPurchasesByCategory = (category) => {
-  return ALL_PURCHASES.filter(p => p.category === category);
+  return ALL_PURCHASES.filter((p) => p.category === category);
 };

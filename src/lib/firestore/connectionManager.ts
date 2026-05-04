@@ -81,13 +81,13 @@ export class FirestoreConnectionManager {
   }
 
   private notifyListeners(): void {
-    this.listeners.forEach(listener => listener(this.isConnected));
+    this.listeners.forEach((listener) => listener(this.isConnected));
   }
 
   public addConnectionListener(callback: (connected: boolean) => void): () => void {
     this.listeners.add(callback);
     callback(this.isConnected);
-    
+
     return () => {
       this.listeners.delete(callback);
     };
@@ -106,7 +106,7 @@ export class FirestoreConnectionManager {
     this.connectionPromise = this.initializeConnection();
     await this.connectionPromise;
     this.connectionPromise = null;
-    
+
     return this.isConnected;
   }
 

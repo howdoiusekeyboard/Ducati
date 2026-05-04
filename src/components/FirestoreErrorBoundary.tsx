@@ -24,7 +24,7 @@ export class FirestoreErrorBoundary extends Component<Props, State> {
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Firestore Error Boundary caught an error:', error, errorInfo);
-    
+
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
@@ -47,10 +47,7 @@ export class FirestoreErrorBoundary extends Component<Props, State> {
               <summary>Error Details</summary>
               <pre>{this.state.error?.message}</pre>
             </details>
-            <button 
-              onClick={() => this.setState({ hasError: false })}
-              className="retry-button"
-            >
+            <button onClick={() => this.setState({ hasError: false })} className="retry-button">
               Try Again
             </button>
           </div>
@@ -66,10 +63,10 @@ export class FirestoreErrorBoundary extends Component<Props, State> {
 export const useFirestoreErrorHandler = () => {
   const handleError = (error: any, context: string = 'Firestore operation') => {
     console.error(`${context} failed:`, error);
-    
+
     // You can add more sophisticated error handling here
     // For example, showing toast notifications, logging to external services, etc.
-    
+
     if (error?.code === 'permission-denied') {
       console.warn('Permission denied - user may need to re-authenticate');
     } else if (error?.code === 'unavailable') {

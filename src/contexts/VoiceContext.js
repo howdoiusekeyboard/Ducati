@@ -11,15 +11,9 @@ export const VoiceProvider = ({ children }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const firestore = useFirestore();
-  
-  const {
-    isSessionActive,
-    isConnecting,
-    startSession,
-    stopSession,
-    sendClientEvent,
-    events
-  } = useRealtimeSession();
+
+  const { isSessionActive, isConnecting, startSession, stopSession, sendClientEvent, events } =
+    useRealtimeSession();
 
   const [financialProfile, setFinancialProfile] = useState(null);
 
@@ -34,7 +28,7 @@ export const VoiceProvider = ({ children }) => {
             return;
           }
         }
-        
+
         // Fallback to localStorage
         const quickProfile = localStorage.getItem('quickFinancialProfile');
         if (quickProfile) {
@@ -55,7 +49,7 @@ export const VoiceProvider = ({ children }) => {
 
   const getPageContext = useCallback(() => {
     const pathname = location.pathname;
-    
+
     if (pathname === '/') {
       return {
         type: 'landing_page',
@@ -93,102 +87,116 @@ NAVIGATION HELP:
 - If user wants detailed analysis - Mention Pro Mode
 
 USER'S FINANCIAL CONTEXT:
-${financialProfile ? `
+${
+  financialProfile
+    ? `
 - Monthly Income: $${financialProfile.monthlyIncome || 'not set'}
 - Monthly Expenses: $${financialProfile.monthlyExpenses || 'not set'}
 - Savings: $${financialProfile.currentSavings || 'not set'}
 - Financial Goal: ${financialProfile.financialGoal || 'not set'}
-` : 'No financial profile set up yet - encourage them to do the Quick Setup for personalized advice!'}
+`
+    : 'No financial profile set up yet - encourage them to do the Quick Setup for personalized advice!'
+}
 
-Be enthusiastic and helpful! Guide them through using the app effectively.`
+Be enthusiastic and helpful! Guide them through using the app effectively.`,
       };
     } else if (pathname === '/chat') {
       return {
         type: 'chat_page',
-        context: `You're in the Ducati Advisor chat interface. Provide financial advice and help with purchase decisions. ${financialProfile ? `User's monthly net income: $${financialProfile.monthlyIncome - financialProfile.monthlyExpenses}` : ''}`
+        context: `You're in the Ducati Advisor chat interface. Provide financial advice and help with purchase decisions. ${financialProfile ? `User's monthly net income: $${financialProfile.monthlyIncome - financialProfile.monthlyExpenses}` : ''}`,
       };
     } else if (pathname === '/profile') {
       return {
         type: 'profile_page',
-        context: 'User is on their Financial Profile page. Help them understand their metrics and how to improve their financial health.'
+        context:
+          'User is on their Financial Profile page. Help them understand their metrics and how to improve their financial health.',
       };
     } else if (pathname === '/dashboard') {
       return {
         type: 'dashboard_page',
-        context: 'User is viewing their Financial Dashboard. Explain the visualizations and metrics shown.'
+        context:
+          'User is viewing their Financial Dashboard. Explain the visualizations and metrics shown.',
       };
     } else if (pathname === '/pro-mode') {
       return {
         type: 'pro_mode',
-        context: 'User is in Pro Mode for advanced purchase analysis. This provides detailed financial projections and decision matrices.'
+        context:
+          'User is in Pro Mode for advanced purchase analysis. This provides detailed financial projections and decision matrices.',
       };
     }
-    
+
     return {
       type: 'general',
-      context: 'Help the user navigate Ducati and make smart financial decisions. Main features: Purchase Analyzer, Financial Profile, Chat, Dashboard.'
+      context:
+        'Help the user navigate Ducati and make smart financial decisions. Main features: Purchase Analyzer, Financial Profile, Chat, Dashboard.',
     };
   }, [location.pathname, financialProfile]);
 
   const startVoiceSession = useCallback(async () => {
     await startSession();
     // Play a subtle start sound (optional)
-    const startSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBzla0fPTgjMGHm7A7+OZURE');
+    const startSound = new Audio(
+      'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBzla0fPTgjMGHm7A7+OZURE'
+    );
     startSound.volume = 0.3;
     startSound.play().catch(() => {}); // Ignore errors if audio fails
-    
+
     const pageContext = getPageContext();
-    
+
     // Send system context
     const contextMessage = {
-      type: "conversation.item.create",
+      type: 'conversation.item.create',
       event_id: crypto.randomUUID(),
       item: {
-        type: "message",
-        role: "system",
-        content: [{
-          type: "input_text",
-          text: pageContext.context
-        }]
-      }
+        type: 'message',
+        role: 'system',
+        content: [
+          {
+            type: 'input_text',
+            text: pageContext.context,
+          },
+        ],
+      },
     };
     sendClientEvent(contextMessage);
-    
+
     // Send appropriate greeting
-    const greetingText = pageContext.type === 'landing_page' 
-      ? `Hey there! I'm your Ducati AI Financial Advisor! I can see you're on the Purchase Analyzer page.
+    const greetingText =
+      pageContext.type === 'landing_page'
+        ? `Hey there! I'm your Ducati AI Financial Advisor! I can see you're on the Purchase Analyzer page.
          I can help you decide if you should buy something, guide you through setting up your financial profile,
          or answer any questions about how Ducati works. You can ask me things like "Should I buy this laptop?"
          or "How do I set up my profile?" or "What's Pro Mode?" What would you like help with?`
-     : pageContext.type === 'chat_page'
-     ? `Welcome back! I'm ready to help with any financial questions or purchase decisions. What's on your mind?`
-     : `Hi! I'm here to help you with Ducati. What can I assist you with?`;
-    
+        : pageContext.type === 'chat_page'
+          ? `Welcome back! I'm ready to help with any financial questions or purchase decisions. What's on your mind?`
+          : `Hi! I'm here to help you with Ducati. What can I assist you with?`;
+
     const greetingMessage = {
-      type: "conversation.item.create",
+      type: 'conversation.item.create',
       event_id: crypto.randomUUID(),
       item: {
-        type: "message",
-        role: "assistant",
-        content: [{
-          type: "input_text",
-          text: greetingText
-        }]
-      }
+        type: 'message',
+        role: 'assistant',
+        content: [
+          {
+            type: 'input_text',
+            text: greetingText,
+          },
+        ],
+      },
     };
     sendClientEvent(greetingMessage);
-    
+
     // Trigger response
-    sendClientEvent({ 
-      type: "response.create",
-      event_id: crypto.randomUUID()
+    sendClientEvent({
+      type: 'response.create',
+      event_id: crypto.randomUUID(),
     });
-   
   }, [startSession, sendClientEvent, getPageContext]);
 
   // Handle navigation commands from voice
   useEffect(() => {
-    events.forEach(event => {
+    events.forEach((event) => {
       if (event.type === 'response.function_call_arguments.done') {
         if (event.name === 'navigate_to_page') {
           try {
@@ -204,22 +212,26 @@ Be enthusiastic and helpful! Guide them through using the app effectively.`
 
   const stopVoiceSession = useCallback(() => {
     // Play a subtle stop sound (optional)
-    const stopSound = new Audio('data:audio/wav;base64,UklGRl4GAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YToGAAB0XV1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBzla0fPTgjMGHm7A7+OZURE');
+    const stopSound = new Audio(
+      'data:audio/wav;base64,UklGRl4GAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YToGAAB0XV1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBzla0fPTgjMGHm7A7+OZURE'
+    );
     stopSound.volume = 0.3;
     stopSound.play().catch(() => {});
     stopSession();
   }, [stopSession]);
 
   return (
-    <VoiceContext.Provider value={{
-      isSessionActive,
-      isConnecting,
-      startVoiceSession,
-      stopVoiceSession,
-      sendMessage: sendClientEvent,
-      events,
-      currentPage: location.pathname
-    }}>
+    <VoiceContext.Provider
+      value={{
+        isSessionActive,
+        isConnecting,
+        startVoiceSession,
+        stopVoiceSession,
+        sendMessage: sendClientEvent,
+        events,
+        currentPage: location.pathname,
+      }}
+    >
       {children}
     </VoiceContext.Provider>
   );

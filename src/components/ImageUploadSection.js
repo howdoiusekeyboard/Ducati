@@ -7,7 +7,7 @@ const ImageUploadSection = ({
   onClearImage,
   showImageOptions,
   onToggleImageOptions,
-  loading
+  loading,
 }) => {
   const [imageCapturing, setImageCapturing] = useState(false);
   const fileInputRef = useRef(null);
@@ -19,7 +19,7 @@ const ImageUploadSection = ({
   useEffect(() => {
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
@@ -27,12 +27,12 @@ const ImageUploadSection = ({
   const startCamera = async () => {
     try {
       setImageCapturing(true);
-      const constraints = { 
-        video: { 
-          facingMode: "environment", 
-          width: { ideal: 1280 }, 
-          height: { ideal: 720 } 
-        } 
+      const constraints = {
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
@@ -40,15 +40,15 @@ const ImageUploadSection = ({
         videoRef.current.srcObject = stream;
       }
     } catch (error) {
-      console.error("Error accessing camera:", error);
-      alert("Unable to access camera. Please check permissions or try a different browser.");
+      console.error('Error accessing camera:', error);
+      alert('Unable to access camera. Please check permissions or try a different browser.');
       setImageCapturing(false);
     }
   };
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
     setImageCapturing(false);
@@ -60,12 +60,16 @@ const ImageUploadSection = ({
       canvasRef.current.width = videoRef.current.videoWidth;
       canvasRef.current.height = videoRef.current.videoHeight;
       context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-      canvasRef.current.toBlob((blob) => {
-        const file = new File([blob], "captured-image.jpeg", { type: "image/jpeg" });
-        const imageUrl = URL.createObjectURL(blob);
-        onImageProcessed(file, imageUrl);
-        stopCamera();
-      }, 'image/jpeg', 0.95);
+      canvasRef.current.toBlob(
+        (blob) => {
+          const file = new File([blob], 'captured-image.jpeg', { type: 'image/jpeg' });
+          const imageUrl = URL.createObjectURL(blob);
+          onImageProcessed(file, imageUrl);
+          stopCamera();
+        },
+        'image/jpeg',
+        0.95
+      );
     }
   };
 
@@ -84,10 +88,9 @@ const ImageUploadSection = ({
       };
       reader.readAsDataURL(file);
     } else {
-      alert("Please select an image file.");
+      alert('Please select an image file.');
     }
   };
-
 
   const triggerFileInput = () => {
     fileInputRef.current.click();
@@ -97,12 +100,7 @@ const ImageUploadSection = ({
     <div className="image-section">
       {imageCapturing ? (
         <div className="camera-container">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            className="camera-preview"
-          />
+          <video ref={videoRef} autoPlay playsInline className="camera-preview" />
           <div className="camera-controls">
             <button
               type="button"
@@ -112,11 +110,7 @@ const ImageUploadSection = ({
             >
               <span className="capture-icon">📸</span>
             </button>
-            <button
-              type="button"
-              onClick={stopCamera}
-              className="cancel-btn"
-            >
+            <button type="button" onClick={stopCamera} className="cancel-btn">
               Cancel
             </button>
           </div>
@@ -124,11 +118,7 @@ const ImageUploadSection = ({
       ) : imagePreview ? (
         <div className="image-preview-container">
           <img src={imagePreview} alt="Item preview" className="item-preview" />
-          <button
-            type="button"
-            onClick={onClearImage}
-            className="clear-btn"
-          >
+          <button type="button" onClick={onClearImage} className="clear-btn">
             Remove Image
           </button>
         </div>

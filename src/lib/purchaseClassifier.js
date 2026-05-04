@@ -7,8 +7,8 @@
 export const CLASSIFICATION_CATEGORIES = {
   ESSENTIAL_DAILY: 'ESSENTIAL_DAILY',
   DISCRETIONARY_SMALL: 'DISCRETIONARY_SMALL',
-  DISCRETIONARY_MEDIUM: 'DISCRETIONARY_MEDIUM', 
-  HIGH_VALUE: 'HIGH_VALUE'
+  DISCRETIONARY_MEDIUM: 'DISCRETIONARY_MEDIUM',
+  HIGH_VALUE: 'HIGH_VALUE',
 };
 
 // In-memory cache for classification results (session-based)
@@ -52,11 +52,11 @@ const evictLRUIfNeeded = () => {
 const setCacheEntry = (key, category) => {
   cleanExpiredCache();
   evictLRUIfNeeded();
-  
+
   classificationCache.set(key, {
     category,
     timestamp: Date.now(),
-    expiresAt: Date.now() + CACHE_EXPIRY_MS
+    expiresAt: Date.now() + CACHE_EXPIRY_MS,
   });
 };
 
@@ -66,14 +66,14 @@ const setCacheEntry = (key, category) => {
 const getCacheEntry = (key) => {
   cleanExpiredCache();
   const entry = classificationCache.get(key);
-  
+
   if (entry) {
     // Move to end for LRU (delete and re-add)
     classificationCache.delete(key);
     classificationCache.set(key, entry);
     return entry;
   }
-  
+
   return null;
 };
 
@@ -144,19 +144,19 @@ export const classifyPurchase = async (itemName, cost) => {
     if (!itemName || typeof itemName !== 'string' || itemName.trim().length === 0) {
       throw new Error('Item name is required and must be a non-empty string');
     }
-    
+
     if (typeof cost !== 'number' || cost < 0) {
       throw new Error('Cost must be a non-negative number');
     }
 
     const cacheKey = getCacheKey(itemName, cost);
-    
+
     // Check cache first
     const cachedResult = getCacheEntry(cacheKey);
     if (cachedResult) {
       return {
         category: cachedResult.category,
-        cached: true
+        cached: true,
       };
     }
 
@@ -166,13 +166,13 @@ export const classifyPurchase = async (itemName, cost) => {
       setCacheEntry(cacheKey, priceBasedCategory);
       return {
         category: priceBasedCategory,
-        cached: false
+        cached: false,
       };
     }
 
     // For items under $50, use AI to classify between essential and discretionary
     const aiClassification = await callClassificationAPI(itemName, cost);
-    
+
     let finalCategory;
     if (aiClassification) {
       finalCategory = aiClassification;
@@ -186,27 +186,26 @@ export const classifyPurchase = async (itemName, cost) => {
 
     return {
       category: finalCategory,
-      cached: false
+      cached: false,
     };
-
   } catch (error) {
     console.error('Error in classifyPurchase:', error);
-    
+
     // Fallback based on price
     if (cost >= 300) {
       return {
         category: CLASSIFICATION_CATEGORIES.HIGH_VALUE,
-        cached: false
+        cached: false,
       };
     } else if (cost >= 51) {
       return {
         category: CLASSIFICATION_CATEGORIES.DISCRETIONARY_MEDIUM,
-        cached: false
+        cached: false,
       };
     } else {
       return {
         category: CLASSIFICATION_CATEGORIES.DISCRETIONARY_SMALL,
-        cached: false
+        cached: false,
       };
     }
   }
@@ -231,7 +230,7 @@ export const getCacheStats = () => {
       key,
       category: entry.category,
       timestamp: entry.timestamp,
-      expiresAt: entry.expiresAt
-    }))
+      expiresAt: entry.expiresAt,
+    })),
   };
 };

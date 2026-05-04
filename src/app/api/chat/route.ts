@@ -98,12 +98,32 @@ function formatProfileContext(profile: Record<string, unknown> | null | undefine
   const monthlyIncome = num('monthlyIncome');
   if (monthlyIncome !== null) lines.push(`Monthly income: $${monthlyIncome}`);
 
-  const expenseKeys = ['housingCost', 'utilitiesCost', 'foodCost', 'transportationCost', 'insuranceCost', 'subscriptionsCost', 'otherExpenses'];
-  const expenses = expenseKeys.map(num).filter((n): n is number => n !== null).reduce((a, b) => a + b, 0);
+  const expenseKeys = [
+    'housingCost',
+    'utilitiesCost',
+    'foodCost',
+    'transportationCost',
+    'insuranceCost',
+    'subscriptionsCost',
+    'otherExpenses',
+  ];
+  const expenses = expenseKeys
+    .map(num)
+    .filter((n): n is number => n !== null)
+    .reduce((a, b) => a + b, 0);
   if (expenses > 0) lines.push(`Monthly expenses (sum): $${expenses}`);
 
-  const debtKeys = ['creditCardDebt', 'studentLoanDebt', 'carLoanDebt', 'mortgageDebt', 'otherDebt'];
-  const debt = debtKeys.map(num).filter((n): n is number => n !== null).reduce((a, b) => a + b, 0);
+  const debtKeys = [
+    'creditCardDebt',
+    'studentLoanDebt',
+    'carLoanDebt',
+    'mortgageDebt',
+    'otherDebt',
+  ];
+  const debt = debtKeys
+    .map(num)
+    .filter((n): n is number => n !== null)
+    .reduce((a, b) => a + b, 0);
   if (debt > 0) lines.push(`Total debt: $${debt}`);
 
   const emergencyFund = num('emergencyFund');
@@ -125,7 +145,9 @@ function formatProfileContext(profile: Record<string, unknown> | null | undefine
   return `\n\nUser financial context (consult before answering, don't recite back):\n${lines.join('\n')}`;
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse<ChatResponse | typeof PRO_MODE_FALLBACK_QUESTIONS>> {
+export async function POST(
+  request: NextRequest
+): Promise<NextResponse<ChatResponse | typeof PRO_MODE_FALLBACK_QUESTIONS>> {
   try {
     if (!process.env.GOOGLE_API_KEY) {
       console.error('GOOGLE_API_KEY environment variable is required');
@@ -180,7 +202,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
     }
 
     if (body.image) {
-      console.warn('Phase 1.7: image input ignored; vision flow restored in Phase 8 (Gemini multimodal).');
+      console.warn(
+        'Phase 1.7: image input ignored; vision flow restored in Phase 8 (Gemini multimodal).'
+      );
     }
 
     const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
@@ -219,10 +243,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
         thinkingConfig: {
           thinkingBudget: 256,
         },
-        tools: [
-          { googleSearch: {} },
-          { urlContext: {} },
-        ],
+        tools: [{ googleSearch: {} }, { urlContext: {} }],
       },
     });
 
@@ -230,7 +251,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
 
     if (!assistantMessage) {
       return NextResponse.json(
-        { error: 'No response received from Ducati Advisor service', errorType: ErrorType.API_ERROR },
+        {
+          error: 'No response received from Ducati Advisor service',
+          errorType: ErrorType.API_ERROR,
+        },
         { status: 500 }
       );
     }
@@ -239,13 +263,21 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
   } catch (error) {
     console.error('Gemini API error:', error);
 
-    const apiError = error as { status?: number; statusCode?: number; code?: string; message?: string };
+    const apiError = error as {
+      status?: number;
+      statusCode?: number;
+      code?: string;
+      message?: string;
+    };
     const status = apiError.status ?? apiError.statusCode;
     const message = apiError.message ?? '';
 
     if (status === 429 || /quota|rate.?limit/i.test(message)) {
       return NextResponse.json(
-        { error: 'Too many requests. Please wait a moment and try again.', errorType: ErrorType.RATE_LIMIT_ERROR },
+        {
+          error: 'Too many requests. Please wait a moment and try again.',
+          errorType: ErrorType.RATE_LIMIT_ERROR,
+        },
         { status: 429 }
       );
     }
@@ -259,14 +291,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
 
     if (status !== undefined && status >= 400 && status < 500) {
       return NextResponse.json(
-        { error: 'Invalid request to Ducati Advisor service', errorType: ErrorType.VALIDATION_ERROR },
+        {
+          error: 'Invalid request to Ducati Advisor service',
+          errorType: ErrorType.VALIDATION_ERROR,
+        },
         { status: 400 }
       );
     }
 
     if (apiError.code === 'ENOTFOUND' || apiError.code === 'ECONNREFUSED') {
       return NextResponse.json(
-        { error: 'Unable to connect to Ducati Advisor service. Please check your connection.', errorType: ErrorType.NETWORK_ERROR },
+        {
+          error: 'Unable to connect to Ducati Advisor service. Please check your connection.',
+          errorType: ErrorType.NETWORK_ERROR,
+        },
         { status: 503 }
       );
     }

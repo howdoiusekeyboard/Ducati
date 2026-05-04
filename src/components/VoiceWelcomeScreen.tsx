@@ -5,10 +5,7 @@ interface VoiceWelcomeScreenProps {
   onStartVoice: () => void;
 }
 
-const VoiceWelcomeScreen: React.FC<VoiceWelcomeScreenProps> = ({
-  onDismiss,
-  onStartVoice
-}) => {
+const VoiceWelcomeScreen: React.FC<VoiceWelcomeScreenProps> = ({ onDismiss, onStartVoice }) => {
   return (
     <div className="voice-welcome-overlay">
       <div className="voice-welcome-card">
@@ -20,16 +17,14 @@ const VoiceWelcomeScreen: React.FC<VoiceWelcomeScreenProps> = ({
             <div className="wave wave-3"></div>
           </div>
         </div>
-        
-        <h2 className="voice-welcome-title">
-          Talk to Your Financial Advisor
-        </h2>
-        
+
+        <h2 className="voice-welcome-title">Talk to Your Financial Advisor</h2>
+
         <p className="voice-welcome-description">
-          Have a natural conversation about your purchases and financial decisions. 
-          Just tap the microphone and start talking!
+          Have a natural conversation about your purchases and financial decisions. Just tap the
+          microphone and start talking!
         </p>
-        
+
         <div className="voice-features">
           <div className="voice-feature">
             <span className="feature-icon">💬</span>
@@ -44,19 +39,13 @@ const VoiceWelcomeScreen: React.FC<VoiceWelcomeScreenProps> = ({
             <span>Instant responses</span>
           </div>
         </div>
-        
+
         <div className="voice-welcome-actions">
-          <button 
-            className="voice-start-btn"
-            onClick={onStartVoice}
-          >
+          <button className="voice-start-btn" onClick={onStartVoice}>
             <span className="btn-icon">🎤</span>
             Start Voice Chat
           </button>
-          <button 
-            className="voice-skip-btn"
-            onClick={onDismiss}
-          >
+          <button className="voice-skip-btn" onClick={onDismiss}>
             Type Instead
           </button>
         </div>

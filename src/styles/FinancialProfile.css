@@ -204,19 +204,19 @@
   .profile-container {
     width: calc(100% - 30px);
   }
-  
+
   .financial-form {
     padding: 24px;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .section-content {
     padding: 16px;
   }
-  
+
   .input-group {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -228,15 +228,15 @@
     width: calc(100% - 20px);
     margin-top: -30px;
   }
-  
+
   .financial-form {
     padding: 20px;
   }
-  
+
   .section-header h2 {
     font-size: 1.1rem;
   }
-  
+
   .debt-entry h3 {
     font-size: 1rem;
   }

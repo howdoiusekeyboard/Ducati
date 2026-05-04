@@ -28,13 +28,7 @@ const ChatInterface: React.FC = () => {
   });
   const [isManualClear, setIsManualClear] = useState(false);
 
-  const {
-    isSessionActive,
-    isConnecting,
-    startVoiceSession,
-    stopVoiceSession,
-    events
-  } = useVoice();
+  const { isSessionActive, isConnecting, startVoiceSession, stopVoiceSession, events } = useVoice();
 
   // Add useEffect to load financial profile
   useEffect(() => {
@@ -77,7 +71,7 @@ const ChatInterface: React.FC = () => {
     const loadChatHistory = async () => {
       // Don't run if this is a manual clear
       if (isManualClear) return;
-      
+
       let isNewUser = false;
 
       if (firestore.isAuthenticated) {
@@ -94,7 +88,7 @@ const ChatInterface: React.FC = () => {
         try {
           const parsedMessages = JSON.parse(savedMessages).map((msg: any) => ({
             ...msg,
-            timestamp: new Date(msg.timestamp)
+            timestamp: new Date(msg.timestamp),
           }));
           setMessages(parsedMessages);
         } catch (error) {
@@ -105,14 +99,18 @@ const ChatInterface: React.FC = () => {
       }
 
       // If no chat history exists, auto-start voice session for verbal welcome
-      if (isNewUser && (!firestore.isAuthenticated || !(await firestore.getChat())?.messages?.length)) {
+      if (
+        isNewUser &&
+        (!firestore.isAuthenticated || !(await firestore.getChat())?.messages?.length)
+      ) {
         // Show a brief text message while starting voice session
         const preparingMessage: Message = {
           id: crypto.randomUUID(),
           role: 'assistant',
-          content: "🎤 Starting voice introduction... Please allow microphone access when prompted!",
+          content:
+            '🎤 Starting voice introduction... Please allow microphone access when prompted!',
           timestamp: new Date(),
-          isVoice: false
+          isVoice: false,
         };
         setMessages([preparingMessage]);
 
@@ -130,7 +128,7 @@ const ChatInterface: React.FC = () => {
 
 Tell me what you're thinking of buying — or just ask. The voice button works too if you'd rather talk than type.`,
               timestamp: new Date(),
-              isVoice: false
+              isVoice: false,
             };
             setMessages([fallbackMessage]);
           }
@@ -169,18 +167,18 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
           role: 'user',
           content: latestEvent.transcript,
           timestamp: new Date(),
-          isVoice: true
+          isVoice: true,
         };
-        setMessages(prev => [...prev, userMessage]);
+        setMessages((prev) => [...prev, userMessage]);
       } else if (latestEvent.type === 'response.audio_transcript.done') {
         const assistantMessage: Message = {
           id: crypto.randomUUID(),
           role: 'assistant',
           content: latestEvent.transcript,
           timestamp: new Date(),
-          isVoice: true
+          isVoice: true,
         };
-        setMessages(prev => [...prev, assistantMessage]);
+        setMessages((prev) => [...prev, assistantMessage]);
       } else if (latestEvent.type === 'ui.show_navigation_prompt') {
         // Show navigation prompt as a special message
         const navigationMessage: Message = {
@@ -188,9 +186,9 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
           role: 'assistant',
           content: latestEvent.data.message,
           timestamp: new Date(),
-          isVoice: true
+          isVoice: true,
         };
-        setMessages(prev => [...prev, navigationMessage]);
+        setMessages((prev) => [...prev, navigationMessage]);
 
         // Add navigation button (rendered as <a>; DOMPurify default policy strips event handlers)
         setTimeout(() => {
@@ -199,9 +197,9 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
             role: 'assistant',
             content: `<a href="/" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; margin: 8px 0; display: inline-block; text-decoration: none;">Go to Purchase Analyzer →</a>`,
             timestamp: new Date(),
-            isVoice: true
+            isVoice: true,
           };
-          setMessages(prev => [...prev, buttonMessage]);
+          setMessages((prev) => [...prev, buttonMessage]);
         }, 500);
       }
     }
@@ -211,11 +209,11 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
     setIsManualClear(false);
     if (isSessionActive) {
       const event = {
-        type: "conversation.item.create",
+        type: 'conversation.item.create',
         item: {
-          type: "message",
-          role: "user",
-          content: [{ type: "input_text", text: messageContent }],
+          type: 'message',
+          role: 'user',
+          content: [{ type: 'input_text', text: messageContent }],
         },
       };
       // Voice events now handled by global voice context
@@ -225,11 +223,15 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
         role: 'user',
         content: messageContent,
         timestamp: new Date(),
-        isVoice: false
+        isVoice: false,
       };
-      setMessages(prev => [...prev, userMessage]);
+      setMessages((prev) => [...prev, userMessage]);
 
-      const response = await sendMessage(messageContent, [...messages, userMessage], financialProfile);
+      const response = await sendMessage(
+        messageContent,
+        [...messages, userMessage],
+        financialProfile
+      );
 
       if (response) {
         const assistantMessage: Message = {
@@ -237,9 +239,9 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
           role: 'assistant',
           content: response,
           timestamp: new Date(),
-          isVoice: false
+          isVoice: false,
         };
-        setMessages(prev => [...prev, assistantMessage]);
+        setMessages((prev) => [...prev, assistantMessage]);
       }
     }
   };
@@ -261,15 +263,17 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
     // Send financial context to the voice session
     if (isSessionActive && financialProfile) {
       const contextMessage = {
-        type: "conversation.item.create",
+        type: 'conversation.item.create',
         item: {
-          type: "message",
-          role: "system",
-          content: [{
-            type: "input_text",
-            text: `User's Financial Context: Monthly income: $${financialProfile.monthlyIncome || 'not provided'}. Monthly expenses: $${financialProfile.monthlyExpenses || 'not provided'}. Savings: $${financialProfile.currentSavings || 'not provided'}. Emergency fund: ${financialProfile.hasEmergencyFund ? 'Yes' : 'No'}. Primary goal: ${financialProfile.financialGoal || 'not specified'}. Use this context to provide personalized financial advice.`
-          }]
-        }
+          type: 'message',
+          role: 'system',
+          content: [
+            {
+              type: 'input_text',
+              text: `User's Financial Context: Monthly income: $${financialProfile.monthlyIncome || 'not provided'}. Monthly expenses: $${financialProfile.monthlyExpenses || 'not provided'}. Savings: $${financialProfile.currentSavings || 'not provided'}. Emergency fund: ${financialProfile.hasEmergencyFund ? 'Yes' : 'No'}. Primary goal: ${financialProfile.financialGoal || 'not specified'}. Use this context to provide personalized financial advice.`,
+            },
+          ],
+        },
       };
       // Context now handled by global voice provider
     }
@@ -278,11 +282,11 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
     const welcomeMessage: Message = {
       id: crypto.randomUUID(),
       role: 'assistant',
-      content: `🎤 Voice session started! ${financialProfile ? `I have your financial profile loaded and ready to give you personalized advice.` : 'I\'m listening...'} Feel free to ask me about any purchase you're considering!`,
+      content: `🎤 Voice session started! ${financialProfile ? `I have your financial profile loaded and ready to give you personalized advice.` : "I'm listening..."} Feel free to ask me about any purchase you're considering!`,
       timestamp: new Date(),
-      isVoice: true
+      isVoice: true,
     };
-    setMessages(prev => [...prev, welcomeMessage]);
+    setMessages((prev) => [...prev, welcomeMessage]);
   };
 
   // Enhanced start session with greeting (keep for backward compatibility)
@@ -351,7 +355,10 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
             </h2>
             <div className="chat-controls">
               {messages.length > 0 && (
-                <button onClick={clearChatHistory} className="btn btn-secondary btn-sm clear-history-btn">
+                <button
+                  onClick={clearChatHistory}
+                  className="btn btn-secondary btn-sm clear-history-btn"
+                >
                   <span className="btn-icon-only">🗑️</span>
                   <span className="btn-text-desktop">Clear</span>
                 </button>
@@ -365,7 +372,11 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
         <MessageInput
           onSendMessage={handleSendMessage}
           isLoading={isLoading || isSessionActive}
-          placeholder={isSessionActive ? "Voice session active - speak to Ducati Advisor!" : "Ask about a purchase or financial advice..."}
+          placeholder={
+            isSessionActive
+              ? 'Voice session active - speak to Ducati Advisor!'
+              : 'Ask about a purchase or financial advice...'
+          }
         />
 
         {/* Quick Actions */}
@@ -380,10 +391,8 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
           </button>
         </div>
       </div>
-
-
     </div>
   );
-}
+};
 
 export default ChatInterface;

@@ -25,10 +25,10 @@ const RecentActivityWidget = ({ purchases, onViewAll }) => {
     } else if (diffDays < 7) {
       return `${diffDays} days ago`;
     } else {
-      return purchaseDate.toLocaleDateString('en-US', { 
-        month: 'short', 
+      return purchaseDate.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
-        year: purchaseDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+        year: purchaseDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
       });
     }
   };
@@ -66,25 +66,26 @@ const RecentActivityWidget = ({ purchases, onViewAll }) => {
         <div className="activity-list">
           {purchases.map((purchase, index) => (
             <div key={purchase.id || index} className="activity-item">
-              <div className="activity-icon">
-                {purchase.decision === 'Buy' ? '✅' : '❌'}
-              </div>
-              
+              <div className="activity-icon">{purchase.decision === 'Buy' ? '✅' : '❌'}</div>
+
               <div className="activity-details">
                 <div className="activity-header">
                   <h4 className="item-name">{purchase.itemName}</h4>
                   <span className="item-date">{formatDate(purchase.date)}</span>
                 </div>
-                
+
                 <div className="activity-info">
                   <span className="item-cost">{formatCurrency(purchase.itemCost)}</span>
-                  <span className={`decision-badge ${purchase.decision === 'Buy' ? 'buy' : 'dont-buy'}`}>
+                  <span
+                    className={`decision-badge ${purchase.decision === 'Buy' ? 'buy' : 'dont-buy'}`}
+                  >
                     {purchase.decision}
                   </span>
-                  {((purchase.decision === "Don't Buy" && purchase.itemCost > 0) || 
-                    (purchase.decision === "Buy" && purchase.savings > 0)) && (
+                  {((purchase.decision === "Don't Buy" && purchase.itemCost > 0) ||
+                    (purchase.decision === 'Buy' && purchase.savings > 0)) && (
                     <span className="savings-badge">
-                      Saved {formatCurrency(
+                      Saved{' '}
+                      {formatCurrency(
                         purchase.decision === "Don't Buy" ? purchase.itemCost : purchase.savings
                       )}
                     </span>
@@ -94,7 +95,8 @@ const RecentActivityWidget = ({ purchases, onViewAll }) => {
                 {purchase.alternative && (
                   <div className="alternative-info">
                     <span className="alternative-icon">💡</span>
-                    Alternative: {purchase.alternative.name} ({formatCurrency(purchase.alternative.price)})
+                    Alternative: {purchase.alternative.name} (
+                    {formatCurrency(purchase.alternative.price)})
                   </div>
                 )}
               </div>
@@ -117,12 +119,13 @@ const RecentActivityWidget = ({ purchases, onViewAll }) => {
                 purchases.reduce((sum, p) => {
                   if (p.decision === "Don't Buy") {
                     return sum + (p.itemCost || 0);
-                  } else if (p.decision === "Buy" && p.savings) {
+                  } else if (p.decision === 'Buy' && p.savings) {
                     return sum + (p.savings || 0);
                   }
                   return sum;
                 }, 0)
-              )} saved
+              )}{' '}
+              saved
             </span>
           </div>
         </div>

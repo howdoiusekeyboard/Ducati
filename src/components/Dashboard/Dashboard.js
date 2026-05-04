@@ -18,15 +18,15 @@ const ERROR_TYPES = {
   FIREBASE_CONFIG: 'FIREBASE_CONFIG',
   NETWORK: 'NETWORK',
   PERMISSION: 'PERMISSION',
-  UNKNOWN: 'UNKNOWN'
+  UNKNOWN: 'UNKNOWN',
 };
 
 const getErrorType = (error) => {
   if (!error) return ERROR_TYPES.UNKNOWN;
-  
+
   const errorMessage = error.message || '';
   const errorCode = error.code || '';
-  
+
   if (errorMessage.includes('project') || errorMessage.includes('configuration')) {
     return ERROR_TYPES.FIREBASE_CONFIG;
   }
@@ -36,20 +36,20 @@ const getErrorType = (error) => {
   if (errorMessage.includes('network') || errorMessage.includes('Failed to fetch')) {
     return ERROR_TYPES.NETWORK;
   }
-  
+
   return ERROR_TYPES.UNKNOWN;
 };
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { 
-    getProfile, 
-    getPurchaseHistory, 
-    subscribeToProfile, 
+  const {
+    getProfile,
+    getPurchaseHistory,
+    subscribeToProfile,
     subscribeToPurchaseHistory,
     isLoading: firestoreLoading,
-    error: firestoreError
+    error: firestoreError,
   } = useFirestore();
 
   const [financialProfile, setFinancialProfile] = useState(null);
@@ -70,7 +70,7 @@ const Dashboard = () => {
         return total + (purchase.itemCost || 0);
       }
       // For "Buy" decisions, only count explicit savings (e.g., from alternatives)
-      else if (purchase.decision === "Buy" && purchase.savings) {
+      else if (purchase.decision === 'Buy' && purchase.savings) {
         return total + (purchase.savings || 0);
       }
       return total;
@@ -82,12 +82,12 @@ const Dashboard = () => {
       buyTotal: 0,
       dontBuyTotal: 0,
       buyCount: 0,
-      dontBuyCount: 0
+      dontBuyCount: 0,
     };
 
     if (!purchaseHistory || !Array.isArray(purchaseHistory)) return breakdown;
 
-    purchaseHistory.forEach(purchase => {
+    purchaseHistory.forEach((purchase) => {
       if (purchase.decision === 'Buy') {
         breakdown.buyTotal += purchase.itemCost;
         breakdown.buyCount++;
@@ -102,9 +102,7 @@ const Dashboard = () => {
 
   const recentPurchases = useMemo(() => {
     if (!purchaseHistory || !Array.isArray(purchaseHistory)) return [];
-    return purchaseHistory
-      .sort((a, b) => b.date - a.date)
-      .slice(0, 5);
+    return purchaseHistory.sort((a, b) => b.date - a.date).slice(0, 5);
   }, [purchaseHistory]);
 
   // Helper functions
@@ -116,12 +114,14 @@ const Dashboard = () => {
       firestoreProfile.transportationCost,
       firestoreProfile.insuranceCost,
       firestoreProfile.subscriptionsCost,
-      firestoreProfile.otherExpenses
+      firestoreProfile.otherExpenses,
     ];
 
-    return expenses.reduce((sum, expense) => {
-      return sum + (parseFloat(expense) || 0);
-    }, 0).toString();
+    return expenses
+      .reduce((sum, expense) => {
+        return sum + (parseFloat(expense) || 0);
+      }, 0)
+      .toString();
   };
 
   const calculateTotalDebtPayments = (firestoreProfile) => {
@@ -129,17 +129,19 @@ const Dashboard = () => {
       firestoreProfile.creditCardPayment,
       firestoreProfile.studentLoanPayment,
       firestoreProfile.carLoanPayment,
-      firestoreProfile.otherDebtPayment
+      firestoreProfile.otherDebtPayment,
     ];
 
-    return payments.reduce((sum, payment) => {
-      return sum + (parseFloat(payment) || 0);
-    }, 0).toString();
+    return payments
+      .reduce((sum, payment) => {
+        return sum + (parseFloat(payment) || 0);
+      }, 0)
+      .toString();
   };
 
   const loadFromLocalStorage = useCallback(() => {
     console.log('Attempting to load from localStorage...');
-    
+
     // Load profile from localStorage
     const savedProfile = localStorage.getItem('quickFinancialProfile');
     if (savedProfile) {
@@ -149,7 +151,7 @@ const Dashboard = () => {
         setFinancialProfile({
           ...parsed,
           userId: user?.uid,
-          lastUpdated: new Date(parsed.lastUpdated || Date.now())
+          lastUpdated: new Date(parsed.lastUpdated || Date.now()),
         });
         setHasLocalFallback(true);
       } catch (parseErr) {
@@ -162,9 +164,9 @@ const Dashboard = () => {
     if (savedHistory) {
       try {
         const parsed = JSON.parse(savedHistory);
-        const history = parsed.map(item => ({
+        const history = parsed.map((item) => ({
           ...item,
-          date: new Date(item.date)
+          date: new Date(item.date),
         }));
         console.log('Found localStorage purchase history:', history.length, 'items');
         setPurchaseHistory(history);
@@ -183,12 +185,12 @@ const Dashboard = () => {
     setError(null);
     setErrorType(null);
     console.log('Loading dashboard data for user:', user.uid);
-    
+
     // Try loading from Firestore
     try {
       setProfileLoading(true);
       const profile = await getProfile();
-      
+
       if (profile) {
         console.log('Firestore profile loaded successfully');
         setFinancialProfile(profile);
@@ -201,13 +203,13 @@ const Dashboard = () => {
       console.error('Error loading profile from Firestore:', profileErr);
       const errType = getErrorType(profileErr);
       setErrorType(errType);
-      
+
       if (errType === ERROR_TYPES.FIREBASE_CONFIG) {
         setError('Firebase configuration error detected. Please check your environment setup.');
       } else {
         setError('Unable to connect to database. Using offline mode.');
       }
-      
+
       loadFromLocalStorage();
     } finally {
       setProfileLoading(false);
@@ -226,10 +228,12 @@ const Dashboard = () => {
       if (savedHistory) {
         try {
           const parsed = JSON.parse(savedHistory);
-          setPurchaseHistory(parsed.map(item => ({
-            ...item,
-            date: new Date(item.date)
-          })));
+          setPurchaseHistory(
+            parsed.map((item) => ({
+              ...item,
+              date: new Date(item.date),
+            }))
+          );
         } catch (e) {
           setPurchaseHistory([]);
         }
@@ -249,11 +253,11 @@ const Dashboard = () => {
     if (!user || hasLocalFallback || errorType === ERROR_TYPES.FIREBASE_CONFIG) return;
 
     const subscriptions = [];
-    
+
     // Only subscribe if we don't have configuration errors
     if (!error || errorType !== ERROR_TYPES.FIREBASE_CONFIG) {
       console.log('Setting up real-time subscriptions');
-      
+
       const unsubscribeProfile = subscribeToProfile((profile) => {
         if (profile) {
           console.log('Real-time profile update received');
@@ -262,7 +266,7 @@ const Dashboard = () => {
           setError(null);
         }
       });
-      
+
       if (unsubscribeProfile) subscriptions.push(unsubscribeProfile);
 
       const unsubscribePurchases = subscribeToPurchaseHistory((purchases) => {
@@ -270,17 +274,24 @@ const Dashboard = () => {
         setPurchaseHistory(purchases);
         setError(null);
       }, 100);
-      
+
       if (unsubscribePurchases) subscriptions.push(unsubscribePurchases);
     }
 
     return () => {
-      subscriptions.forEach(unsub => unsub && unsub());
+      subscriptions.forEach((unsub) => unsub && unsub());
     };
-  }, [user?.uid, hasLocalFallback, errorType, error, subscribeToProfile, subscribeToPurchaseHistory]);
+  }, [
+    user?.uid,
+    hasLocalFallback,
+    errorType,
+    error,
+    subscribeToProfile,
+    subscribeToPurchaseHistory,
+  ]);
 
   const handleRetry = useCallback(() => {
-    setRetryCount(prev => prev + 1);
+    setRetryCount((prev) => prev + 1);
     loadDashboardData();
   }, [loadDashboardData]);
 
@@ -296,10 +307,12 @@ const Dashboard = () => {
         <div className="dashboard-error config-error">
           <div className="error-icon">🔧</div>
           <h2>Configuration Issue Detected</h2>
-          <p>There's an issue with the database configuration that's preventing data from loading.</p>
-          
+          <p>
+            There's an issue with the database configuration that's preventing data from loading.
+          </p>
+
           <EnvironmentChecker />
-          
+
           <div className="error-actions">
             <button onClick={handleRetry} className="btn btn-primary">
               Try Again
@@ -358,9 +371,7 @@ const Dashboard = () => {
           <span className="dashboard-icon">📊</span>
           Your Financial Dashboard
         </h1>
-        <p className="dashboard-subtitle">
-          Track your progress toward financial freedom
-        </p>
+        <p className="dashboard-subtitle">Track your progress toward financial freedom</p>
         {(hasLocalFallback || error) && (
           <div className="dashboard-status">
             {hasLocalFallback && (
@@ -382,36 +393,27 @@ const Dashboard = () => {
       <div className="dashboard-grid">
         {/* Financial Health Score */}
         <div className="widget-container widget-health">
-          <HealthScoreWidget 
-            profile={financialProfile} 
-          />
+          <HealthScoreWidget profile={financialProfile} />
         </div>
 
         {/* Savings Tracker */}
         <div className="widget-container widget-savings">
-          <SavingsTrackerWidget 
-            totalSavings={totalSavings}
-            userId={user.uid}
-          />
+          <SavingsTrackerWidget totalSavings={totalSavings} userId={user.uid} />
         </div>
 
         {/* Purchase Decisions */}
         <div className="widget-container widget-decisions">
-          <PurchaseDecisionWidget 
-            breakdown={purchaseBreakdown}
-          />
+          <PurchaseDecisionWidget breakdown={purchaseBreakdown} />
         </div>
 
         {/* Monthly Expenses */}
         <div className="widget-container widget-expenses">
-          <ExpenseBreakdownWidget 
-            profile={financialProfile}
-          />
+          <ExpenseBreakdownWidget profile={financialProfile} />
         </div>
 
         {/* Recent Activity */}
         <div className="widget-container widget-recent">
-          <RecentActivityWidget 
+          <RecentActivityWidget
             purchases={recentPurchases}
             onViewAll={() => navigate('/history')}
           />
@@ -420,17 +422,11 @@ const Dashboard = () => {
 
       {/* Dashboard Actions */}
       <div className="dashboard-actions">
-        <button 
-          onClick={() => navigate('/')} 
-          className="action-btn primary"
-        >
+        <button onClick={() => navigate('/')} className="action-btn primary">
           <span className="action-icon">🛒</span>
           Analyze New Purchase
         </button>
-        <button 
-          onClick={() => navigate('/profile')} 
-          className="action-btn secondary"
-        >
+        <button onClick={() => navigate('/profile')} className="action-btn secondary">
           <span className="action-icon">👤</span>
           Update Profile
         </button>

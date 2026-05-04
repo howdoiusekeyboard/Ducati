@@ -29,7 +29,7 @@ export const analyzeImageWithOpenAI = async (base64Image) => {
         - If you see an iPhone: {"name": "Apple iPhone", "cost": 800, "facts": "Smartphone with Apple branding"}
         
         Image to analyze:`,
-        image: base64Image
+        image: base64Image,
       }),
     });
 
@@ -50,69 +50,69 @@ export const analyzeImageWithOpenAI = async (base64Image) => {
         .replace(/^```json\s*/, '')
         .replace(/\s*```$/, '')
         .trim();
-      
+
       // Try to find JSON in the response
       const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
       const jsonStr = jsonMatch ? jsonMatch[0] : cleanedResponse;
-      
+
       const parsedResponse = JSON.parse(jsonStr);
-      
+
       // Validate the response has required fields
-      if (!parsedResponse.name || parsedResponse.name === "Error") {
+      if (!parsedResponse.name || parsedResponse.name === 'Error') {
         return {
-          name: "Error",
+          name: 'Error',
           cost: 0,
-          facts: "Could not identify the product from the image"
+          facts: 'Could not identify the product from the image',
         };
       }
-      
+
       return {
-        name: parsedResponse.name || "Unknown Product",
+        name: parsedResponse.name || 'Unknown Product',
         cost: parseFloat(parsedResponse.cost) || 0,
-        facts: parsedResponse.facts || "Product identified from image"
+        facts: parsedResponse.facts || 'Product identified from image',
       };
     } catch (parseError) {
       // If JSON parsing fails, try to extract information from text response
       const responseText = data.response.toLowerCase();
-      
+
       // Try to identify common products from text
-      let productName = "Unknown Product";
+      let productName = 'Unknown Product';
       let estimatedCost = 0;
-      
+
       if (responseText.includes('coca-cola') || responseText.includes('coke')) {
-        productName = "Coca-Cola";
-        estimatedCost = 1.50;
+        productName = 'Coca-Cola';
+        estimatedCost = 1.5;
       } else if (responseText.includes('pepsi')) {
-        productName = "Pepsi";
-        estimatedCost = 1.50;
+        productName = 'Pepsi';
+        estimatedCost = 1.5;
       } else if (responseText.includes('iphone')) {
-        productName = "iPhone";
+        productName = 'iPhone';
         estimatedCost = 800;
       } else if (responseText.includes('samsung')) {
-        productName = "Samsung Phone";
+        productName = 'Samsung Phone';
         estimatedCost = 700;
       }
-      
-      if (productName !== "Unknown Product") {
+
+      if (productName !== 'Unknown Product') {
         return {
           name: productName,
           cost: estimatedCost,
-          facts: `Identified ${productName} from image analysis`
+          facts: `Identified ${productName} from image analysis`,
         };
       }
-      
+
       return {
-        name: "Error",
+        name: 'Error',
         cost: 0,
-        facts: "Could not parse product information from the response"
+        facts: 'Could not parse product information from the response',
       };
     }
   } catch (error) {
     console.error('Error analyzing image with OpenAI:', error);
     return {
-      name: "Error",
+      name: 'Error',
       cost: 0,
-      facts: "Failed to analyze image: " + error.message
+      facts: 'Failed to analyze image: ' + error.message,
     };
   }
 };
@@ -127,7 +127,14 @@ export const analyzeImageWithOpenAI = async (base64Image) => {
  * @param {Object} alternative - Cheaper alternative if found (optional)
  * @returns {Promise<{decision: string, reasoning: string, alternative?: Object}>}
  */
-export const getPurchaseRecommendation = async (itemName, cost, purpose, frequency, financialProfile, alternative) => {
+export const getPurchaseRecommendation = async (
+  itemName,
+  cost,
+  purpose,
+  frequency,
+  financialProfile,
+  alternative
+) => {
   try {
     // Build the prompt for Charlie Munger-style advice
     let prompt = `You are Charlie Munger, the legendary investor and Warren Buffett's business partner. 
@@ -160,7 +167,7 @@ export const getPurchaseRecommendation = async (itemName, cost, purpose, frequen
 
     // Add a timestamp to encourage unique responses
     const timestamp = Date.now();
-    
+
     prompt += `\n\nProvide your response in the following JSON format (ensure it's valid JSON):
     {
       "decision": "Buy" or "Don't Buy",
@@ -216,26 +223,29 @@ export const getPurchaseRecommendation = async (itemName, cost, purpose, frequen
       const parsedResponse = JSON.parse(cleanedResponse);
 
       // Clean up the reasoning to remove any JSON artifacts
-      let cleanedReasoning = parsedResponse.reasoning || "";
-      cleanedReasoning = cleanedReasoning.replace(/^\s*\{\s*"decision":[^,]*,\s*"reasoning":\s*"|"\s*\}\s*$/g, '');
+      let cleanedReasoning = parsedResponse.reasoning || '';
+      cleanedReasoning = cleanedReasoning.replace(
+        /^\s*\{\s*"decision":[^,]*,\s*"reasoning":\s*"|"\s*\}\s*$/g,
+        ''
+      );
 
       // Array of different fallback quotes to ensure variety
       const fallbackQuotes = [
-        "The big money is not in the buying and selling, but in the waiting.",
-        "It is remarkable how much long-term advantage people like us have gotten by trying to be consistently not stupid, instead of trying to be very intelligent.",
-        "The desire to get rich fast is pretty dangerous.",
-        "A great business at a fair price is superior to a fair business at a great price.",
+        'The big money is not in the buying and selling, but in the waiting.',
+        'It is remarkable how much long-term advantage people like us have gotten by trying to be consistently not stupid, instead of trying to be very intelligent.',
+        'The desire to get rich fast is pretty dangerous.',
+        'A great business at a fair price is superior to a fair business at a great price.',
         "I think I've been in the top 5% of my age cohort all my life in understanding the power of incentives, and all my life I've underestimated it.",
-        "Spend each day trying to be a little wiser than you were when you woke up.",
-        "The first rule of compounding: Never interrupt it unnecessarily."
+        'Spend each day trying to be a little wiser than you were when you woke up.',
+        'The first rule of compounding: Never interrupt it unnecessarily.',
       ];
-      
+
       const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
 
       const result = {
         decision: parsedResponse.decision || "Don't Buy",
         reasoning: cleanedReasoning || "I couldn't provide a proper analysis at this time.",
-        quote: parsedResponse.quote || randomQuote
+        quote: parsedResponse.quote || randomQuote,
       };
 
       // Include alternative if it was provided
@@ -249,16 +259,16 @@ export const getPurchaseRecommendation = async (itemName, cost, purpose, frequen
       const responseText = data.response;
       let decision = "Don't Buy";
       let reasoning = "I couldn't provide a proper analysis at this time.";
-      
+
       // Use the same fallback quotes array for consistency
       const fallbackQuotes = [
-        "The big money is not in the buying and selling, but in the waiting.",
-        "It is remarkable how much long-term advantage people like us have gotten by trying to be consistently not stupid, instead of trying to be very intelligent.",
-        "The desire to get rich fast is pretty dangerous.",
-        "A great business at a fair price is superior to a fair business at a great price.",
+        'The big money is not in the buying and selling, but in the waiting.',
+        'It is remarkable how much long-term advantage people like us have gotten by trying to be consistently not stupid, instead of trying to be very intelligent.',
+        'The desire to get rich fast is pretty dangerous.',
+        'A great business at a fair price is superior to a fair business at a great price.',
         "I think I've been in the top 5% of my age cohort all my life in understanding the power of incentives, and all my life I've underestimated it.",
-        "Spend each day trying to be a little wiser than you were when you woke up.",
-        "The first rule of compounding: Never interrupt it unnecessarily."
+        'Spend each day trying to be a little wiser than you were when you woke up.',
+        'The first rule of compounding: Never interrupt it unnecessarily.',
       ];
       let quote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
 
@@ -284,8 +294,11 @@ export const getPurchaseRecommendation = async (itemName, cost, purpose, frequen
         }
       } else {
         // If no JSON found, try simple text extraction
-        if (responseText.toLowerCase().includes("buy") && !responseText.toLowerCase().includes("don't buy")) {
-          decision = "Buy";
+        if (
+          responseText.toLowerCase().includes('buy') &&
+          !responseText.toLowerCase().includes("don't buy")
+        ) {
+          decision = 'Buy';
         }
         // Clean up reasoning by removing JSON artifacts
         reasoning = responseText
@@ -302,31 +315,31 @@ export const getPurchaseRecommendation = async (itemName, cost, purpose, frequen
         decision: decision,
         reasoning: reasoning,
         quote: quote,
-        alternative: alternative
+        alternative: alternative,
       };
     }
   } catch (error) {
     console.error('Error getting purchase recommendation:', error);
-    
+
     // Use random fallback quote even in error cases
     const fallbackQuotes = [
-      "The big money is not in the buying and selling, but in the waiting.",
-      "It is remarkable how much long-term advantage people like us have gotten by trying to be consistently not stupid, instead of trying to be very intelligent.",
-      "The desire to get rich fast is pretty dangerous.",
-      "A great business at a fair price is superior to a fair business at a great price.",
+      'The big money is not in the buying and selling, but in the waiting.',
+      'It is remarkable how much long-term advantage people like us have gotten by trying to be consistently not stupid, instead of trying to be very intelligent.',
+      'The desire to get rich fast is pretty dangerous.',
+      'A great business at a fair price is superior to a fair business at a great price.',
       "I think I've been in the top 5% of my age cohort all my life in understanding the power of incentives, and all my life I've underestimated it.",
-      "Spend each day trying to be a little wiser than you were when you woke up.",
-      "The first rule of compounding: Never interrupt it unnecessarily."
+      'Spend each day trying to be a little wiser than you were when you woke up.',
+      'The first rule of compounding: Never interrupt it unnecessarily.',
     ];
-    
+
     return {
-      decision: "Error",
+      decision: 'Error',
       reasoning: "I couldn't analyze this purchase due to a technical error: " + error.message,
       quote: fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)],
-      alternative: alternative
+      alternative: alternative,
     };
   }
-}
+};
 
 /**
  * Find cheaper alternatives using OpenAI
@@ -400,11 +413,11 @@ export const findCheaperAlternative = async (itemName, currentPrice, location = 
         .replace(/^```json\s*/, '')
         .replace(/\s*```$/, '')
         .trim();
-      
+
       // Try to find JSON in the response
       const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
       const jsonStr = jsonMatch ? jsonMatch[0] : cleanedResponse;
-      
+
       const parsedResponse = JSON.parse(jsonStr);
 
       // Check if a valid alternative was found
@@ -414,7 +427,7 @@ export const findCheaperAlternative = async (itemName, currentPrice, location = 
           price: parseFloat(parsedResponse.estimatedTotalCost || parsedResponse.price),
           retailer: parsedResponse.retailer,
           locallyAvailable: parsedResponse.locallyAvailable || false,
-          estimatedTotalCost: parseFloat(parsedResponse.estimatedTotalCost || parsedResponse.price)
+          estimatedTotalCost: parseFloat(parsedResponse.estimatedTotalCost || parsedResponse.price),
         };
       }
 

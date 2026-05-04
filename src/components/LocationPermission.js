@@ -16,7 +16,7 @@ const LocationPermission = ({ onLocationSet }) => {
           <p>Enable location to find nearby stores and accurate shipping costs</p>
         </div>
         <div className="banner-actions">
-          <button 
+          <button
             onClick={async () => {
               const loc = await requestPermission();
               if (loc) onLocationSet?.(loc);
@@ -27,10 +27,7 @@ const LocationPermission = ({ onLocationSet }) => {
           >
             Enable Location
           </button>
-          <button 
-            onClick={() => setShowBanner(false)}
-            className="dismiss-btn"
-          >
+          <button onClick={() => setShowBanner(false)} className="dismiss-btn">
             Not Now
           </button>
         </div>

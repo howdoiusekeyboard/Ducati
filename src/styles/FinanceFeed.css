@@ -516,11 +516,11 @@
   .video-player-container {
     flex-direction: column;
   }
-  
+
   .playlist-sidebar {
     display: none;
   }
-  
+
   .mobile-only {
     display: block;
   }
@@ -530,38 +530,38 @@
   .finance-feed-container {
     width: calc(100% - 30px);
   }
-  
+
   .video-controls {
     flex-direction: column;
     gap: 16px;
     padding: 20px;
   }
-  
+
   .control-button {
     width: 100%;
     justify-content: center;
   }
-  
+
   .control-text {
     display: inline;
   }
-  
+
   .playlist-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
-  
+
   .education-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .tips-list {
     gap: 16px;
   }
-  
+
   .tip-item {
     padding: 16px;
   }
-  
+
   .educational-section,
   .tips-section,
   .feed-cta {
@@ -574,65 +574,65 @@
     width: calc(100% - 20px);
     margin-top: -30px;
   }
-  
+
   .playlist-section {
     padding: 24px 16px;
   }
-  
+
   .playlist-section h2 {
     font-size: 1.5rem;
   }
-  
+
   .playlist-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .playlist-item {
     display: flex;
     gap: 12px;
   }
-  
+
   .playlist-thumbnail {
     width: 120px;
     padding-bottom: 0;
     height: 90px;
     flex-shrink: 0;
   }
-  
+
   .playlist-info {
     flex: 1;
     padding: 8px;
   }
-  
+
   .educational-section h2,
   .tips-section h2,
   .feed-cta h3 {
     font-size: 1.75rem;
   }
-  
+
   .education-icon {
     font-size: 2.5rem;
   }
-  
+
   .tip-number {
     width: 32px;
     height: 32px;
     font-size: 1rem;
   }
-  
+
   .tip-content h4 {
     font-size: 1rem;
   }
-  
+
   .feed-cta {
     padding: 32px 20px;
   }
-  
+
   .feed-cta p {
     font-size: 1rem;
   }
-  
+
   .feed-cta .cta-button {
     font-size: 1rem;
     padding: 14px 28px;

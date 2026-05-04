@@ -113,7 +113,9 @@ describe('verifyAuthFromRequest', () => {
         method: 'POST',
         headers: { Authorization: 'Bearer some-token' },
       });
-      await expect(mod.verifyAuthFromRequest(request)).rejects.toThrow(/FIREBASE_SERVICE_ACCOUNT_JSON/);
+      await expect(mod.verifyAuthFromRequest(request)).rejects.toThrow(
+        /FIREBASE_SERVICE_ACCOUNT_JSON/
+      );
     });
   });
 });

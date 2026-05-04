@@ -37,7 +37,7 @@ export const useLocation = () => {
     try {
       // Clear cache to force browser request
       LocationService.clearCache();
-      
+
       // Request browser location explicitly
       const browserLocation = await LocationService.getBrowserLocation();
       if (browserLocation) {
@@ -58,6 +58,6 @@ export const useLocation = () => {
     error,
     fetchLocation,
     requestPermission,
-    formatLocation: LocationService.formatLocation
+    formatLocation: LocationService.formatLocation,
   };
 };

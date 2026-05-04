@@ -1,24 +1,24 @@
 // src/components/PurchaseAdvisor.js
-import React, { useState, useReducer, useCallback, useEffect } from "react";
-import { analyzeImageWithOpenAI, findCheaperAlternative } from "../lib/openaiAPI";
-import { getEnhancedPurchaseRecommendation } from "../lib/enhancedOpenAIIntegration";
-import DecisionMatrix from "./DecisionMatrix";
-import ProgressiveFinancialProfile from "./ProgressiveFinancialProfile";
-import SavingsTracker from "./SavingsTracker";
-import ImageUploadSection from "./ImageUploadSection";
-import ResultBubble from "./ResultBubble";
-import { useFirestore } from "../hooks/useFirestore";
+import React, { useState, useReducer, useCallback, useEffect } from 'react';
+import { analyzeImageWithOpenAI, findCheaperAlternative } from '../lib/openaiAPI';
+import { getEnhancedPurchaseRecommendation } from '../lib/enhancedOpenAIIntegration';
+import DecisionMatrix from './DecisionMatrix';
+import ProgressiveFinancialProfile from './ProgressiveFinancialProfile';
+import SavingsTracker from './SavingsTracker';
+import ImageUploadSection from './ImageUploadSection';
+import ResultBubble from './ResultBubble';
+import { useFirestore } from '../hooks/useFirestore';
 import { useLocation } from '../hooks/useLocation';
 import { LocationService } from '../lib/locationService';
-import "../styles/App.css";
+import '../styles/App.css';
 
 // Constants
 const INITIAL_FORM_STATE = {
-  itemName: "",
-  itemCost: "",
-  purpose: "",
-  frequency: "",
-  searchForAlternative: true
+  itemName: '',
+  itemCost: '',
+  purpose: '',
+  frequency: '',
+  searchForAlternative: true,
 };
 
 const INITIAL_UI_STATE = {
@@ -27,7 +27,7 @@ const INITIAL_UI_STATE = {
   showFinancialProfile: false,
   showSavingsTracker: false,
   showResultBubble: false,
-  showImageOptions: false
+  showImageOptions: false,
 };
 
 // Reducer for form state management
@@ -70,11 +70,11 @@ const createGoogleSearchLink = (itemName) => {
 const saveToHistory = async (analysisResult, itemName, itemCost, firestore) => {
   const decision = analysisResult.formatted.decision;
   let savings = 0;
-  
+
   // Set savings based on decision
   if (decision === "Don't Buy") {
     savings = parseFloat(itemCost);
-  } else if (decision === "Buy" && analysisResult.alternative) {
+  } else if (decision === 'Buy' && analysisResult.alternative) {
     const alternativeSavings = parseFloat(itemCost) - analysisResult.alternative.price;
     savings = alternativeSavings > 0 ? alternativeSavings : 0;
   }
@@ -86,9 +86,8 @@ const saveToHistory = async (analysisResult, itemName, itemCost, firestore) => {
     decision: decision,
     savings: savings,
     alternative: analysisResult.alternative,
-    analysisDetails: analysisResult.formatted.analysisDetails
+    analysisDetails: analysisResult.formatted.analysisDetails,
   };
-
 
   console.log('User:', firestore.user);
   console.log('User UID:', firestore.user?.uid);
@@ -102,7 +101,7 @@ const saveToHistory = async (analysisResult, itemName, itemCost, firestore) => {
       const history = JSON.parse(localStorage.getItem('purchaseHistory') || '[]');
       history.unshift({
         ...historyEntry,
-        date: historyEntry.date.toISOString()
+        date: historyEntry.date.toISOString(),
       });
       localStorage.setItem('purchaseHistory', JSON.stringify(history));
       console.log('Purchase history saved to localStorage successfully');
@@ -117,11 +116,11 @@ const saveToHistory = async (analysisResult, itemName, itemCost, firestore) => {
     // Wait longer for auth to complete with timeout
     const authTimeout = 5000; // 5 seconds
     const startTime = Date.now();
-    
-    while (firestore.authLoading && (Date.now() - startTime) < authTimeout) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+
+    while (firestore.authLoading && Date.now() - startTime < authTimeout) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    
+
     if (firestore.authLoading) {
       console.log('Auth loading timeout, falling back to localStorage');
       saveToLocalStorage('auth loading timeout');
@@ -133,25 +132,27 @@ const saveToHistory = async (analysisResult, itemName, itemCost, firestore) => {
   if (firestore.isAuthenticated && firestore.user && firestore.user.uid && !firestore.authLoading) {
     try {
       console.log('Attempting to save purchase history for user:', firestore.user.uid);
-      
+
       // Add a timeout to the save operation
       const savePromise = firestore.savePurchase(historyEntry);
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Save operation timed out')), 15000); // 15 second timeout
       });
-      
+
       await Promise.race([savePromise, timeoutPromise]);
       console.log('Purchase history saved to Firestore successfully');
     } catch (error) {
       console.error('Failed to save purchase history to Firestore:', error);
       console.error('Error details:', error.message, error.code);
-      
+
       // Always fallback to localStorage on any Firestore error
       saveToLocalStorage(`Firestore error: ${error.message || 'Unknown error'}`);
     }
   } else {
     // Fallback to localStorage
-    saveToLocalStorage(`User not authenticated. Auth state: authenticated=${firestore.isAuthenticated}, hasUser=${!!firestore.user}, hasUid=${!!(firestore.user && firestore.user.uid)}, authLoading=${firestore.authLoading}`);
+    saveToLocalStorage(
+      `User not authenticated. Auth state: authenticated=${firestore.isAuthenticated}, hasUser=${!!firestore.user}, hasUid=${!!(firestore.user && firestore.user.uid)}, authLoading=${firestore.authLoading}`
+    );
   }
 };
 
@@ -164,7 +165,8 @@ const loadFinancialProfile = async (firestore) => {
       return {
         ...firestoreProfile,
         summary: firestoreProfile.summary || {
-          monthlyNetIncome: ((parseFloat(firestoreProfile.monthlyIncome) || 0) -
+          monthlyNetIncome:
+            (parseFloat(firestoreProfile.monthlyIncome) || 0) -
             (parseFloat(firestoreProfile.housingCost) || 0) -
             (parseFloat(firestoreProfile.utilitiesCost) || 0) -
             (parseFloat(firestoreProfile.foodCost) || 0) -
@@ -176,11 +178,11 @@ const loadFinancialProfile = async (firestore) => {
             (parseFloat(firestoreProfile.studentLoanPayment) || 0) -
             (parseFloat(firestoreProfile.carLoanPayment) || 0) -
             (parseFloat(firestoreProfile.mortgagePayment) || 0) -
-            (parseFloat(firestoreProfile.otherDebtPayment) || 0)),
+            (parseFloat(firestoreProfile.otherDebtPayment) || 0),
           debtToIncomeRatio: 0,
           emergencyFundMonths: 0,
-          healthScore: 50
-        }
+          healthScore: 50,
+        },
       };
     }
   }
@@ -193,21 +195,26 @@ const loadFinancialProfile = async (firestore) => {
       monthlyIncome: parsed.monthlyIncome,
       monthlyExpenses: parsed.monthlyExpenses,
       currentSavings: parsed.currentSavings,
-      debtPayments: parsed.debtPayments || "0",
+      debtPayments: parsed.debtPayments || '0',
       summary: {
-        monthlyNetIncome: parsed.summary?.monthlyNetIncome ||
-          ((parseFloat(parsed.monthlyIncome) || 0) -
+        monthlyNetIncome:
+          parsed.summary?.monthlyNetIncome ||
+          (parseFloat(parsed.monthlyIncome) || 0) -
             (parseFloat(parsed.monthlyExpenses) || 0) -
-            (parseFloat(parsed.debtPayments) || 0)),
-        debtToIncomeRatio: parsed.debtPayments && parseFloat(parsed.monthlyIncome) > 0 ?
-          ((parseFloat(parsed.debtPayments) / parseFloat(parsed.monthlyIncome)) * 100) : 0,
-        emergencyFundMonths: parsed.summary?.savingsMonths ||
-          (parsed.currentSavings && parsed.monthlyExpenses && parseFloat(parsed.monthlyExpenses) > 0 ?
-            (parseFloat(parsed.currentSavings) / parseFloat(parsed.monthlyExpenses)) : 0),
-        healthScore: parsed.summary?.healthScore || 50
+            (parseFloat(parsed.debtPayments) || 0),
+        debtToIncomeRatio:
+          parsed.debtPayments && parseFloat(parsed.monthlyIncome) > 0
+            ? (parseFloat(parsed.debtPayments) / parseFloat(parsed.monthlyIncome)) * 100
+            : 0,
+        emergencyFundMonths:
+          parsed.summary?.savingsMonths ||
+          (parsed.currentSavings && parsed.monthlyExpenses && parseFloat(parsed.monthlyExpenses) > 0
+            ? parseFloat(parsed.currentSavings) / parseFloat(parsed.monthlyExpenses)
+            : 0),
+        healthScore: parsed.summary?.healthScore || 50,
       },
-      riskTolerance: parsed.riskTolerance || "moderate",
-      financialGoal: parsed.financialGoal || "balance"
+      riskTolerance: parsed.riskTolerance || 'moderate',
+      financialGoal: parsed.financialGoal || 'balance',
     };
   }
 
@@ -228,7 +235,7 @@ const PurchaseAdvisor = () => {
 
   // Firestore hook
   const firestore = useFirestore();
-  
+
   // Location hook
   const { location, isLoading: locationLoading, requestPermission } = useLocation();
 
@@ -253,23 +260,27 @@ const PurchaseAdvisor = () => {
   }, [firestore.isAuthenticated]);
 
   // Callbacks
-  const handleFinancialProfileUpdate = useCallback(async (profile) => {
-    const updatedProfile = {
-      ...profile,
-      summary: {
-        ...profile.summary,
-        emergencyFundMonths: profile.summary?.savingsMonths || profile.summary?.emergencyFundMonths || 0
+  const handleFinancialProfileUpdate = useCallback(
+    async (profile) => {
+      const updatedProfile = {
+        ...profile,
+        summary: {
+          ...profile.summary,
+          emergencyFundMonths:
+            profile.summary?.savingsMonths || profile.summary?.emergencyFundMonths || 0,
+        },
+      };
+
+      // Save to Firestore if authenticated
+      if (firestore.isAuthenticated) {
+        await firestore.saveProfile(updatedProfile);
       }
-    };
 
-    // Save to Firestore if authenticated
-    if (firestore.isAuthenticated) {
-      await firestore.saveProfile(updatedProfile);
-    }
-
-    setFinancialProfile(updatedProfile);
-    dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: false });
-  }, [firestore]);
+      setFinancialProfile(updatedProfile);
+      dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: false });
+    },
+    [firestore]
+  );
 
   const handleImageProcessed = useCallback(async (file, preview) => {
     setImageFile(file);
@@ -287,11 +298,11 @@ const PurchaseAdvisor = () => {
         });
 
         const itemDetails = await analyzeImageWithOpenAI(base64Image);
-        if (itemDetails && itemDetails.name && itemDetails.name !== "Error") {
+        if (itemDetails && itemDetails.name && itemDetails.name !== 'Error') {
           dispatchForm({
             type: 'SET_ITEM_FROM_IMAGE',
             name: itemDetails.name,
-            cost: itemDetails.cost?.toString()
+            cost: itemDetails.cost?.toString(),
           });
         }
       } catch (error) {
@@ -309,22 +320,22 @@ const PurchaseAdvisor = () => {
   const analyzePurchase = useCallback(async () => {
     // Validation
     if (!formState.itemCost.trim()) {
-      alert("Please enter the cost of the item");
+      alert('Please enter the cost of the item');
       return;
     }
 
     if (!imageFile && !formState.itemName.trim()) {
-      alert("Please either capture an image or enter the item name");
+      alert('Please either capture an image or enter the item name');
       return;
     }
 
     // Check for financial profile
     if (!financialProfile && !hasSeenProfilePrompt) {
       const shouldSetupProfile = window.confirm(
-        "🎯 Get personalized advice!\n\n" +
-        "Add your financial info for recommendations tailored to your situation. " +
-        "It only takes 2 minutes and helps us give you better advice.\n\n" +
-        "Would you like to set it up now?"
+        '🎯 Get personalized advice!\n\n' +
+          'Add your financial info for recommendations tailored to your situation. ' +
+          'It only takes 2 minutes and helps us give you better advice.\n\n' +
+          'Would you like to set it up now?'
       );
 
       localStorage.setItem('hasSeenProfilePrompt', 'true');
@@ -343,25 +354,25 @@ const PurchaseAdvisor = () => {
 
     try {
       console.log('=== Starting Purchase Analysis ===');
-      console.log('Auth status:', { 
-        isAuthenticated: firestore.isAuthenticated, 
+      console.log('Auth status:', {
+        isAuthenticated: firestore.isAuthenticated,
         authLoading: firestore.authLoading,
-        hasUser: !!firestore.user 
+        hasUser: !!firestore.user,
       });
-      
+
       const recognizedItemName = formState.itemName;
       const costValue = parseFloat(formState.itemCost);
       let alternative = null;
 
       // Get current location if not already loaded
-      const currentLocation = location || await LocationService.getUserLocation();
-      
+      const currentLocation = location || (await LocationService.getUserLocation());
+
       // Find alternatives if requested
       if (formState.searchForAlternative) {
         console.log('Finding alternatives...');
         dispatchUI({ type: 'SET_FINDING_ALTERNATIVES', value: true });
         alternative = await findCheaperAlternative(
-          recognizedItemName, 
+          recognizedItemName,
           costValue,
           currentLocation // Pass location
         );
@@ -383,7 +394,7 @@ const PurchaseAdvisor = () => {
       console.log('Recommendation received:', recommendation);
 
       const mungerMessage = {
-        sender: "Munger",
+        sender: 'Munger',
         text: recommendation.summary,
         formatted: {
           decision: recommendation.decision,
@@ -391,13 +402,13 @@ const PurchaseAdvisor = () => {
           reasoning: recommendation.reasoning,
           quote: recommendation.quote,
           analysisDetails: { ...recommendation.analysisDetails, itemName: recognizedItemName },
-          decisionMatrix: recommendation.decisionMatrix
+          decisionMatrix: recommendation.decisionMatrix,
         },
-        alternative: alternative
+        alternative: alternative,
       };
 
       setMessages([mungerMessage]);
-      
+
       console.log('Saving to history...');
       await saveToHistory(mungerMessage, formState.itemName, formState.itemCost, firestore);
       console.log('History saved successfully');
@@ -409,23 +420,31 @@ const PurchaseAdvisor = () => {
       dispatchUI({ type: 'SHOW_RESULTS' });
       console.log('=== Purchase Analysis Complete ===');
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       const errorMessage = {
-        sender: "Munger",
+        sender: 'Munger',
         text: "Sorry, I couldn't analyze this purchase right now.",
         formatted: {
-          decision: "Error",
+          decision: 'Error',
           summary: "Sorry, I couldn't analyze this purchase right now. A technical error occurred.",
-          reasoning: "Technical error occurred: " + error.message,
-          quote: "The big money is not in the buying and selling, but in the waiting."
-        }
+          reasoning: 'Technical error occurred: ' + error.message,
+          quote: 'The big money is not in the buying and selling, but in the waiting.',
+        },
       };
       setMessages([errorMessage]);
       dispatchUI({ type: 'SHOW_RESULTS' });
     } finally {
       dispatchUI({ type: 'SET_LOADING', value: false });
     }
-  }, [formState, imageFile, financialProfile, hasSeenProfilePrompt, clearImage, firestore, location]);
+  }, [
+    formState,
+    imageFile,
+    financialProfile,
+    hasSeenProfilePrompt,
+    clearImage,
+    firestore,
+    location,
+  ]);
 
   // Render helpers
   const getHealthScoreColor = (score) => {
@@ -442,17 +461,18 @@ const PurchaseAdvisor = () => {
 
   return (
     <div className="App">
-      
       <div className="hero-section">
         <h1 className="hero-title">To Buy or not to Buy?</h1>
         <p className="hero-subtitle">
-          That is the{" "}
+          That is the{' '}
           <span
             className="million-link"
-            onClick={() => dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showSavingsTracker', value: true })}
+            onClick={() =>
+              dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showSavingsTracker', value: true })
+            }
           >
             million
-          </span>{" "}
+          </span>{' '}
           dollar question
         </p>
       </div>
@@ -467,7 +487,9 @@ const PurchaseAdvisor = () => {
             </h3>
             <button
               className="update-profile-btn"
-              onClick={() => dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: true })}
+              onClick={() =>
+                dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: true })
+              }
               title="Update financial info"
             >
               Update
@@ -476,7 +498,9 @@ const PurchaseAdvisor = () => {
           <div className="mini-profile-stats">
             <div className="mini-stat">
               <span className="stat-label">Monthly Net:</span>
-              <span className={`stat-value ${financialProfile.summary.monthlyNetIncome >= 0 ? 'positive' : 'negative'}`}>
+              <span
+                className={`stat-value ${financialProfile.summary.monthlyNetIncome >= 0 ? 'positive' : 'negative'}`}
+              >
                 ${Math.abs(financialProfile.summary.monthlyNetIncome).toFixed(0)}
               </span>
             </div>
@@ -491,7 +515,9 @@ const PurchaseAdvisor = () => {
             </div>
             <div className="mini-stat">
               <span className="stat-label">Emergency:</span>
-              <span className={`stat-value ${(financialProfile.summary.emergencyFundMonths || 0) >= 3 ? 'positive' : (financialProfile.summary.emergencyFundMonths || 0) >= 1 ? 'warning' : 'negative'}`}>
+              <span
+                className={`stat-value ${(financialProfile.summary.emergencyFundMonths || 0) >= 3 ? 'positive' : (financialProfile.summary.emergencyFundMonths || 0) >= 1 ? 'warning' : 'negative'}`}
+              >
                 {(financialProfile.summary.emergencyFundMonths || 0).toFixed(1)}mo
               </span>
             </div>
@@ -504,7 +530,9 @@ const PurchaseAdvisor = () => {
             <p>Get personalized advice based on your financial situation</p>
             <button
               className="setup-profile-btn"
-              onClick={() => dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: true })}
+              onClick={() =>
+                dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: true })
+              }
             >
               Quick Setup (2 min)
             </button>
@@ -532,8 +560,10 @@ const PurchaseAdvisor = () => {
                   id="itemName"
                   type="text"
                   value={formState.itemName}
-                  onChange={(e) => dispatchForm({ type: 'UPDATE_FIELD', field: 'itemName', value: e.target.value })}
-                  placeholder={imageFile ? "Identifying..." : "What are you considering buying?"}
+                  onChange={(e) =>
+                    dispatchForm({ type: 'UPDATE_FIELD', field: 'itemName', value: e.target.value })
+                  }
+                  placeholder={imageFile ? 'Identifying...' : 'What are you considering buying?'}
                   disabled={uiState.loading}
                   className="input-field"
                 />
@@ -545,7 +575,9 @@ const PurchaseAdvisor = () => {
                   id="itemCost"
                   type="number"
                   value={formState.itemCost}
-                  onChange={(e) => dispatchForm({ type: 'UPDATE_FIELD', field: 'itemCost', value: e.target.value })}
+                  onChange={(e) =>
+                    dispatchForm({ type: 'UPDATE_FIELD', field: 'itemCost', value: e.target.value })
+                  }
                   placeholder="How much does it cost?"
                   disabled={uiState.loading}
                   className="input-field"
@@ -560,7 +592,9 @@ const PurchaseAdvisor = () => {
                   id="purpose"
                   type="text"
                   value={formState.purpose}
-                  onChange={(e) => dispatchForm({ type: 'UPDATE_FIELD', field: 'purpose', value: e.target.value })}
+                  onChange={(e) =>
+                    dispatchForm({ type: 'UPDATE_FIELD', field: 'purpose', value: e.target.value })
+                  }
                   placeholder="What will you use it for?"
                   disabled={uiState.loading}
                   className="input-field"
@@ -572,7 +606,13 @@ const PurchaseAdvisor = () => {
                 <select
                   id="frequency"
                   value={formState.frequency}
-                  onChange={(e) => dispatchForm({ type: 'UPDATE_FIELD', field: 'frequency', value: e.target.value })}
+                  onChange={(e) =>
+                    dispatchForm({
+                      type: 'UPDATE_FIELD',
+                      field: 'frequency',
+                      value: e.target.value,
+                    })
+                  }
                   disabled={uiState.loading}
                   className="select-field"
                 >
@@ -594,7 +634,9 @@ const PurchaseAdvisor = () => {
             onImageProcessed={handleImageProcessed}
             onClearImage={clearImage}
             showImageOptions={uiState.showImageOptions}
-            onToggleImageOptions={(show) => dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showImageOptions', value: show })}
+            onToggleImageOptions={(show) =>
+              dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showImageOptions', value: show })
+            }
             loading={uiState.loading}
           />
 
@@ -604,7 +646,13 @@ const PurchaseAdvisor = () => {
               <input
                 type="checkbox"
                 checked={formState.searchForAlternative}
-                onChange={(e) => dispatchForm({ type: 'UPDATE_FIELD', field: 'searchForAlternative', value: e.target.checked })}
+                onChange={(e) =>
+                  dispatchForm({
+                    type: 'UPDATE_FIELD',
+                    field: 'searchForAlternative',
+                    value: e.target.checked,
+                  })
+                }
                 disabled={uiState.loading}
                 className="checkbox-input"
               />
@@ -637,8 +685,6 @@ const PurchaseAdvisor = () => {
               </span>
             )}
           </button>
-
-
         </div>
       </div>
 
@@ -653,13 +699,19 @@ const PurchaseAdvisor = () => {
 
       {/* Modals */}
       {uiState.showSavingsTracker && (
-        <SavingsTracker onClose={() => dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showSavingsTracker', value: false })} />
+        <SavingsTracker
+          onClose={() =>
+            dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showSavingsTracker', value: false })
+          }
+        />
       )}
 
       {uiState.showFinancialProfile && (
         <ProgressiveFinancialProfile
           onProfileUpdate={handleFinancialProfileUpdate}
-          onClose={() => dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: false })}
+          onClose={() =>
+            dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: false })
+          }
         />
       )}
     </div>

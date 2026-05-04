@@ -19,7 +19,7 @@ export const useRobustDataLoader = <T>(
     data: null,
     loading: true,
     error: null,
-    hasLocalFallback: false
+    hasLocalFallback: false,
   });
 
   // Use refs to store stable references
@@ -38,7 +38,7 @@ export const useRobustDataLoader = <T>(
 
   const loadFromLocalStorage = useCallback((): T | null => {
     if (!localStorageKey) return null;
-    
+
     try {
       const saved = localStorage.getItem(localStorageKey);
       if (saved) {
@@ -53,25 +53,25 @@ export const useRobustDataLoader = <T>(
 
   const loadData = useCallback(async () => {
     if (!user) {
-      setState(prev => ({ ...prev, loading: false, data: null }));
+      setState((prev) => ({ ...prev, loading: false, data: null }));
       return;
     }
 
     // Only show loading on initial load or manual retry
     if (!hasInitialized.current) {
-      setState(prev => ({ ...prev, loading: true, error: null }));
+      setState((prev) => ({ ...prev, loading: true, error: null }));
     }
-    
+
     try {
       // Try to load from Firestore
       const firestoreData = await firestoreLoaderRef.current();
-      
+
       if (firestoreData) {
         setState({
           data: firestoreData,
           loading: false,
           error: null,
-          hasLocalFallback: false
+          hasLocalFallback: false,
         });
         hasInitialized.current = true;
         return;
@@ -84,7 +84,7 @@ export const useRobustDataLoader = <T>(
           data: localData,
           loading: false,
           error: null,
-          hasLocalFallback: true
+          hasLocalFallback: true,
         });
         hasInitialized.current = true;
         return;
@@ -95,13 +95,12 @@ export const useRobustDataLoader = <T>(
         data: null,
         loading: false,
         error: null,
-        hasLocalFallback: false
+        hasLocalFallback: false,
       });
       hasInitialized.current = true;
-
     } catch (error: any) {
       console.error(`Error loading ${dataKey}:`, error);
-      
+
       // Try localStorage as fallback on error
       const localData = loadFromLocalStorage();
       if (localData) {
@@ -109,14 +108,14 @@ export const useRobustDataLoader = <T>(
           data: localData,
           loading: false,
           error: `Connection issue - using offline data`,
-          hasLocalFallback: true
+          hasLocalFallback: true,
         });
       } else {
         setState({
           data: null,
           loading: false,
           error: error.message || `Failed to load ${dataKey}`,
-          hasLocalFallback: false
+          hasLocalFallback: false,
         });
       }
       hasInitialized.current = true;
@@ -137,6 +136,6 @@ export const useRobustDataLoader = <T>(
 
   return {
     ...state,
-    retry
+    retry,
   };
 };

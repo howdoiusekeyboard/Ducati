@@ -11,13 +11,18 @@
  * @param {Object} locationContext - User location context (optional)
  * @returns {string} Formatted prompt for AI API
  */
-export const getPromptForCategory = (category, initialSummary, finalDecision, locationContext = null) => {
+export const getPromptForCategory = (
+  category,
+  initialSummary,
+  finalDecision,
+  locationContext = null
+) => {
   // Build location context string
   let locationInfo = '';
   if (locationContext) {
-    const location = locationContext.city ? 
-      `${locationContext.city}, ${locationContext.state || locationContext.country}` : 
-      locationContext.country || 'Unknown location';
+    const location = locationContext.city
+      ? `${locationContext.city}, ${locationContext.state || locationContext.country}`
+      : locationContext.country || 'Unknown location';
     locationInfo = `\n\nUser Location: ${location} (${locationContext.accuracy} accuracy)
 Consider local market conditions, availability, and regional pricing in your advice.`;
   }
@@ -65,6 +70,11 @@ Provide your response as a JSON object with a single key: "refinedSummary".`;
 
     default:
       // Fallback to DISCRETIONARY_SMALL template for unknown categories
-      return getPromptForCategory('DISCRETIONARY_SMALL', initialSummary, finalDecision, locationContext);
+      return getPromptForCategory(
+        'DISCRETIONARY_SMALL',
+        initialSummary,
+        finalDecision,
+        locationContext
+      );
   }
 };

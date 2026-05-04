@@ -12,7 +12,7 @@ export class OfflineManager {
     if (typeof window !== 'undefined') {
       window.addEventListener('online', this.handleOnline.bind(this));
       window.addEventListener('offline', this.handleOffline.bind(this));
-      
+
       // Initialize with current state
       this.isOffline = !navigator.onLine;
     }
@@ -52,7 +52,7 @@ export class OfflineManager {
   }
 
   private notifyListeners() {
-    this.listeners.forEach(listener => listener(this.isOffline));
+    this.listeners.forEach((listener) => listener(this.isOffline));
   }
 
   public addListener(callback: (isOffline: boolean) => void): () => void {

@@ -10,7 +10,8 @@ const HealthScoreWidget = ({ profile }) => {
   const debtToIncomeRatio = safeNumber(profile?.summary?.debtToIncomeRatio, 0);
 
   // Calculate current savings safely
-  const currentSavings = safeNumber(profile?.checkingSavingsBalance, 0) +
+  const currentSavings =
+    safeNumber(profile?.checkingSavingsBalance, 0) +
     safeNumber(profile?.emergencyFund, 0) +
     safeNumber(profile?.retirementAccounts, 0) +
     safeNumber(profile?.stocksAndBonds, 0);
@@ -31,7 +32,7 @@ const HealthScoreWidget = ({ profile }) => {
   // Data for the gauge chart
   const gaugeData = [
     { name: 'Score', value: healthScore, fill: getScoreColor(healthScore) },
-    { name: 'Remaining', value: 100 - healthScore, fill: '#e5e7eb' }
+    { name: 'Remaining', value: 100 - healthScore, fill: '#e5e7eb' },
   ];
 
   // Format currency
@@ -97,34 +98,41 @@ const HealthScoreWidget = ({ profile }) => {
 
           <div className="metric-card">
             <div className="metric-label">Total Savings</div>
-            <div className="metric-value">
-              {formatCurrency(currentSavings)}
-            </div>
-            <div className="metric-sublabel">
-              Across all accounts
-            </div>
+            <div className="metric-value">{formatCurrency(currentSavings)}</div>
+            <div className="metric-sublabel">Across all accounts</div>
           </div>
 
           <div className="metric-card">
             <div className="metric-label">Emergency Fund</div>
-            <div className={`metric-value ${emergencyFundMonths >= 3 ? 'positive' : emergencyFundMonths >= 1 ? 'warning' : 'negative'}`}>
+            <div
+              className={`metric-value ${emergencyFundMonths >= 3 ? 'positive' : emergencyFundMonths >= 1 ? 'warning' : 'negative'}`}
+            >
               {safeToFixed(emergencyFundMonths, 1)} mo
             </div>
             <div className="metric-sublabel">
-              {emergencyFundMonths >= 6 ? 'Excellent coverage' : 
-               emergencyFundMonths >= 3 ? 'Good coverage' :
-               emergencyFundMonths >= 1 ? 'Build it up' : 'Start saving'}
+              {emergencyFundMonths >= 6
+                ? 'Excellent coverage'
+                : emergencyFundMonths >= 3
+                  ? 'Good coverage'
+                  : emergencyFundMonths >= 1
+                    ? 'Build it up'
+                    : 'Start saving'}
             </div>
           </div>
 
           <div className="metric-card">
             <div className="metric-label">Debt Ratio</div>
-            <div className={`metric-value ${debtToIncomeRatio <= 20 ? 'positive' : debtToIncomeRatio <= 40 ? 'warning' : 'negative'}`}>
+            <div
+              className={`metric-value ${debtToIncomeRatio <= 20 ? 'positive' : debtToIncomeRatio <= 40 ? 'warning' : 'negative'}`}
+            >
               {safeToFixed(debtToIncomeRatio, 0)}%
             </div>
             <div className="metric-sublabel">
-              {debtToIncomeRatio <= 20 ? 'Healthy' : 
-               debtToIncomeRatio <= 40 ? 'Manageable' : 'High'}
+              {debtToIncomeRatio <= 20
+                ? 'Healthy'
+                : debtToIncomeRatio <= 40
+                  ? 'Manageable'
+                  : 'High'}
             </div>
           </div>
         </div>
@@ -134,7 +142,8 @@ const HealthScoreWidget = ({ profile }) => {
           <h4>💡 Quick Tips</h4>
           {healthScore < 40 && (
             <p className="tip urgent">
-              Focus on building an emergency fund and reducing high-interest debt to improve your score.
+              Focus on building an emergency fund and reducing high-interest debt to improve your
+              score.
             </p>
           )}
           {healthScore >= 40 && healthScore < 70 && (

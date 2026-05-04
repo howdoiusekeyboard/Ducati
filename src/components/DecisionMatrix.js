@@ -25,17 +25,29 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
 
   return (
     <div className="decision-matrix-container">
-      <div className="matrix-header" onClick={() => setIsExpanded(!isExpanded)} role="button" tabIndex="0" aria-expanded={isExpanded}>
+      <div
+        className="matrix-header"
+        onClick={() => setIsExpanded(!isExpanded)}
+        role="button"
+        tabIndex="0"
+        aria-expanded={isExpanded}
+      >
         <h3>
           <span className="matrix-icon">📊</span>
           Decision Analysis Matrix
         </h3>
         <div className="overall-score">
           <span className="score-label">Overall Score:</span>
-          <span className="score-value" style={{ color: getScoreColor(analysisDetails.finalScore / 10) }}>
+          <span
+            className="score-value"
+            style={{ color: getScoreColor(analysisDetails.finalScore / 10) }}
+          >
             {analysisDetails.finalScore}/100
           </span>
-          <button className="toggle-indicator" aria-label={isExpanded ? 'Collapse details' : 'Expand details'}>
+          <button
+            className="toggle-indicator"
+            aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
+          >
             {isExpanded ? '▲' : '▼'}
           </button>
         </div>
@@ -63,14 +75,11 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
                           className="score-bar"
                           style={{
                             width: `${item.score * 10}%`,
-                            backgroundColor: getScoreColor(item.score)
+                            backgroundColor: getScoreColor(item.score),
                           }}
                         />
                       </div>
-                      <span
-                        className="score-label"
-                        style={{ color: getScoreColor(item.score) }}
-                      >
+                      <span className="score-label" style={{ color: getScoreColor(item.score) }}>
                         {getScoreLabel(item.score)}
                       </span>
                     </div>
@@ -98,14 +107,11 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
                           className="score-bar"
                           style={{
                             width: `${item.score * 10}%`,
-                            backgroundColor: getScoreColor(item.score)
+                            backgroundColor: getScoreColor(item.score),
                           }}
                         />
                       </div>
-                      <span
-                        className="score-label"
-                        style={{ color: getScoreColor(item.score) }}
-                      >
+                      <span className="score-label" style={{ color: getScoreColor(item.score) }}>
                         {getScoreLabel(item.score)}
                       </span>
                     </div>
@@ -133,14 +139,11 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
                           className="score-bar"
                           style={{
                             width: `${item.score * 10}%`,
-                            backgroundColor: getScoreColor(item.score)
+                            backgroundColor: getScoreColor(item.score),
                           }}
                         />
                       </div>
-                      <span
-                        className="score-label"
-                        style={{ color: getScoreColor(item.score) }}
-                      >
+                      <span className="score-label" style={{ color: getScoreColor(item.score) }}>
                         {getScoreLabel(item.score)}
                       </span>
                     </div>
@@ -168,14 +171,11 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
                           className="score-bar"
                           style={{
                             width: `${item.score * 10}%`,
-                            backgroundColor: getScoreColor(item.score)
+                            backgroundColor: getScoreColor(item.score),
                           }}
                         />
                       </div>
-                      <span
-                        className="score-label"
-                        style={{ color: getScoreColor(item.score) }}
-                      >
+                      <span className="score-label" style={{ color: getScoreColor(item.score) }}>
                         {getScoreLabel(item.score)}
                       </span>
                     </div>
@@ -208,9 +208,9 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
           {/* Decision Explanation */}
           <div className="decision-explanation">
             <p className="explanation-text">
-              This analysis uses a <strong>Weighted Decision Matrix</strong> based on academic research in consumer behavior
-              and financial decision-making. Each criterion is scored from 0-10 and weighted by importance to calculate
-              an overall recommendation score.
+              This analysis uses a <strong>Weighted Decision Matrix</strong> based on academic
+              research in consumer behavior and financial decision-making. Each criterion is scored
+              from 0-10 and weighted by importance to calculate an overall recommendation score.
             </p>
           </div>
         </div>

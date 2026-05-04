@@ -162,7 +162,7 @@
   transition: transform 0.2s;
 }
 
-.user-profile-button[aria-expanded="true"] .dropdown-arrow {
+.user-profile-button[aria-expanded='true'] .dropdown-arrow {
   transform: rotate(180deg);
 }
 
@@ -447,7 +447,7 @@
   margin-bottom: 15px;
 }
 
-.config-error-container>p {
+.config-error-container > p {
   color: #666;
   font-size: 1.1rem;
   margin-bottom: 30px;
@@ -495,7 +495,7 @@
   font-size: 0.9rem;
 }
 
-.setup-instructions>p {
+.setup-instructions > p {
   margin-top: 15px;
   font-style: italic;
   color: #6b7280;
@@ -538,7 +538,7 @@
   margin-bottom: 10px;
 }
 
-.auth-error>p {
+.auth-error > p {
   color: #7f1d1d;
   margin-bottom: 15px;
 }

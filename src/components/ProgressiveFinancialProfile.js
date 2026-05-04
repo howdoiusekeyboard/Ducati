@@ -1,20 +1,20 @@
 // src/components/ProgressiveFinancialProfile.js
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useFirestore } from "../hooks/useFirestore";
-import "../styles/ProgressiveFinancialProfile.css";
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useFirestore } from '../hooks/useFirestore';
+import '../styles/ProgressiveFinancialProfile.css';
 
 const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
   const { user } = useAuth();
   const { saveProfile, getProfile, isAuthenticated } = useFirestore();
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState({
-    monthlyIncome: "",
-    monthlyExpenses: "",
-    currentSavings: "",
+    monthlyIncome: '',
+    monthlyExpenses: '',
+    currentSavings: '',
     riskTolerance: null,
-    debtPayments: "",
-    financialGoal: "",
+    debtPayments: '',
+    financialGoal: '',
   });
   const [includedDebtInExpenses, setIncludedDebtInExpenses] = useState(false);
 
@@ -35,12 +35,12 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
             console.log('Firestore profile loaded successfully');
             // Map Firestore profile to quick profile format
             const quickProfile = {
-              monthlyIncome: firestoreProfile.monthlyIncome || "",
+              monthlyIncome: firestoreProfile.monthlyIncome || '',
               monthlyExpenses: calculateTotalExpenses(firestoreProfile),
-              currentSavings: firestoreProfile.checkingSavingsBalance || "",
+              currentSavings: firestoreProfile.checkingSavingsBalance || '',
               riskTolerance: firestoreProfile.riskTolerance || null,
               debtPayments: calculateTotalDebtPayments(firestoreProfile),
-              financialGoal: firestoreProfile.financialPriorities || "",
+              financialGoal: firestoreProfile.financialPriorities || '',
             };
             setProfile(quickProfile);
             if (quickProfile.monthlyIncome && quickProfile.monthlyExpenses) setStep(4);
@@ -66,12 +66,12 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
       if (savedProfile) {
         const parsed = JSON.parse(savedProfile);
         setProfile({
-          monthlyIncome: parsed.monthlyIncome || "",
-          monthlyExpenses: parsed.monthlyExpenses || "",
-          currentSavings: parsed.currentSavings || "",
+          monthlyIncome: parsed.monthlyIncome || '',
+          monthlyExpenses: parsed.monthlyExpenses || '',
+          currentSavings: parsed.currentSavings || '',
           riskTolerance: parsed.riskTolerance || null,
-          debtPayments: parsed.debtPayments || "",
-          financialGoal: parsed.financialGoal || "",
+          debtPayments: parsed.debtPayments || '',
+          financialGoal: parsed.financialGoal || '',
         });
         if (parsed.monthlyIncome && parsed.monthlyExpenses) setStep(4);
       }
@@ -85,14 +85,14 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
         firestoreProfile.transportationCost,
         firestoreProfile.insuranceCost,
         firestoreProfile.subscriptionsCost,
-        firestoreProfile.otherExpenses
+        firestoreProfile.otherExpenses,
       ];
 
       const total = expenses.reduce((sum, expense) => {
         return sum + (parseFloat(expense) || 0);
       }, 0);
 
-      return total > 0 ? total.toString() : "";
+      return total > 0 ? total.toString() : '';
     };
 
     const calculateTotalDebtPayments = (firestoreProfile) => {
@@ -100,14 +100,14 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
         firestoreProfile.creditCardPayment,
         firestoreProfile.studentLoanPayment,
         firestoreProfile.carLoanPayment,
-        firestoreProfile.otherDebtPayment
+        firestoreProfile.otherDebtPayment,
       ];
 
       const total = payments.reduce((sum, payment) => {
         return sum + (parseFloat(payment) || 0);
       }, 0);
 
-      return total > 0 ? total.toString() : "";
+      return total > 0 ? total.toString() : '';
     };
 
     loadProfile();
@@ -116,69 +116,69 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
   const questions = [
     {
       title: "What's your monthly income after taxes?",
-      field: "monthlyIncome",
-      type: "number",
-      placeholder: "e.g., 5000",
-      prefix: "$",
-      help: "This helps us understand your purchasing power"
+      field: 'monthlyIncome',
+      type: 'number',
+      placeholder: 'e.g., 5000',
+      prefix: '$',
+      help: 'This helps us understand your purchasing power',
     },
     {
-      title: "Essential monthly expenses (exclude loan/credit-card payments)",
-      field: "monthlyExpenses",
-      type: "number",
-      placeholder: "e.g., 3500",
-      prefix: "$",
-      help: "Housing (rent or mortgage), utilities, groceries, insurance, subscriptions. Do not include credit-card or loan minimums—we ask next.",
-      hasCheckbox: true
+      title: 'Essential monthly expenses (exclude loan/credit-card payments)',
+      field: 'monthlyExpenses',
+      type: 'number',
+      placeholder: 'e.g., 3500',
+      prefix: '$',
+      help: 'Housing (rent or mortgage), utilities, groceries, insurance, subscriptions. Do not include credit-card or loan minimums—we ask next.',
+      hasCheckbox: true,
     },
     {
-      title: "How much do you have in savings?",
-      field: "currentSavings",
-      type: "number",
-      placeholder: "e.g., 10000",
-      prefix: "$",
-      help: "Your total in checking + savings accounts"
+      title: 'How much do you have in savings?',
+      field: 'currentSavings',
+      type: 'number',
+      placeholder: 'e.g., 10000',
+      prefix: '$',
+      help: 'Your total in checking + savings accounts',
     },
     {
       title: "What's your risk tolerance?",
-      field: "riskTolerance",
-      type: "choice",
+      field: 'riskTolerance',
+      type: 'choice',
       choices: [
-        { value: "low", label: "Low", emoji: "🛡️" },
-        { value: "moderate", label: "Moderate", emoji: "⚖️" },
-        { value: "high", label: "High", emoji: "🚀" }
+        { value: 'low', label: 'Low', emoji: '🛡️' },
+        { value: 'moderate', label: 'Moderate', emoji: '⚖️' },
+        { value: 'high', label: 'High', emoji: '🚀' },
       ],
-      help: "How comfortable are you with financial risk?"
+      help: 'How comfortable are you with financial risk?',
     },
     {
-      title: "Total monthly minimum debt payments",
-      field: "debtPayments",
-      type: "number",
-      placeholder: "e.g., 500",
-      prefix: "$",
-      help: "Credit cards, auto/student/personal loans (exclude mortgage). Minimums only.",
-      optional: true
+      title: 'Total monthly minimum debt payments',
+      field: 'debtPayments',
+      type: 'number',
+      placeholder: 'e.g., 500',
+      prefix: '$',
+      help: 'Credit cards, auto/student/personal loans (exclude mortgage). Minimums only.',
+      optional: true,
     },
     {
       title: "What's your main financial goal?",
-      field: "financialGoal",
-      type: "choice",
+      field: 'financialGoal',
+      type: 'choice',
       choices: [
-        { value: "save", label: "Build savings", emoji: "🏦" },
-        { value: "debt", label: "Pay off debt", emoji: "💳" },
-        { value: "invest", label: "Grow wealth", emoji: "📈" },
-        { value: "balance", label: "Balanced approach", emoji: "⚖️" }
-      ]
-    }
+        { value: 'save', label: 'Build savings', emoji: '🏦' },
+        { value: 'debt', label: 'Pay off debt', emoji: '💳' },
+        { value: 'invest', label: 'Grow wealth', emoji: '📈' },
+        { value: 'balance', label: 'Balanced approach', emoji: '⚖️' },
+      ],
+    },
   ];
 
   const currentQuestion = questions[step];
 
-  const handleInputChange = value => {
+  const handleInputChange = (value) => {
     console.log('Input change:', currentQuestion.field, value);
-    setProfile(prev => ({
+    setProfile((prev) => ({
       ...prev,
-      [currentQuestion.field]: value
+      [currentQuestion.field]: value,
     }));
   };
 
@@ -189,7 +189,14 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
       e.stopPropagation();
     }
 
-    console.log('handleNext called, step:', step, 'field:', currentQuestion.field, 'value:', profile[currentQuestion.field]);
+    console.log(
+      'handleNext called, step:',
+      step,
+      'field:',
+      currentQuestion.field,
+      'value:',
+      profile[currentQuestion.field]
+    );
 
     // Validate current input if required
     if (!currentQuestion.optional && !profile[currentQuestion.field]) {
@@ -214,20 +221,18 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
     const savings = toNumber(profile.currentSavings);
 
     // Adjust expenses if user accidentally included debt
-    const expenses = (includedDebtInExpenses ? Math.max(0, expensesInput - debt) : expensesInput);
+    const expenses = includedDebtInExpenses ? Math.max(0, expensesInput - debt) : expensesInput;
 
     const monthlyNetIncome = income - expenses - debt;
 
-    const debtToIncomeRatio = (income > 0 && debt > 0)
-      ? (debt / income) * 100
-      : 0;
+    const debtToIncomeRatio = income > 0 && debt > 0 ? (debt / income) * 100 : 0;
 
     const runwayDenom = Math.max(0, expenses + debt); // total monthly burn (must-pay)
-    const emergencyFundMonths = runwayDenom > 0 ? (savings / runwayDenom) : 0;
+    const emergencyFundMonths = runwayDenom > 0 ? savings / runwayDenom : 0;
 
     // Keep back-compat alias
     const savingsMonths = emergencyFundMonths;
-    
+
     // Derive hasEmergencyFund for internal use (not persisted)
     const hasEmergencyFund = emergencyFundMonths >= 3;
 
@@ -240,13 +245,13 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
       savingsMonths, // backward compatibility
       healthScore,
       hasEmergencyFund: hasEmergencyFund,
-      primaryGoal: profile.financialGoal
+      primaryGoal: profile.financialGoal,
     };
 
     const completeProfile = {
       ...profile,
       summary,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
 
     // Save to localStorage
@@ -258,41 +263,41 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
         console.log('Saving profile to Firestore...');
         await saveProfile({
           monthlyIncome: profile.monthlyIncome,
-          incomeFrequency: "monthly",
-          otherIncomeSources: "",
-          housingCost: "",
-          utilitiesCost: "",
-          foodCost: "",
-          transportationCost: "",
-          insuranceCost: "",
-          subscriptionsCost: "",
+          incomeFrequency: 'monthly',
+          otherIncomeSources: '',
+          housingCost: '',
+          utilitiesCost: '',
+          foodCost: '',
+          transportationCost: '',
+          insuranceCost: '',
+          subscriptionsCost: '',
           otherExpenses: profile.monthlyExpenses,
-          creditCardDebt: "",
+          creditCardDebt: '',
           creditCardPayment: profile.debtPayments,
-          studentLoanDebt: "",
-          studentLoanPayment: "",
-          carLoanDebt: "",
-          carLoanPayment: "",
-          mortgageDebt: "",
-          mortgagePayment: "",
-          otherDebt: "",
-          otherDebtPayment: "",
-          creditScore: "",
-          creditLimit: "",
-          currentCreditBalance: "",
+          studentLoanDebt: '',
+          studentLoanPayment: '',
+          carLoanDebt: '',
+          carLoanPayment: '',
+          mortgageDebt: '',
+          mortgagePayment: '',
+          otherDebt: '',
+          otherDebtPayment: '',
+          creditScore: '',
+          creditLimit: '',
+          currentCreditBalance: '',
           checkingSavingsBalance: profile.currentSavings,
-          emergencyFund: hasEmergencyFund ? profile.currentSavings : "0",
-          retirementAccounts: "",
-          stocksAndBonds: "",
-          realEstateValue: "",
-          otherInvestments: "",
-          shortTermGoals: "",
-          midTermGoals: "",
-          longTermGoals: "",
-          purchaseTimeframe: "",
+          emergencyFund: hasEmergencyFund ? profile.currentSavings : '0',
+          retirementAccounts: '',
+          stocksAndBonds: '',
+          realEstateValue: '',
+          otherInvestments: '',
+          shortTermGoals: '',
+          midTermGoals: '',
+          longTermGoals: '',
+          purchaseTimeframe: '',
           riskTolerance: profile.riskTolerance,
           financialPriorities: profile.financialGoal,
-          summary
+          summary,
         });
         console.log('Profile saved to Firestore successfully');
       } catch (error) {
@@ -315,9 +320,9 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
   const handleSkip = () => {
     if (currentQuestion.optional) {
       // Clear the field when skipping
-      setProfile(prev => ({
+      setProfile((prev) => ({
         ...prev,
-        [currentQuestion.field]: ""
+        [currentQuestion.field]: '',
       }));
       handleNext();
     }
@@ -359,21 +364,27 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
   const progress = ((step + 1) / questions.length) * 100;
 
   return (
-    <div className="pfp-overlay" onClick={(e) => {
-      if (e.target.className === 'pfp-overlay') onClose();
-    }}>
+    <div
+      className="pfp-overlay"
+      onClick={(e) => {
+        if (e.target.className === 'pfp-overlay') onClose();
+      }}
+    >
       <div className="pfp-modal" onClick={(e) => e.stopPropagation()}>
         <button className="pfp-close" onClick={onClose} aria-label="Close" type="button">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M13 1L1 13M1 1L13 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path
+              d="M13 1L1 13M1 1L13 13"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </svg>
         </button>
 
         <div className="pfp-header">
           <h2 className="pfp-title">Quick Financial Check-in</h2>
-          <p className="pfp-subtitle">
-            Answer a few questions for personalized purchase advice
-          </p>
+          <p className="pfp-subtitle">Answer a few questions for personalized purchase advice</p>
         </div>
 
         <div className="pfp-progress">
@@ -383,9 +394,7 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
         <div className="pfp-content">
           <div className="pfp-question">
             <h3>{currentQuestion.title}</h3>
-            {currentQuestion.help && (
-              <p className="pfp-help">{currentQuestion.help}</p>
-            )}
+            {currentQuestion.help && <p className="pfp-help">{currentQuestion.help}</p>}
 
             {currentQuestion.type === 'number' && (
               <div className="pfp-input-wrapper">
@@ -394,7 +403,7 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
                   <input
                     type="number"
                     value={profile[currentQuestion.field] || ''}
-                    onChange={e => handleInputChange(e.target.value)}
+                    onChange={(e) => handleInputChange(e.target.value)}
                     placeholder={currentQuestion.placeholder}
                     className="pfp-input"
                     autoFocus
@@ -407,15 +416,17 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
                   />
                 </div>
                 {currentQuestion.hasCheckbox && (
-                  <label style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px', 
-                    marginTop: '12px',
-                    fontSize: '0.875rem',
-                    color: '#f59e0b',
-                    cursor: 'pointer'
-                  }}>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginTop: '12px',
+                      fontSize: '0.875rem',
+                      color: '#f59e0b',
+                      cursor: 'pointer',
+                    }}
+                  >
                     <input
                       type="checkbox"
                       checked={includedDebtInExpenses}
@@ -430,7 +441,7 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
 
             {currentQuestion.type === 'choice' && (
               <div className="pfp-choices">
-                {currentQuestion.choices.map(choice => (
+                {currentQuestion.choices.map((choice) => (
                   <button
                     key={choice.value}
                     className={`pfp-choice ${profile[currentQuestion.field] === choice.value ? 'selected' : ''}`}
@@ -448,20 +459,12 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
 
         <div className="pfp-actions">
           {step > 0 && (
-            <button
-              className="pfp-button pfp-back"
-              onClick={handleBack}
-              type="button"
-            >
+            <button className="pfp-button pfp-back" onClick={handleBack} type="button">
               Back
             </button>
           )}
           {currentQuestion.optional && (
-            <button
-              className="pfp-button pfp-skip"
-              onClick={handleSkip}
-              type="button"
-            >
+            <button className="pfp-button pfp-skip" onClick={handleSkip} type="button">
               Skip
             </button>
           )}
@@ -470,9 +473,10 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
             onClick={handleNext}
             disabled={!profile[currentQuestion.field] && !currentQuestion.optional}
             type="button"
-            style={{ 
-              pointerEvents: (!profile[currentQuestion.field] && !currentQuestion.optional) ? 'none' : 'auto',
-              opacity: (!profile[currentQuestion.field] && !currentQuestion.optional) ? 0.5 : 1
+            style={{
+              pointerEvents:
+                !profile[currentQuestion.field] && !currentQuestion.optional ? 'none' : 'auto',
+              opacity: !profile[currentQuestion.field] && !currentQuestion.optional ? 0.5 : 1,
             }}
           >
             {step === questions.length - 1 ? 'Complete' : 'Next'}
@@ -482,14 +486,13 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
         <div className="pfp-footer">
           <p>
             {isAuthenticated
-              ? "Your data is securely saved to your account"
-              : "Your data is saved locally and never shared"
-            }
+              ? 'Your data is securely saved to your account'
+              : 'Your data is saved locally and never shared'}
           </p>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default ProgressiveFinancialProfile;

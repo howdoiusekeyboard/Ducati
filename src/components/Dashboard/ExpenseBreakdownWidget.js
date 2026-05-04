@@ -1,6 +1,17 @@
 // src/components/Dashboard/ExpenseBreakdownWidget.js
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 
 const ExpenseBreakdownWidget = ({ profile }) => {
   const [viewMode, setViewMode] = useState('bar'); // 'bar' or 'pie'
@@ -13,17 +24,17 @@ const ExpenseBreakdownWidget = ({ profile }) => {
     Transportation: parseFloat(profile?.transportationCost || '0'),
     Insurance: parseFloat(profile?.insuranceCost || '0'),
     Subscriptions: parseFloat(profile?.subscriptionsCost || '0'),
-    'Other': parseFloat(profile?.otherExpenses || '0'),
+    Other: parseFloat(profile?.otherExpenses || '0'),
   };
 
   // Add debt payments as a category
-  const debtPayments = 
+  const debtPayments =
     parseFloat(profile?.creditCardPayment || '0') +
     parseFloat(profile?.studentLoanPayment || '0') +
     parseFloat(profile?.carLoanPayment || '0') +
     parseFloat(profile?.mortgagePayment || '0') +
     parseFloat(profile?.otherDebtPayment || '0');
-  
+
   if (debtPayments > 0) {
     expenses['Debt Payments'] = debtPayments;
   }
@@ -37,7 +48,7 @@ const ExpenseBreakdownWidget = ({ profile }) => {
     .map(([category, amount]) => ({
       category,
       amount,
-      percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0
+      percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0,
     }))
     .sort((a, b) => b.amount - a.amount);
 
@@ -50,7 +61,7 @@ const ExpenseBreakdownWidget = ({ profile }) => {
     Insurance: '#ef4444',
     Subscriptions: '#ec4899',
     'Debt Payments': '#6366f1',
-    'Other': '#64748b'
+    Other: '#64748b',
   };
 
   // Custom tooltip
@@ -60,12 +71,8 @@ const ExpenseBreakdownWidget = ({ profile }) => {
       return (
         <div className="custom-tooltip">
           <p className="tooltip-label">{data.category}</p>
-          <p className="tooltip-value">
-            {formatCurrency(data.amount)}
-          </p>
-          <p className="tooltip-percentage">
-            {data.percentage.toFixed(1)}% of total
-          </p>
+          <p className="tooltip-value">{formatCurrency(data.amount)}</p>
+          <p className="tooltip-percentage">{data.percentage.toFixed(1)}% of total</p>
         </div>
       );
     }
@@ -85,7 +92,8 @@ const ExpenseBreakdownWidget = ({ profile }) => {
   // Calculate expense ratios
   const monthlyIncome = parseFloat(profile?.monthlyIncome || '0');
   const expenseRatio = monthlyIncome > 0 ? (totalExpenses / monthlyIncome) * 100 : 0;
-  const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - totalExpenses) / monthlyIncome) * 100 : 0;
+  const savingsRate =
+    monthlyIncome > 0 ? ((monthlyIncome - totalExpenses) / monthlyIncome) * 100 : 0;
 
   // Get largest expense category
   const largestExpense = chartData.length > 0 ? chartData[0] : null;
@@ -101,7 +109,9 @@ const ExpenseBreakdownWidget = ({ profile }) => {
           </h3>
         </div>
         <div className="widget-content empty-state">
-          <p>No expense data available. Update your financial profile to see your expense breakdown.</p>
+          <p>
+            No expense data available. Update your financial profile to see your expense breakdown.
+          </p>
         </div>
       </div>
     );
@@ -163,18 +173,15 @@ const ExpenseBreakdownWidget = ({ profile }) => {
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 40 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="category" 
+                <XAxis
+                  dataKey="category"
                   angle={-45}
                   textAnchor="end"
                   height={80}
                   interval={0}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis 
-                  tickFormatter={(value) => `$${value}`}
-                  tick={{ fontSize: 12 }}
-                />
+                <YAxis tickFormatter={(value) => `$${value}`} tick={{ fontSize: 12 }} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
                   {chartData.map((entry, index) => (
@@ -209,7 +216,10 @@ const ExpenseBreakdownWidget = ({ profile }) => {
         <div className="expense-categories">
           {chartData.map((item) => (
             <div key={item.category} className="category-item">
-              <div className="category-color" style={{ backgroundColor: colors[item.category] || '#94a3b8' }} />
+              <div
+                className="category-color"
+                style={{ backgroundColor: colors[item.category] || '#94a3b8' }}
+              />
               <div className="category-details">
                 <span className="category-name">{item.category}</span>
                 <span className="category-amount">{formatCurrency(item.amount)}</span>
@@ -225,12 +235,14 @@ const ExpenseBreakdownWidget = ({ profile }) => {
           {largestExpense && (
             <p>
               Your largest expense is <strong>{largestExpense.category}</strong> at{' '}
-              <strong>{formatCurrency(largestExpense.amount)}</strong> ({largestExpense.percentage.toFixed(0)}% of total)
+              <strong>{formatCurrency(largestExpense.amount)}</strong> (
+              {largestExpense.percentage.toFixed(0)}% of total)
             </p>
           )}
           {expenseRatio > 90 && (
             <p className="warning-text">
-              ⚠️ Your expenses are {expenseRatio.toFixed(0)}% of income. Consider reducing non-essential spending.
+              ⚠️ Your expenses are {expenseRatio.toFixed(0)}% of income. Consider reducing
+              non-essential spending.
             </p>
           )}
           {savingsRate >= 20 && (

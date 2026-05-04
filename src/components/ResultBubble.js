@@ -6,18 +6,13 @@ const ResultBubble = ({ messages = [], onClose, createGoogleSearchLink }) => {
   const navigate = useNavigate();
 
   // Grab the first formatted reply from “Munger”
-  const purchaseData = messages.find(
-    (m) => m.sender === 'Munger' && m.formatted
-  )?.formatted;
+  const purchaseData = messages.find((m) => m.sender === 'Munger' && m.formatted)?.formatted;
 
   // High‑value if category flag OR cost ≥ $300
   const isHighValue = useMemo(() => {
     if (!purchaseData?.analysisDetails) return false;
     const { purchaseCategory, itemCost } = purchaseData.analysisDetails;
-    return (
-      purchaseCategory === 'HIGH_VALUE' ||
-      (itemCost && Number(itemCost) >= 300)
-    );
+    return purchaseCategory === 'HIGH_VALUE' || (itemCost && Number(itemCost) >= 300);
   }, [purchaseData]);
 
   const handleProMode = () => {
@@ -56,30 +51,23 @@ const ResultBubble = ({ messages = [], onClose, createGoogleSearchLink }) => {
                     {msg.formatted.decision === 'Buy'
                       ? '✅'
                       : msg.formatted.decision === "Don't Buy"
-                      ? '❌'
-                      : '⚠️'}
+                        ? '❌'
+                        : '⚠️'}
                   </div>
                   <h3 className="decision-title">{msg.formatted.decision}</h3>
                 </div>
 
                 <div className="decision-body">
-                  <p className="recommendation-summary">
-                    {msg.formatted.summary}
-                  </p>
+                  <p className="recommendation-summary">{msg.formatted.summary}</p>
 
                   {/* Pro‑Mode prompt */}
                   {isHighValue && (
                     <div className="pro-mode-section">
                       <div className="pro-mode-alert">
                         <span className="pro-mode-icon">💎</span>
-                        <span className="pro-mode-text">
-                          High‑Value Purchase Detected
-                        </span>
+                        <span className="pro-mode-text">High‑Value Purchase Detected</span>
                       </div>
-                      <button
-                        className="pro-mode-button"
-                        onClick={handleProMode}
-                      >
+                      <button className="pro-mode-button" onClick={handleProMode}>
                         Activate Pro Mode
                       </button>
                     </div>
@@ -90,8 +78,8 @@ const ResultBubble = ({ messages = [], onClose, createGoogleSearchLink }) => {
                     <div className="alternative-product">
                       <h4>Cheaper Alternative Found:</h4>
                       <p>
-                        <strong>{msg.alternative.name}</strong> – $
-                        {msg.alternative.price} at {msg.alternative.retailer}
+                        <strong>{msg.alternative.name}</strong> – ${msg.alternative.price} at{' '}
+                        {msg.alternative.retailer}
                       </p>
                       <p>
                         <a
@@ -119,15 +107,14 @@ const ResultBubble = ({ messages = [], onClose, createGoogleSearchLink }) => {
                 </div>
 
                 {/* Decision matrix */}
-                {msg.formatted.analysisDetails &&
-                  msg.formatted.decisionMatrix && (
-                    <div className="decision-matrix-wrapper">
-                      <DecisionMatrix
-                        analysisDetails={msg.formatted.analysisDetails}
-                        decisionMatrix={msg.formatted.decisionMatrix}
-                      />
-                    </div>
-                  )}
+                {msg.formatted.analysisDetails && msg.formatted.decisionMatrix && (
+                  <div className="decision-matrix-wrapper">
+                    <DecisionMatrix
+                      analysisDetails={msg.formatted.analysisDetails}
+                      decisionMatrix={msg.formatted.decisionMatrix}
+                    />
+                  </div>
+                )}
               </div>
             ) : null
           )}

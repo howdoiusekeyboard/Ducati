@@ -31,7 +31,8 @@ const EnvironmentChecker: React.FC = () => {
       NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
       NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:
+        process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     };
 
@@ -41,7 +42,7 @@ const EnvironmentChecker: React.FC = () => {
         issues.push({
           variable: key,
           issue: 'Missing',
-          suggestion: 'Add this variable to your .env.local file'
+          suggestion: 'Add this variable to your .env.local file',
         });
         return;
       }
@@ -52,7 +53,7 @@ const EnvironmentChecker: React.FC = () => {
           variable: key,
           issue: 'Contains leading/trailing whitespace',
           value: JSON.stringify(value),
-          suggestion: 'Remove spaces at the beginning or end'
+          suggestion: 'Remove spaces at the beginning or end',
         });
       }
 
@@ -62,7 +63,7 @@ const EnvironmentChecker: React.FC = () => {
           variable: key,
           issue: 'Contains newline characters',
           value: JSON.stringify(value),
-          suggestion: 'Remove any line breaks - the value should be on a single line'
+          suggestion: 'Remove any line breaks - the value should be on a single line',
         });
       }
 
@@ -72,7 +73,7 @@ const EnvironmentChecker: React.FC = () => {
           variable: key,
           issue: 'Contains escaped characters (\\n, \\r, \\t)',
           value: JSON.stringify(value),
-          suggestion: 'Remove any \\n, \\r, or \\t sequences'
+          suggestion: 'Remove any \\n, \\r, or \\t sequences',
         });
       }
 
@@ -83,7 +84,7 @@ const EnvironmentChecker: React.FC = () => {
             variable: key,
             issue: 'Invalid format - contains invalid characters',
             value: JSON.stringify(value),
-            suggestion: 'Project ID should only contain lowercase letters, numbers, and hyphens'
+            suggestion: 'Project ID should only contain lowercase letters, numbers, and hyphens',
           });
         }
       }
@@ -91,7 +92,7 @@ const EnvironmentChecker: React.FC = () => {
 
     setCheckResult({
       isValid: issues.length === 0,
-      issues
+      issues,
     });
     setIsChecking(false);
   };
@@ -112,7 +113,7 @@ const EnvironmentChecker: React.FC = () => {
   return (
     <div className="env-checker">
       <h2>Environment Configuration Check</h2>
-      
+
       {checkResult.isValid ? (
         <div className="check-success">
           <div className="success-icon">✅</div>
@@ -124,7 +125,7 @@ const EnvironmentChecker: React.FC = () => {
           <div className="error-icon">⚠️</div>
           <h3>Configuration Issues Found</h3>
           <p>The following issues were detected in your environment variables:</p>
-          
+
           <div className="issues-list">
             {checkResult.issues.map((issue, index) => (
               <div key={index} className="issue-item">
@@ -148,12 +149,14 @@ const EnvironmentChecker: React.FC = () => {
           <div className="fix-instructions">
             <h3>How to Fix:</h3>
             <ol>
-              <li>Open your <code>.env.local</code> file in your project root</li>
+              <li>
+                Open your <code>.env.local</code> file in your project root
+              </li>
               <li>Check each variable listed above</li>
               <li>Make sure each value is on a single line with no extra spaces or line breaks</li>
               <li>Save the file and restart your development server</li>
             </ol>
-            
+
             <div className="example">
               <h4>Example of correct format:</h4>
               <pre>{`NEXT_PUBLIC_FIREBASE_PROJECT_ID=ducati-mvp

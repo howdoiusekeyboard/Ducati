@@ -30,7 +30,7 @@ export const useProfileImage = ({ photoURL, displayName, email }: UseProfileImag
   // Function to get optimized Google profile image URL
   const getOptimizedImageUrl = (url: string) => {
     if (!url) return null;
-    
+
     try {
       // Handle Google profile images
       if (url.includes('googleusercontent.com')) {
@@ -39,7 +39,7 @@ export const useProfileImage = ({ photoURL, displayName, email }: UseProfileImag
         const optimizedUrl = `${baseUrl}=s96-c`;
         return optimizedUrl;
       }
-      
+
       // Handle other image URLs
       return url;
     } catch (error) {
@@ -56,11 +56,11 @@ export const useProfileImage = ({ photoURL, displayName, email }: UseProfileImag
       }
       return names[0]![0]!.toUpperCase();
     }
-    
+
     if (email) {
       return email[0]!.toUpperCase();
     }
-    
+
     return 'U';
   };
 

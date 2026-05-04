@@ -39,9 +39,7 @@ function getAdminApp(): App {
   return cachedApp;
 }
 
-export type AuthResult =
-  | { ok: true; uid: string }
-  | { ok: false; status: 401; error: string };
+export type AuthResult = { ok: true; uid: string } | { ok: false; status: 401; error: string };
 
 export async function verifyAuthFromRequest(request: Request): Promise<AuthResult> {
   const authHeader = request.headers.get('Authorization');

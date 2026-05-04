@@ -1,36 +1,36 @@
-import React, { useState } from "react";
-import "../styles/FinanceFeed.css";
+import React, { useState } from 'react';
+import '../styles/FinanceFeed.css';
 
 const FinanceFeed = () => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  
+
   // Updated with working YouTube video IDs for personal finance content
   const financeVideos = [
-    { 
-      id: "UcAY6qRHlw0", 
-      title: "Basics of Personal Finance",
-      channel: "Finance Tips"
+    {
+      id: 'UcAY6qRHlw0',
+      title: 'Basics of Personal Finance',
+      channel: 'Finance Tips',
     },
-    { 
-      id: "HQzoZfc3GwQ", 
-      title: "Budget Basics",
-      channel: "Money Smart"
+    {
+      id: 'HQzoZfc3GwQ',
+      title: 'Budget Basics',
+      channel: 'Money Smart',
     },
-    { 
-      id: "4j2emMn7UaI", 
-      title: "Investing 101",
-      channel: "Invest Smart"
+    {
+      id: '4j2emMn7UaI',
+      title: 'Investing 101',
+      channel: 'Invest Smart',
     },
-    { 
-      id: "0uYnj1i1EQw", 
-      title: "How to Save Money",
-      channel: "Savings Guide"
+    {
+      id: '0uYnj1i1EQw',
+      title: 'How to Save Money',
+      channel: 'Savings Guide',
     },
-    { 
-      id: "Q5jlY8_WmEE", 
-      title: "Tackling Debt",
-      channel: "Credit Help"
-    }
+    {
+      id: 'Q5jlY8_WmEE',
+      title: 'Tackling Debt',
+      channel: 'Credit Help',
+    },
   ];
 
   const handleNextVideo = () => {
@@ -38,9 +38,7 @@ const FinanceFeed = () => {
   };
 
   const handlePrevVideo = () => {
-    setCurrentVideoIndex((prev) => 
-      prev === 0 ? financeVideos.length - 1 : prev - 1
-    );
+    setCurrentVideoIndex((prev) => (prev === 0 ? financeVideos.length - 1 : prev - 1));
   };
 
   const handleVideoSelect = (index) => {
@@ -52,9 +50,7 @@ const FinanceFeed = () => {
       {/* Hero Section */}
       <div className="hero-section">
         <h1 className="hero-title">Finance Feed</h1>
-        <p className="hero-subtitle">
-          Quick financial tips and insights to boost your money IQ
-        </p>
+        <p className="hero-subtitle">Quick financial tips and insights to boost your money IQ</p>
       </div>
 
       <div className="finance-feed-container">
@@ -74,9 +70,9 @@ const FinanceFeed = () => {
                     className="youtube-player"
                   />
                 </div>
-                
+
                 <div className="video-controls">
-                  <button 
+                  <button
                     onClick={handlePrevVideo}
                     className="control-button prev"
                     aria-label="Previous video"
@@ -84,7 +80,7 @@ const FinanceFeed = () => {
                     <span className="control-icon">◀</span>
                     <span className="control-text">Previous</span>
                   </button>
-                  
+
                   <div className="video-info">
                     <h3>{financeVideos[currentVideoIndex].title}</h3>
                     <p className="video-channel">{financeVideos[currentVideoIndex].channel}</p>
@@ -92,8 +88,8 @@ const FinanceFeed = () => {
                       {currentVideoIndex + 1} of {financeVideos.length}
                     </p>
                   </div>
-                  
-                  <button 
+
+                  <button
                     onClick={handleNextVideo}
                     className="control-button next"
                     aria-label="Next video"
@@ -109,7 +105,7 @@ const FinanceFeed = () => {
                 <h3>Up Next</h3>
                 <div className="sidebar-playlist">
                   {financeVideos.map((video, index) => (
-                    <div 
+                    <div
                       key={video.id}
                       className={`sidebar-item ${index === currentVideoIndex ? 'active' : ''}`}
                       onClick={() => handleVideoSelect(index)}
@@ -117,7 +113,7 @@ const FinanceFeed = () => {
                       tabIndex="0"
                     >
                       <div className="sidebar-thumbnail">
-                        <img 
+                        <img
                           src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
                           alt={video.title}
                           onError={(e) => {
@@ -146,7 +142,7 @@ const FinanceFeed = () => {
             <h2>Quick Finance Tips</h2>
             <div className="playlist-grid">
               {financeVideos.map((video, index) => (
-                <div 
+                <div
                   key={video.id}
                   className={`playlist-item ${index === currentVideoIndex ? 'active' : ''}`}
                   onClick={() => handleVideoSelect(index)}
@@ -154,7 +150,7 @@ const FinanceFeed = () => {
                   tabIndex="0"
                 >
                   <div className="playlist-thumbnail">
-                    <img 
+                    <img
                       src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
                       alt={video.title}
                       onError={(e) => {
@@ -191,13 +187,13 @@ const FinanceFeed = () => {
                 <h3>Build Knowledge</h3>
                 <p>Learn key financial concepts in bite-sized, easy-to-understand videos.</p>
               </div>
-              
+
               <div className="education-card">
                 <span className="education-icon">💡</span>
                 <h3>Make Better Decisions</h3>
                 <p>Apply what you learn directly to your daily financial choices.</p>
               </div>
-              
+
               <div className="education-card">
                 <span className="education-icon">🚀</span>
                 <h3>Accelerate Growth</h3>
@@ -217,7 +213,7 @@ const FinanceFeed = () => {
                   <p>Save at least 10% of your income before any other expenses.</p>
                 </div>
               </div>
-              
+
               <div className="tip-item">
                 <span className="tip-number">2</span>
                 <div className="tip-content">
@@ -225,7 +221,7 @@ const FinanceFeed = () => {
                   <p>You can't manage what you don't measure. Use Ducati to analyze purchases!</p>
                 </div>
               </div>
-              
+
               <div className="tip-item">
                 <span className="tip-number">3</span>
                 <div className="tip-content">
@@ -233,7 +229,7 @@ const FinanceFeed = () => {
                   <p>Wait 24 hours before making non-essential purchases.</p>
                 </div>
               </div>
-              
+
               <div className="tip-item">
                 <span className="tip-number">4</span>
                 <div className="tip-content">
@@ -241,7 +237,7 @@ const FinanceFeed = () => {
                   <p>Time in the market beats timing the market. Start investing today.</p>
                 </div>
               </div>
-              
+
               <div className="tip-item">
                 <span className="tip-number">5</span>
                 <div className="tip-content">
@@ -265,6 +261,6 @@ const FinanceFeed = () => {
       </div>
     </div>
   );
-}
+};
 
 export default FinanceFeed;

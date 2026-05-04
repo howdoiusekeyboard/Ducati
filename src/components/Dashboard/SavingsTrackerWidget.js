@@ -14,7 +14,7 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
   useEffect(() => {
     const loadGoal = async () => {
       if (!userId || !db) return;
-      
+
       try {
         const goalDoc = await getDoc(doc(db, 'savingsGoals', userId));
         if (goalDoc.exists()) {
@@ -35,14 +35,14 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
   // Save goal to Firestore
   const saveGoal = async () => {
     if (!userId || !db) return;
-    
+
     try {
       await setDoc(doc(db, 'savingsGoals', userId), {
         amount: tempGoal,
         description: tempDescription,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
-      
+
       setSavingsGoal(tempGoal);
       setGoalDescription(tempDescription);
       setIsEditingGoal(false);
@@ -67,11 +67,11 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
 
   // Milestone messages
   const getMilestoneMessage = () => {
-    if (progress >= 100) return "🎉 Goal achieved! Time to set a new one!";
-    if (progress >= 75) return "🔥 Almost there! Keep going!";
-    if (progress >= 50) return "💪 Halfway to your goal!";
-    if (progress >= 25) return "🚀 Great progress!";
-    return "🌟 Every dollar saved counts!";
+    if (progress >= 100) return '🎉 Goal achieved! Time to set a new one!';
+    if (progress >= 75) return '🔥 Almost there! Keep going!';
+    if (progress >= 50) return '💪 Halfway to your goal!';
+    if (progress >= 25) return '🚀 Great progress!';
+    return '🌟 Every dollar saved counts!';
   };
 
   return (
@@ -95,9 +95,7 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
         <div className="total-savings">
           <div className="savings-label">Total Saved with Ducati</div>
           <div className="savings-amount">{formatCurrency(totalSavings)}</div>
-          <div className="savings-sublabel">
-            from smart purchase decisions
-          </div>
+          <div className="savings-sublabel">from smart purchase decisions</div>
         </div>
 
         {/* Goal Editor */}
@@ -128,12 +126,12 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
               <button onClick={saveGoal} className="btn-save">
                 Save Goal
               </button>
-              <button 
+              <button
                 onClick={() => {
                   setIsEditingGoal(false);
                   setTempGoal(savingsGoal);
                   setTempDescription(goalDescription);
-                }} 
+                }}
                 className="btn-cancel"
               >
                 Cancel
@@ -153,20 +151,18 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
         {/* Progress Bar */}
         <div className="progress-section">
           <div className="progress-bar-container">
-            <div 
+            <div
               className="progress-bar-fill"
-              style={{ 
+              style={{
                 width: `${progress}%`,
-                backgroundColor: progress >= 100 ? '#10b981' : 
-                               progress >= 50 ? '#3b82f6' : '#8b5cf6'
+                backgroundColor:
+                  progress >= 100 ? '#10b981' : progress >= 50 ? '#3b82f6' : '#8b5cf6',
               }}
             >
-              <span className="progress-percentage">
-                {progress.toFixed(0)}%
-              </span>
+              <span className="progress-percentage">{progress.toFixed(0)}%</span>
             </div>
           </div>
-          
+
           <div className="progress-details">
             <div className="progress-stat">
               <span className="stat-label">Saved</span>
@@ -180,9 +176,7 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
         </div>
 
         {/* Milestone Message */}
-        <div className="milestone-message">
-          {getMilestoneMessage()}
-        </div>
+        <div className="milestone-message">{getMilestoneMessage()}</div>
 
         {/* Motivational Stats */}
         <div className="savings-stats">
@@ -198,9 +192,7 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
           <div className="stat-item">
             <div className="stat-icon">☕</div>
             <div className="stat-content">
-              <div className="stat-number">
-                {Math.floor(totalSavings / 5)}
-              </div>
+              <div className="stat-number">{Math.floor(totalSavings / 5)}</div>
               <div className="stat-label">coffees worth</div>
             </div>
           </div>
@@ -210,10 +202,7 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
         {progress >= 100 && (
           <div className="goal-achieved">
             <p>🎊 Congratulations! You've reached your savings goal!</p>
-            <button 
-              onClick={() => setIsEditingGoal(true)} 
-              className="new-goal-btn"
-            >
+            <button onClick={() => setIsEditingGoal(true)} className="new-goal-btn">
               Set New Goal
             </button>
           </div>

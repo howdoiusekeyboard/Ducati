@@ -1,10 +1,7 @@
 module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
-  testMatch: [
-    '**/__tests__/**/*.+(ts|tsx|js)',
-    '**/?(*.)+(spec|test).+(ts|tsx|js)'
-  ],
+  testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: { ignoreDeprecations: '6.0', rootDir: '.' } }],
     '^.+\\.(js|jsx)$': ['babel-jest', { configFile: './.babelrc.test' }],
@@ -24,17 +21,12 @@ module.exports = {
       branches: 70,
       functions: 70,
       lines: 70,
-      statements: 70
-    }
+      statements: 70,
+    },
   },
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    '/.next/',
-    '/public/',
-    '/scripts/',
-  ],
+  coveragePathIgnorePatterns: ['/node_modules/', '/.next/', '/public/', '/scripts/'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   verbose: true,
-  testTimeout: 10000
+  testTimeout: 10000,
 };

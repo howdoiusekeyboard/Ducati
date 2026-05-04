@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfileImage } from '../hooks/useProfileImage';
 
-
 const UserProfile: React.FC = () => {
   const { user, signOut } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -55,40 +54,28 @@ const UserProfile: React.FC = () => {
             referrerPolicy="no-referrer"
           />
         ) : (
-          <div className="user-avatar-placeholder">
-            {initials}
-          </div>
+          <div className="user-avatar-placeholder">{initials}</div>
         )}
-        <span className="user-name">
-          {user.displayName || user.email}
-        </span>
+        <span className="user-name">{user.displayName || user.email}</span>
         <span className="dropdown-arrow">▼</span>
       </button>
 
       {isDropdownOpen && (
         <div className="user-dropdown">
           <div className="user-info">
-            <p className="user-display-name">
-              {user.displayName || 'User'}
-            </p>
+            <p className="user-display-name">{user.displayName || 'User'}</p>
             <p className="user-email">{user.email}</p>
           </div>
 
           <hr className="dropdown-divider" />
-          <button
-            className="sign-out-button"
-            onClick={handleSignOut}
-          >
+          <button className="sign-out-button" onClick={handleSignOut}>
             Sign Out
           </button>
         </div>
       )}
 
       {isDropdownOpen && (
-        <div
-          className="dropdown-overlay"
-          onClick={() => setIsDropdownOpen(false)}
-        />
+        <div className="dropdown-overlay" onClick={() => setIsDropdownOpen(false)} />
       )}
     </div>
   );

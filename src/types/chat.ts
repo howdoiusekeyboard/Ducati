@@ -42,5 +42,5 @@ export enum ErrorType {
   NETWORK_ERROR = 'network_error',
   API_ERROR = 'api_error',
   VALIDATION_ERROR = 'validation_error',
-  RATE_LIMIT_ERROR = 'rate_limit_error'
+  RATE_LIMIT_ERROR = 'rate_limit_error',
 }

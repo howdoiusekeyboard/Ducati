@@ -1,0 +1,12 @@
+.next
+out
+build
+node_modules
+coverage
+public
+bun.lock
+package-lock.json
+*.min.css
+*.min.js
+.firebase
+.vercel

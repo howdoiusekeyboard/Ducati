@@ -49,7 +49,7 @@ export const LocationService = {
             longitude,
             ...locationData,
             source: 'browser',
-            accuracy: 'high'
+            accuracy: 'high',
           });
         },
         () => resolve(null),
@@ -62,11 +62,11 @@ export const LocationService = {
     try {
       // Use a free IP geolocation service
       const response = await fetch('https://ipapi.co/json/', {
-        signal: AbortSignal.timeout(3000)
+        signal: AbortSignal.timeout(3000),
       });
-      
+
       if (!response.ok) return null;
-      
+
       const data = await response.json();
       return {
         city: data.city,
@@ -77,7 +77,7 @@ export const LocationService = {
         latitude: data.latitude,
         longitude: data.longitude,
         source: 'ip',
-        accuracy: 'medium'
+        accuracy: 'medium',
       };
     } catch {
       return null;
@@ -90,16 +90,16 @@ export const LocationService = {
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
         { signal: AbortSignal.timeout(3000) }
       );
-      
+
       if (!response.ok) return {};
-      
+
       const data = await response.json();
       return {
         city: data.address?.city || data.address?.town,
         state: data.address?.state,
         country: data.address?.country,
         countryCode: data.address?.country_code?.toUpperCase(),
-        postalCode: data.address?.postcode
+        postalCode: data.address?.postcode,
       };
     } catch {
       return {};
@@ -113,7 +113,7 @@ export const LocationService = {
       country: 'United States',
       countryCode: 'US',
       source: 'default',
-      accuracy: 'low'
+      accuracy: 'low',
     };
   },
 
@@ -128,10 +128,13 @@ export const LocationService = {
 
   cacheLocation(locationData) {
     try {
-      localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify({
-        data: locationData,
-        timestamp: Date.now()
-      }));
+      localStorage.setItem(
+        LOCATION_CACHE_KEY,
+        JSON.stringify({
+          data: locationData,
+          timestamp: Date.now(),
+        })
+      );
     } catch (error) {
       console.error('Failed to cache location:', error);
     }
@@ -150,14 +153,14 @@ export const LocationService = {
    */
   formatLocation(location) {
     if (!location) return 'Location unknown';
-    
+
     const parts = [];
     if (location.city) parts.push(location.city);
     if (location.state) parts.push(location.state);
     if (location.countryCode && location.countryCode !== 'US') {
       parts.push(location.countryCode);
     }
-    
+
     return parts.join(', ') || 'Location unknown';
-  }
+  },
 };

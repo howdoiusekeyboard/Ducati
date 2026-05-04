@@ -27,15 +27,15 @@ export const useRealtimeSession = () => {
       const parsedArgs = JSON.parse(args);
       // Send function result back
       const resultEvent = {
-        type: "conversation.item.create",
+        type: 'conversation.item.create',
         item: {
-          type: "function_call_output",
+          type: 'function_call_output',
           call_id: call_id,
           output: JSON.stringify({
             success: true,
-            message: "Ready to analyze the purchase"
-          })
-        }
+            message: 'Ready to analyze the purchase',
+          }),
+        },
       };
       // We'll need to handle sendClientEvent differently since it's not defined yet
       if (dataChannel.current?.readyState === 'open') {
@@ -45,29 +45,34 @@ export const useRealtimeSession = () => {
 
       // Trigger response generation
       if (dataChannel.current?.readyState === 'open') {
-        const responseEvent = { type: "response.create", event_id: crypto.randomUUID() };
+        const responseEvent = { type: 'response.create', event_id: crypto.randomUUID() };
         dataChannel.current.send(JSON.stringify(responseEvent));
       }
     } else if (name === 'get_financial_tip') {
       const parsedArgs = JSON.parse(args);
       const tips: { [key: string]: string } = {
-        saving: "A great way to save is the 50/30/20 rule: 50% for needs, 30% for wants, and 20% for savings and debt repayment.",
-        investing: "Start investing early to take advantage of compound interest. Even small amounts can grow significantly over time.",
-        budgeting: "Track every expense for a month to understand where your money goes. You'll be surprised by what you find!",
-        debt: "Focus on paying off high-interest debt first while making minimum payments on everything else.",
-        emergency_fund: "Aim to save 3-6 months of expenses in an emergency fund before making major purchases.",
-        purchase_decisions: "Wait 24-48 hours before making non-essential purchases. This cooling-off period often prevents impulse buys."
+        saving:
+          'A great way to save is the 50/30/20 rule: 50% for needs, 30% for wants, and 20% for savings and debt repayment.',
+        investing:
+          'Start investing early to take advantage of compound interest. Even small amounts can grow significantly over time.',
+        budgeting:
+          "Track every expense for a month to understand where your money goes. You'll be surprised by what you find!",
+        debt: 'Focus on paying off high-interest debt first while making minimum payments on everything else.',
+        emergency_fund:
+          'Aim to save 3-6 months of expenses in an emergency fund before making major purchases.',
+        purchase_decisions:
+          'Wait 24-48 hours before making non-essential purchases. This cooling-off period often prevents impulse buys.',
       };
 
       const resultEvent = {
-        type: "conversation.item.create",
+        type: 'conversation.item.create',
         item: {
-          type: "function_call_output",
+          type: 'function_call_output',
           call_id: call_id,
           output: JSON.stringify({
-            tip: tips[parsedArgs.topic] || tips.purchase_decisions
-          })
-        }
+            tip: tips[parsedArgs.topic] || tips.purchase_decisions,
+          }),
+        },
       };
 
       if (dataChannel.current?.readyState === 'open') {
@@ -77,7 +82,7 @@ export const useRealtimeSession = () => {
 
       // Trigger response generation
       if (dataChannel.current?.readyState === 'open') {
-        const responseEvent = { type: "response.create", event_id: crypto.randomUUID() };
+        const responseEvent = { type: 'response.create', event_id: crypto.randomUUID() };
         dataChannel.current.send(JSON.stringify(responseEvent));
       }
     }
@@ -92,10 +97,10 @@ export const useRealtimeSession = () => {
       data: {
         itemName,
         estimatedCost,
-        message: `Ready to analyze your ${itemName} purchase? Click here to use the Purchase Analyzer!`
-      }
+        message: `Ready to analyze your ${itemName} purchase? Click here to use the Purchase Analyzer!`,
+      },
     };
-    setEvents(prev => [promptEvent, ...prev]);
+    setEvents((prev) => [promptEvent, ...prev]);
   }, []);
 
   const startSession = useCallback(async () => {
@@ -129,9 +134,9 @@ export const useRealtimeSession = () => {
 
       // 3. Setup Microphone and Data Channel
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-      const dc = pc.createDataChannel("oai-events");
+      const dc = pc.createDataChannel('oai-events');
       dataChannel.current = dc;
 
       // Add event listeners for the data channel
@@ -142,23 +147,25 @@ export const useRealtimeSession = () => {
 
         // Send initial greeting and trigger response
         const greetingEvent = {
-          type: "conversation.item.create",
+          type: 'conversation.item.create',
           event_id: crypto.randomUUID(),
           item: {
-            type: "message",
-            role: "assistant",
-            content: [{
-              type: "input_text",
-              text: "Hey there! I'm your Ducati Advisor, and I'm genuinely excited to help you make smarter money decisions. You know that feeling when you're about to buy something and you're not quite sure if it's the right move? That's exactly where I come in. I'm here to be your financial wingman - whether you're debating a big purchase, trying to figure out your budget, or just want to chat about money stuff. We can talk just like this with voice, or you can type to me anytime. I'm not here to judge your spending - we've all been there with impulse buys! I'm here to help you think through decisions so you feel confident about your choices. So... what's on your mind? Got a purchase you're considering? Want to talk budgets? Or maybe you just want to see what I'm all about? I'm all ears!"
-            }]
-          }
+            type: 'message',
+            role: 'assistant',
+            content: [
+              {
+                type: 'input_text',
+                text: "Hey there! I'm your Ducati Advisor, and I'm genuinely excited to help you make smarter money decisions. You know that feeling when you're about to buy something and you're not quite sure if it's the right move? That's exactly where I come in. I'm here to be your financial wingman - whether you're debating a big purchase, trying to figure out your budget, or just want to chat about money stuff. We can talk just like this with voice, or you can type to me anytime. I'm not here to judge your spending - we've all been there with impulse buys! I'm here to help you think through decisions so you feel confident about your choices. So... what's on your mind? Got a purchase you're considering? Want to talk budgets? Or maybe you just want to see what I'm all about? I'm all ears!",
+              },
+            ],
+          },
         };
         dc.send(JSON.stringify(greetingEvent));
 
         // Trigger the AI to actually speak the greeting
         const responseEvent = {
-          type: "response.create",
-          event_id: crypto.randomUUID()
+          type: 'response.create',
+          event_id: crypto.randomUUID(),
         };
         dc.send(JSON.stringify(responseEvent));
       };
@@ -166,7 +173,7 @@ export const useRealtimeSession = () => {
       dc.onmessage = (e) => {
         const event = JSON.parse(e.data);
         event.timestamp = new Date().toLocaleTimeString();
-        setEvents(prev => [event, ...prev]);
+        setEvents((prev) => [event, ...prev]);
 
         // Handle session events
         if (event.type === 'session.created' || event.type === 'session.updated') {
@@ -183,7 +190,10 @@ export const useRealtimeSession = () => {
           const response = event.response;
           if (response && response.output) {
             response.output.forEach((output: any) => {
-              if (output.type === 'function_call' && output.name === 'navigate_to_purchase_analyzer') {
+              if (
+                output.type === 'function_call' &&
+                output.name === 'navigate_to_purchase_analyzer'
+              ) {
                 // Parse the arguments
                 try {
                   const args = JSON.parse(output.arguments);
@@ -225,22 +235,21 @@ export const useRealtimeSession = () => {
       await pc.setLocalDescription(offer);
 
       const sdpResponse = await fetch(`https://api.openai.com/v1/realtime?model=gpt-realtime`, {
-        method: "POST",
+        method: 'POST',
         body: offer.sdp,
         headers: {
-          'Authorization': `Bearer ${ephemeralKey}`,
+          Authorization: `Bearer ${ephemeralKey}`,
           'Content-Type': 'application/sdp',
         },
       });
 
       const answer: RTCSessionDescriptionInit = {
-        type: "answer",
+        type: 'answer',
         sdp: await sdpResponse.text(),
       };
       await pc.setRemoteDescription(answer);
-
     } catch (error) {
-      console.error("Failed to start session:", error);
+      console.error('Failed to start session:', error);
       setIsConnecting(false);
     }
   }, [handleFunctionCall, showPurchaseAnalyzerPrompt]);
@@ -290,24 +299,25 @@ export const useRealtimeSession = () => {
       const displayEvent: SessionEvent = {
         ...eventWithId,
         type: (eventWithId as any).type || 'client_event',
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toLocaleTimeString(),
       };
-      setEvents(prev => [displayEvent, ...prev]);
+      setEvents((prev) => [displayEvent, ...prev]);
     }
   }, []);
 
-
-
   // Update session configuration
-  const updateSession = useCallback((updates: any) => {
-    if (dataChannel.current?.readyState === 'open') {
-      const updateEvent = {
-        type: "session.update",
-        session: updates
-      };
-      sendClientEvent(updateEvent);
-    }
-  }, [sendClientEvent]);
+  const updateSession = useCallback(
+    (updates: any) => {
+      if (dataChannel.current?.readyState === 'open') {
+        const updateEvent = {
+          type: 'session.update',
+          session: updates,
+        };
+        sendClientEvent(updateEvent);
+      }
+    },
+    [sendClientEvent]
+  );
 
   // Cleanup effect to stop session when component unmounts or user navigates away
   useEffect(() => {
@@ -380,6 +390,6 @@ export const useRealtimeSession = () => {
     startSession,
     stopSession,
     sendClientEvent,
-    updateSession
+    updateSession,
   };
 };

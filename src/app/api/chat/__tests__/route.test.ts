@@ -38,15 +38,18 @@ import { validateEnvironment, getOpenAIConfig } from '@/lib/openai-config';
 describe('Chat API Route Logic', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default mock implementation
-    (OpenAI as jest.MockedClass<typeof OpenAI>).mockImplementation(() => ({
-      chat: {
-        completions: {
-          create: mockCreate,
-        },
-      },
-    } as any));
+    (OpenAI as jest.MockedClass<typeof OpenAI>).mockImplementation(
+      () =>
+        ({
+          chat: {
+            completions: {
+              create: mockCreate,
+            },
+          },
+        }) as any
+    );
 
     // Set up environment variable
     process.env.OPENAI_API_KEY = 'test-api-key';

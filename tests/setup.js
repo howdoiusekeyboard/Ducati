@@ -54,14 +54,12 @@ expect.extend({
     const pass = received >= floor && received <= ceiling;
     if (pass) {
       return {
-        message: () =>
-          `expected ${received} not to be within range ${floor} - ${ceiling}`,
+        message: () => `expected ${received} not to be within range ${floor} - ${ceiling}`,
         pass: true,
       };
     } else {
       return {
-        message: () =>
-          `expected ${received} to be within range ${floor} - ${ceiling}`,
+        message: () => `expected ${received} to be within range ${floor} - ${ceiling}`,
         pass: false,
       };
     }
@@ -70,12 +68,12 @@ expect.extend({
 
 // Global test utilities
 global.createMockProfile = (overrides = {}) => ({
-  monthlyIncome: "5000",
-  monthlyExpenses: "3000",
-  currentSavings: "10000",
-  riskTolerance: "moderate",
-  debtPayments: "500",
-  financialGoal: "balance",
+  monthlyIncome: '5000',
+  monthlyExpenses: '3000',
+  currentSavings: '10000',
+  riskTolerance: 'moderate',
+  debtPayments: '500',
+  financialGoal: 'balance',
   summary: {
     monthlyNetIncome: 1500,
     debtToIncomeRatio: 10,
@@ -83,18 +81,18 @@ global.createMockProfile = (overrides = {}) => ({
     savingsMonths: 2.86,
     healthScore: 65,
     hasEmergencyFund: false,
-    primaryGoal: "balance"
+    primaryGoal: 'balance',
   },
-  ...overrides
+  ...overrides,
 });
 
 global.createMockPurchase = (overrides = {}) => ({
-  itemName: "Test Item",
+  itemName: 'Test Item',
   cost: 100,
-  purpose: "Test purpose",
-  frequency: "Daily",
-  category: "DISCRETIONARY_SMALL",
-  ...overrides
+  purpose: 'Test purpose',
+  frequency: 'Daily',
+  category: 'DISCRETIONARY_SMALL',
+  ...overrides,
 });
 
 // Setup test timeout

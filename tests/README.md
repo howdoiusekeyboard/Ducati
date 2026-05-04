@@ -49,11 +49,13 @@ npm run test:verbose
 The test suite uses 7 distinct personas to ensure comprehensive coverage:
 
 ### Main Personas
+
 1. **Struggling Student Sarah** - Low income ($1,500), minimal savings, risk-averse
 2. **High-Earner Henry** - High income ($12,000), high debt, no emergency fund
 3. **Balanced Barbara** - Medium income ($5,000), good savings, moderate approach
 
 ### Edge Case Personas
+
 4. **Zero Income Ian** - No income, some savings
 5. **High Debt Hannah** - 50% debt-to-income ratio
 6. **Wealthy Wendy** - Very high income, excellent financial position
@@ -62,6 +64,7 @@ The test suite uses 7 distinct personas to ensure comprehensive coverage:
 ## Key Test Scenarios
 
 ### Unit Tests
+
 - Weight adjustments based on risk tolerance
 - Affordability scoring at different income levels
 - Emergency fund impact on decisions
@@ -70,12 +73,14 @@ The test suite uses 7 distinct personas to ensure comprehensive coverage:
 - Confidence level calculations
 
 ### Integration Tests
+
 - Complete recommendation flows for each persona
 - Cross-persona validation for essential purchases
 - Alternative product impact on recommendations
 - Goal-specific purchase approvals
 
 ### Edge Cases
+
 - Zero and negative income handling
 - Extreme debt scenarios (>100% of income)
 - Free items (cost = $0)
@@ -105,22 +110,26 @@ The test suite uses 7 distinct personas to ensure comprehensive coverage:
 The tests validate 13 decision criteria across 4 categories:
 
 ### Financial (40% weight)
+
 - Affordability
 - Value for Money
 - Opportunity Cost
 - Financial Goal Alignment
 
 ### Utility (30% weight)
+
 - Necessity
 - Frequency of Use
 - Longevity
 
 ### Psychological (20% weight)
+
 - Emotional Value
 - Social Factors
 - Buyer's Remorse Risk
 
 ### Risk (10% weight, adjusted by risk tolerance)
+
 - Financial Risk
 - Alternative Availability
 
@@ -128,11 +137,11 @@ The tests validate 13 decision criteria across 4 categories:
 
 ### Example Test Case Matrix
 
-| Persona | Item | Price | Expected | Rationale |
-|---------|------|-------|----------|-----------|
-| Struggling Student | Gaming Console | $500 | Don't Buy | 500% of monthly net income |
-| High-Earner Henry | Home Gym | $1,500 | Buy | Daily use, affordable |
-| Balanced Barbara | Stock Platform | $100/mo | Buy | Aligns with invest goal |
+| Persona            | Item           | Price   | Expected  | Rationale                  |
+| ------------------ | -------------- | ------- | --------- | -------------------------- |
+| Struggling Student | Gaming Console | $500    | Don't Buy | 500% of monthly net income |
+| High-Earner Henry  | Home Gym       | $1,500  | Buy       | Daily use, affordable      |
+| Balanced Barbara   | Stock Platform | $100/mo | Buy       | Aligns with invest goal    |
 
 ## Debugging Tests
 

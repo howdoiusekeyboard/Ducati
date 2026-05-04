@@ -11,7 +11,7 @@ import {
   limit,
   addDoc,
   serverTimestamp,
-  Timestamp
+  Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { User } from 'firebase/auth';
@@ -22,7 +22,7 @@ import {
   PurchaseHistoryItem,
   FinancialProfileData,
   ChatHistoryData,
-  ProModeAnalysis
+  ProModeAnalysis,
 } from './collections';
 
 // User Services
@@ -33,7 +33,7 @@ export const createUserDocument = async (user: User): Promise<void> => {
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     const userRef = doc(db, COLLECTIONS.USERS, user.uid);
     const userDoc = await getDoc(userRef);
 
@@ -44,22 +44,18 @@ export const createUserDocument = async (user: User): Promise<void> => {
         displayName: user.displayName,
         photoURL: user.photoURL,
         createdAt: new Date(),
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
       await setDoc(userRef, {
         ...userData,
         createdAt: serverTimestamp(),
-        lastUpdated: serverTimestamp()
+        lastUpdated: serverTimestamp(),
       });
     }
   };
 
-  return operationManager.executeOperation(
-    `user-create-${user.uid}`,
-    operation,
-    { maxRetries: 2 }
-  );
+  return operationManager.executeOperation(`user-create-${user.uid}`, operation, { maxRetries: 2 });
 };
 
 // Purchase History Services
@@ -73,10 +69,11 @@ export const savePurchaseHistory = async (
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     let dateToSave: Date;
     try {
-      dateToSave = purchaseData.date instanceof Date ? purchaseData.date : new Date(purchaseData.date);
+      dateToSave =
+        purchaseData.date instanceof Date ? purchaseData.date : new Date(purchaseData.date);
       if (isNaN(dateToSave.getTime())) {
         dateToSave = new Date();
       }
@@ -88,17 +85,14 @@ export const savePurchaseHistory = async (
       ...purchaseData,
       userId: userId.trim(),
       date: Timestamp.fromDate(dateToSave),
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     };
 
     const purchaseHistoryRef = collection(db, COLLECTIONS.PURCHASE_HISTORY);
     await addDoc(purchaseHistoryRef, documentData);
   };
 
-  return operationManager.executeOperation(
-    `purchase-save-${userId}-${Date.now()}`,
-    operation
-  );
+  return operationManager.executeOperation(`purchase-save-${userId}-${Date.now()}`, operation);
 };
 
 export const getUserPurchaseHistory = async (
@@ -111,7 +105,7 @@ export const getUserPurchaseHistory = async (
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     const purchaseHistoryRef = collection(db, COLLECTIONS.PURCHASE_HISTORY);
     const q = query(
       purchaseHistoryRef,
@@ -121,11 +115,11 @@ export const getUserPurchaseHistory = async (
     );
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => {
+    return snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         ...data,
-        date: data.date?.toDate ? data.date.toDate() : new Date(data.date)
+        date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
       } as PurchaseHistoryItem;
     });
   };
@@ -149,12 +143,12 @@ export const saveFinancialProfile = async (
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     const profileRef = doc(db, COLLECTIONS.FINANCIAL_PROFILES, userId);
     const documentData = {
       ...profileData,
       userId,
-      lastUpdated: serverTimestamp()
+      lastUpdated: serverTimestamp(),
     };
     await setDoc(profileRef, documentData);
   };
@@ -162,22 +156,17 @@ export const saveFinancialProfile = async (
   // Clear cache when saving new profile
   operationManager.clearCache(`profile-${userId}`);
 
-  return operationManager.executeOperation(
-    `profile-save-${userId}`,
-    operation
-  );
+  return operationManager.executeOperation(`profile-save-${userId}`, operation);
 };
 
-export const getFinancialProfile = async (
-  userId: string
-): Promise<FinancialProfileData | null> => {
+export const getFinancialProfile = async (userId: string): Promise<FinancialProfileData | null> => {
   if (!db || !userId) {
     throw new Error('Database not initialized or userId missing');
   }
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     const profileRef = doc(db, COLLECTIONS.FINANCIAL_PROFILES, userId);
     const profileDoc = await getDoc(profileRef);
 
@@ -188,7 +177,9 @@ export const getFinancialProfile = async (
     const data = profileDoc.data();
     return {
       ...data,
-      lastUpdated: data.lastUpdated?.toDate ? data.lastUpdated.toDate() : new Date(data.lastUpdated)
+      lastUpdated: data.lastUpdated?.toDate
+        ? data.lastUpdated.toDate()
+        : new Date(data.lastUpdated),
     } as FinancialProfileData;
   };
 
@@ -211,36 +202,34 @@ export const saveChatHistory = async (
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     const chatRef = doc(db, COLLECTIONS.CHAT_HISTORY, userId);
     await setDoc(chatRef, {
       userId,
-      messages: messages.map(msg => ({
+      messages: messages.map((msg) => ({
         ...msg,
-        timestamp: msg.timestamp instanceof Date ? Timestamp.fromDate(msg.timestamp) : Timestamp.fromDate(new Date(msg.timestamp))
+        timestamp:
+          msg.timestamp instanceof Date
+            ? Timestamp.fromDate(msg.timestamp)
+            : Timestamp.fromDate(new Date(msg.timestamp)),
       })),
-      lastUpdated: serverTimestamp()
+      lastUpdated: serverTimestamp(),
     });
   };
 
   operationManager.clearCache(`chat-${userId}`);
 
-  return operationManager.executeOperation(
-    `chat-save-${userId}`,
-    operation
-  );
+  return operationManager.executeOperation(`chat-save-${userId}`, operation);
 };
 
-export const getChatHistory = async (
-  userId: string
-): Promise<ChatHistoryData | null> => {
+export const getChatHistory = async (userId: string): Promise<ChatHistoryData | null> => {
   if (!db || !userId) {
     throw new Error('Database not initialized or userId missing');
   }
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     const chatRef = doc(db, COLLECTIONS.CHAT_HISTORY, userId);
     const chatDoc = await getDoc(chatRef);
 
@@ -249,11 +238,14 @@ export const getChatHistory = async (
     const data = chatDoc.data();
     return {
       ...data,
-      messages: data.messages?.map((msg: any) => ({
-        ...msg,
-        timestamp: msg.timestamp?.toDate ? msg.timestamp.toDate() : new Date(msg.timestamp)
-      })) || [],
-      lastUpdated: data.lastUpdated?.toDate ? data.lastUpdated.toDate() : new Date(data.lastUpdated)
+      messages:
+        data.messages?.map((msg: any) => ({
+          ...msg,
+          timestamp: msg.timestamp?.toDate ? msg.timestamp.toDate() : new Date(msg.timestamp),
+        })) || [],
+      lastUpdated: data.lastUpdated?.toDate
+        ? data.lastUpdated.toDate()
+        : new Date(data.lastUpdated),
     } as ChatHistoryData;
   };
 
@@ -276,19 +268,16 @@ export const saveProModeAnalysis = async (
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     const proModeRef = collection(db, COLLECTIONS.PRO_MODE_ANALYSES);
     await addDoc(proModeRef, {
       ...analysisData,
       userId,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     });
   };
 
-  return operationManager.executeOperation(
-    `promode-save-${userId}-${Date.now()}`,
-    operation
-  );
+  return operationManager.executeOperation(`promode-save-${userId}-${Date.now()}`, operation);
 };
 
 export const getUserProModeAnalyses = async (
@@ -301,7 +290,7 @@ export const getUserProModeAnalyses = async (
 
   const operation = async () => {
     if (!db) throw new Error('Database not initialized');
-    
+
     const proModeRef = collection(db, COLLECTIONS.PRO_MODE_ANALYSES);
     const q = query(
       proModeRef,
@@ -311,11 +300,11 @@ export const getUserProModeAnalyses = async (
     );
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => {
+    return snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         ...data,
-        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt)
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
       } as ProModeAnalysis;
     });
   };

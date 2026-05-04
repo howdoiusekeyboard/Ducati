@@ -24,12 +24,14 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           <div className="empty-state-icon">💬</div>
           <h3 className="empty-state-title">Welcome to Ducati Advisor!</h3>
           <p className="empty-state-subtitle">
-            I&apos;m here to help you make smart purchasing decisions. 
-            Ask me about any item you&apos;re thinking of buying, or start a voice conversation!
+            I&apos;m here to help you make smart purchasing decisions. Ask me about any item
+            you&apos;re thinking of buying, or start a voice conversation!
           </p>
           <div className="empty-state-tips">
             <p className="empty-state-tip">💡 Try asking: &quot;Should I buy a new iPhone?&quot;</p>
-            <p className="empty-state-tip">💡 Or: &quot;Help me decide between a laptop and tablet&quot;</p>
+            <p className="empty-state-tip">
+              💡 Or: &quot;Help me decide between a laptop and tablet&quot;
+            </p>
             <p className="empty-state-tip">💡 Or click the microphone to talk to me!</p>
           </div>
         </div>
@@ -53,18 +55,21 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                 {message.isVoice && <span className="voice-badge">🎤</span>}
               </strong>
             </div>
-            
+
             {/* Message Content - sanitized via DOMPurify before injection */}
             <div
               className="message-content"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.content) }}
             />
-            
+
             {/* Message Timestamp */}
-            <div className="message-timestamp" aria-label={`Sent at ${message.timestamp.toLocaleTimeString()}`}>
+            <div
+              className="message-timestamp"
+              aria-label={`Sent at ${message.timestamp.toLocaleTimeString()}`}
+            >
               {message.timestamp.toLocaleTimeString([], {
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
               })}
             </div>
           </div>
@@ -74,6 +79,6 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
       <div ref={messagesEndRef} />
     </div>
   );
-}
+};
 
 export default MessageList;

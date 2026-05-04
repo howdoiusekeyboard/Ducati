@@ -39,9 +39,13 @@ export const getCurrentEnvironment = (): Environment => {
 /**
  * Validates that required environment variables are present and properly formatted
  */
-export const validateEnvironment = (): { isValid: boolean; error?: string; warnings?: string[] } => {
+export const validateEnvironment = (): {
+  isValid: boolean;
+  error?: string;
+  warnings?: string[];
+} => {
   const warnings: string[] = [];
-  
+
   // Check required environment variables
   if (!process.env.OPENAI_API_KEY) {
     return {
@@ -85,19 +89,21 @@ export const validateEnvironment = (): { isValid: boolean; error?: string; warni
     if (!process.env.NEXT_PUBLIC_APP_NAME) {
       warnings.push('NEXT_PUBLIC_APP_NAME is not set for production');
     }
-    
+
     // In production, recommend more conservative settings
     const config = getOpenAIConfig();
     if (config.temperature > 0.8) {
-      warnings.push('Consider using lower temperature (≤0.8) in production for more consistent responses');
+      warnings.push(
+        'Consider using lower temperature (≤0.8) in production for more consistent responses'
+      );
     }
   }
 
-  return { 
-    isValid: true, 
-    warnings: warnings.length > 0 ? warnings : undefined 
+  return {
+    isValid: true,
+    warnings: warnings.length > 0 ? warnings : undefined,
   };
-}
+};
 
 /**
  * Gets OpenAI configuration from environment variables with environment-specific fallbacks
@@ -108,11 +114,11 @@ export const getOpenAIConfig = (): OpenAIConfig => {
 
   return {
     model: process.env.OPENAI_MODEL || defaults.model,
-    temperature: process.env.OPENAI_TEMPERATURE 
-      ? parseFloat(process.env.OPENAI_TEMPERATURE) 
+    temperature: process.env.OPENAI_TEMPERATURE
+      ? parseFloat(process.env.OPENAI_TEMPERATURE)
       : defaults.temperature,
-    maxTokens: process.env.OPENAI_MAX_TOKENS 
-      ? parseInt(process.env.OPENAI_MAX_TOKENS) 
+    maxTokens: process.env.OPENAI_MAX_TOKENS
+      ? parseInt(process.env.OPENAI_MAX_TOKENS)
       : defaults.maxTokens,
   };
 };

@@ -22,12 +22,25 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           <div className="setup-instructions">
             <h3>To get started:</h3>
             <ol>
-              <li>Create a Firebase project at <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer">Firebase Console</a></li>
+              <li>
+                Create a Firebase project at{' '}
+                <a
+                  href="https://console.firebase.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Firebase Console
+                </a>
+              </li>
               <li>Enable Authentication with Google and Email/Password providers</li>
-              <li>Copy your Firebase config to <code>.env.local</code></li>
+              <li>
+                Copy your Firebase config to <code>.env.local</code>
+              </li>
               <li>Restart your development server</li>
             </ol>
-            <p>See <code>FIREBASE_AUTH_SETUP.md</code> for detailed instructions.</p>
+            <p>
+              See <code>FIREBASE_AUTH_SETUP.md</code> for detailed instructions.
+            </p>
           </div>
         </div>
       </div>

@@ -12,15 +12,15 @@ export const safeToFixed = (value, decimals = 2) => {
   if (value === null || value === undefined || value === '') {
     return (0).toFixed(decimals);
   }
-  
+
   // Convert to number
   const num = typeof value === 'number' ? value : parseFloat(value);
-  
+
   // Check if conversion resulted in valid number
   if (isNaN(num)) {
     return (0).toFixed(decimals);
   }
-  
+
   return num.toFixed(decimals);
 };
 
@@ -34,7 +34,7 @@ export const safeNumber = (value, defaultValue = 0) => {
   if (value === null || value === undefined || value === '') {
     return defaultValue;
   }
-  
+
   const num = typeof value === 'number' ? value : parseFloat(value);
   return isNaN(num) ? defaultValue : num;
 };
@@ -64,9 +64,9 @@ export const formatCurrency = (amount) => {
 export const safePercentage = (value, total, decimals = 1) => {
   const numValue = safeNumber(value, 0);
   const numTotal = safeNumber(total, 0);
-  
+
   if (numTotal === 0) return 0;
-  
+
   const percentage = (numValue / numTotal) * 100;
   return parseFloat(percentage.toFixed(decimals));
 };

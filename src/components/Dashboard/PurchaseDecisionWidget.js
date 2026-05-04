@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 
 const PurchaseDecisionWidget = ({ breakdown }) => {
   const { buyTotal, dontBuyTotal, buyCount, dontBuyCount } = breakdown;
-  
+
   // Calculate total and percentages
   const totalAmount = buyTotal + dontBuyTotal;
   const buyPercentage = totalAmount > 0 ? (buyTotal / totalAmount) * 100 : 0;
@@ -11,35 +11,35 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
 
   // Data for pie chart
   const chartData = [
-    { 
-      name: 'Approved Purchases', 
+    {
+      name: 'Approved Purchases',
       value: buyTotal,
       count: buyCount,
-      color: '#10b981'
+      color: '#10b981',
     },
-    { 
-      name: 'Avoided Purchases', 
+    {
+      name: 'Avoided Purchases',
       value: dontBuyTotal,
       count: dontBuyCount,
-      color: '#ef4444'
-    }
+      color: '#ef4444',
+    },
   ];
 
   // Custom label for pie chart
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
     if (percent < 0.05) return null; // Don't show label for very small slices
-    
+
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
         className="pie-label"
         fontWeight="600"
@@ -76,14 +76,16 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
   };
 
   // Calculate impact score
-  const impactScore = dontBuyTotal > 0 ? 
-    Math.min(100, Math.round((dontBuyTotal / (dontBuyTotal + buyTotal)) * 200)) : 0;
+  const impactScore =
+    dontBuyTotal > 0
+      ? Math.min(100, Math.round((dontBuyTotal / (dontBuyTotal + buyTotal)) * 200))
+      : 0;
 
   const getImpactMessage = () => {
-    if (impactScore >= 80) return "🌟 Outstanding financial discipline!";
-    if (impactScore >= 60) return "💪 Great job avoiding impulse buys!";
-    if (impactScore >= 40) return "📈 Good balance in your decisions!";
-    if (impactScore >= 20) return "💡 Consider being more selective!";
+    if (impactScore >= 80) return '🌟 Outstanding financial discipline!';
+    if (impactScore >= 60) return '💪 Great job avoiding impulse buys!';
+    if (impactScore >= 40) return '📈 Good balance in your decisions!';
+    if (impactScore >= 20) return '💡 Consider being more selective!';
     return "🎯 Let's work on those spending habits!";
   };
 
@@ -157,7 +159,8 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
             </div>
             <div className="stat-value">{formatCurrency(dontBuyTotal)}</div>
             <div className="stat-detail">
-              {dontBuyCount} purchase{dontBuyCount !== 1 ? 's' : ''} • {dontBuyPercentage.toFixed(0)}%
+              {dontBuyCount} purchase{dontBuyCount !== 1 ? 's' : ''} •{' '}
+              {dontBuyPercentage.toFixed(0)}%
             </div>
           </div>
         </div>
@@ -167,12 +170,12 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
           <h4>Decision Impact Score</h4>
           <div className="impact-score-container">
             <div className="impact-score-bar">
-              <div 
+              <div
                 className="impact-score-fill"
-                style={{ 
+                style={{
                   width: `${impactScore}%`,
-                  backgroundColor: impactScore >= 60 ? '#10b981' : 
-                                 impactScore >= 30 ? '#f59e0b' : '#ef4444'
+                  backgroundColor:
+                    impactScore >= 60 ? '#10b981' : impactScore >= 30 ? '#f59e0b' : '#ef4444',
                 }}
               />
             </div>
@@ -189,11 +192,13 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
               You've evaluated <strong>{buyCount + dontBuyCount}</strong> purchase decisions
             </li>
             <li>
-              Average purchase value: <strong>{formatCurrency(totalAmount / (buyCount + dontBuyCount))}</strong>
+              Average purchase value:{' '}
+              <strong>{formatCurrency(totalAmount / (buyCount + dontBuyCount))}</strong>
             </li>
             {dontBuyTotal > 0 && (
               <li>
-                Total avoided spending: <strong className="highlight">{formatCurrency(dontBuyTotal)}</strong>
+                Total avoided spending:{' '}
+                <strong className="highlight">{formatCurrency(dontBuyTotal)}</strong>
               </li>
             )}
           </ul>

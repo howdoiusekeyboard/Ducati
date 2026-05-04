@@ -18,7 +18,7 @@ const status: FirebaseStatus = {
   isConfigured: false,
   isInitialized: false,
   error: null,
-  missingVars: []
+  missingVars: [],
 };
 
 /**
@@ -67,7 +67,7 @@ const getFirebaseConfig = () => {
     'projectId',
     'storageBucket',
     'messagingSenderId',
-    'appId'
+    'appId',
   ] as const;
 
   const missingFields: string[] = [];

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
       {
         url: '/favicon.ico',
         type: 'image/x-icon',
-      }
+      },
     ],
     shortcut: '/icons8-money-96.png',
     apple: '/icons8-money-96.png',
@@ -53,11 +53,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>

@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
-import { AuthProvider, useAuth } from "../contexts/AuthContext";
-import { VoiceProvider } from "../contexts/VoiceContext";
-import { FirestoreErrorBoundary } from "./FirestoreErrorBoundary";
-import OfflineIndicator from "./OfflineIndicator";
-import FloatingVoiceButton from "./FloatingVoiceButton";
-import ScrollToTop from "./ScrollToTop";
-import { initializeOfflinePersistence } from "../lib/firestore/offline";
-import UserProfile from "./UserProfile";
-import LoginPage from "./LoginPage";
-import TermsPage from "./TermsPage";
-import PrivacyPage from "./PrivacyPage";
-import PurchaseAdvisor from "./PurchaseAdvisor";
-import FinancialProfile from "./FinancialProfile";
-import About from "./About";
-import ProMode from "./ProMode";
-import UserGuide from "./UserGuide";
-import FinanceFeed from "./FinanceFeed";
-import ChatInterface from "./ChatInterface";
-import { Dashboard } from "./Dashboard";
-import "../styles/App.css";
-import "../styles/OfflineIndicator.css";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { VoiceProvider } from '../contexts/VoiceContext';
+import { FirestoreErrorBoundary } from './FirestoreErrorBoundary';
+import OfflineIndicator from './OfflineIndicator';
+import FloatingVoiceButton from './FloatingVoiceButton';
+import ScrollToTop from './ScrollToTop';
+import { initializeOfflinePersistence } from '../lib/firestore/offline';
+import UserProfile from './UserProfile';
+import LoginPage from './LoginPage';
+import TermsPage from './TermsPage';
+import PrivacyPage from './PrivacyPage';
+import PurchaseAdvisor from './PurchaseAdvisor';
+import FinancialProfile from './FinancialProfile';
+import About from './About';
+import ProMode from './ProMode';
+import UserGuide from './UserGuide';
+import FinanceFeed from './FinanceFeed';
+import ChatInterface from './ChatInterface';
+import { Dashboard } from './Dashboard';
+import '../styles/App.css';
+import '../styles/OfflineIndicator.css';
 
 // Header Component with Hamburger Menu
 const Header = () => {
@@ -46,7 +46,7 @@ const Header = () => {
           </Link>
           <div className="header-right">
             {user && <UserProfile />}
-            <button 
+            <button
               className={`hamburger-menu ${isMenuOpen ? 'active' : ''}`}
               onClick={toggleMenu}
               aria-label="Toggle navigation menu"
@@ -63,24 +63,24 @@ const Header = () => {
       {/* Navigation Drawer */}
       <div className={`nav-drawer ${isMenuOpen ? 'open' : ''}`}>
         <nav className="nav-drawer-content">
-          <Link 
-            to="/chat" 
+          <Link
+            to="/chat"
             className={`nav-drawer-link ${location.pathname === '/chat' ? 'active' : ''}`}
             onClick={closeMenu}
           >
             <span className="nav-drawer-icon">💬</span>
             Ducati Advisor
           </Link>
-          <Link 
-            to="/dashboard" 
+          <Link
+            to="/dashboard"
             className={`nav-drawer-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
             onClick={closeMenu}
           >
             <span className="nav-drawer-icon">📊</span>
             Financial Dashboard
           </Link>
-          <Link 
-            to="/finance-feed" 
+          <Link
+            to="/finance-feed"
             className={`nav-drawer-link ${location.pathname === '/finance-feed' ? 'active' : ''}`}
             onClick={closeMenu}
           >
@@ -88,8 +88,8 @@ const Header = () => {
             Finance Feed
           </Link>
           {!user && (
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className={`nav-drawer-link ${location.pathname === '/login' ? 'active' : ''}`}
               onClick={closeMenu}
             >
@@ -97,16 +97,16 @@ const Header = () => {
               Sign In
             </Link>
           )}
-          <Link 
-            to="/user-guide" 
+          <Link
+            to="/user-guide"
             className={`nav-drawer-link ${location.pathname === '/user-guide' ? 'active' : ''}`}
             onClick={closeMenu}
           >
             <span className="nav-drawer-icon">📖</span>
             User Guide
           </Link>
-          <Link 
-            to="/about" 
+          <Link
+            to="/about"
             className={`nav-drawer-link ${location.pathname === '/about' ? 'active' : ''}`}
             onClick={closeMenu}
           >
@@ -117,16 +117,10 @@ const Header = () => {
       </div>
 
       {/* Overlay */}
-      {isMenuOpen && (
-        <div 
-          className="nav-overlay"
-          onClick={closeMenu}
-          aria-hidden="true"
-        />
-      )}
+      {isMenuOpen && <div className="nav-overlay" onClick={closeMenu} aria-hidden="true" />}
     </>
   );
-}
+};
 
 // Footer Component
 const Footer = () => {
@@ -135,7 +129,7 @@ const Footer = () => {
       <p>Based on proven investment principles and decision-making framework</p>
     </footer>
   );
-}
+};
 
 // Navigation Component
 const Navigation = () => {
@@ -148,7 +142,7 @@ const Navigation = () => {
 
   return (
     <div className="nav-container">
-      {location.pathname === "/" ? (
+      {location.pathname === '/' ? (
         <Link to="/profile" className="nav-button">
           <span className="nav-icon">👤</span>
           My Financial Profile
@@ -161,7 +155,7 @@ const Navigation = () => {
       )}
     </div>
   );
-}
+};
 
 // Component to handle initialization
 const AppInitializer = () => {
@@ -211,6 +205,6 @@ const App = () => {
       </FirestoreErrorBoundary>
     </AuthProvider>
   );
-}
+};
 
 export default App;

@@ -2,14 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useVoice } from '../contexts/VoiceContext';
 
 const FloatingVoiceButton = () => {
-  const { 
-    isSessionActive, 
-    isConnecting, 
-    startVoiceSession, 
-    stopVoiceSession,
-    currentPage 
-  } = useVoice();
-  
+  const { isSessionActive, isConnecting, startVoiceSession, stopVoiceSession, currentPage } =
+    useVoice();
+
   const [showTooltip, setShowTooltip] = useState(false);
   const [pulseAnimation, setPulseAnimation] = useState(false);
 
@@ -20,7 +15,7 @@ const FloatingVoiceButton = () => {
         setShowTooltip(true);
         setPulseAnimation(true);
         localStorage.setItem('hasSeenVoiceTooltip', 'true');
-        
+
         // Hide tooltip after 7 seconds
         setTimeout(() => setShowTooltip(false), 7000);
       }, 3000);
@@ -50,12 +45,13 @@ const FloatingVoiceButton = () => {
             <div>
               <p className="tooltip-title">Your AI Financial Advisor</p>
               <p className="tooltip-text">
-                Click the microphone to talk to me! Ask about purchases, get financial advice, or learn how to use Ducati.
+                Click the microphone to talk to me! Ask about purchases, get financial advice, or
+                learn how to use Ducati.
               </p>
             </div>
           </div>
           <div className="tooltip-arrow"></div>
-          <button 
+          <button
             className="tooltip-close"
             onClick={() => setShowTooltip(false)}
             aria-label="Close tooltip"
@@ -64,7 +60,7 @@ const FloatingVoiceButton = () => {
           </button>
         </div>
       )}
-      
+
       <button
         className={`floating-voice-btn ${isSessionActive ? 'active' : ''} ${isConnecting ? 'connecting' : ''} ${pulseAnimation ? 'pulse-attention' : ''}`}
         onClick={handleClick}
@@ -93,11 +89,13 @@ const FloatingVoiceButton = () => {
           )}
         </div>
       </button>
-      
+
       <div className={`voice-status-badge ${isSessionActive ? 'active' : ''}`}>
-        {isSessionActive ? 'Voice Active' :
-         currentPage === '/' ? 'Ask me anything!' :
-         'Tap to Talk'}
+        {isSessionActive
+          ? 'Voice Active'
+          : currentPage === '/'
+            ? 'Ask me anything!'
+            : 'Tap to Talk'}
       </div>
     </div>
   );

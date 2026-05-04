@@ -18,7 +18,13 @@ const parseAndRenderLinks = (text) => {
 
     const [fullMatch, linkText, url] = match;
     parts.push(
-      <a href={url} target="_blank" rel="noopener noreferrer" className="analysis-link" key={url + lastIndex}>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="analysis-link"
+        key={url + lastIndex}
+      >
         {linkText}
       </a>
     );
@@ -50,7 +56,7 @@ const ProMode = () => {
     setTimeout(() => {
       window.scrollTo(0, 0);
     }, 0);
-    
+
     const loadPurchaseData = async () => {
       try {
         const storedData = sessionStorage.getItem('proModePurchase');
@@ -66,7 +72,7 @@ const ProMode = () => {
         console.log('Generating questions for:', data);
         const generatedQuestions = await generateProModeQuestions(data);
         console.log('Generated questions:', generatedQuestions);
-        
+
         // Ensure backward compatibility - questions work with or without new fields
         const processedQuestions = generatedQuestions.map((q, index) => ({
           id: q.id || `q${index + 1}`,
@@ -75,9 +81,9 @@ const ProMode = () => {
           // New optional fields - keep them if present
           dimension: q.dimension,
           answer_type: q.answer_type,
-          search_hint: q.search_hint
+          search_hint: q.search_hint,
         }));
-        
+
         setQuestions(processedQuestions);
         setLoading(false);
       } catch (error) {
@@ -91,16 +97,16 @@ const ProMode = () => {
   }, [navigate]);
 
   const handleAnswerChange = (questionId, answer) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [questionId]: answer
+      [questionId]: answer,
     }));
   };
 
   const toggleHint = (questionId) => {
-    setVisibleHints(prev => ({
+    setVisibleHints((prev) => ({
       ...prev,
-      [questionId]: !prev[questionId]
+      [questionId]: !prev[questionId],
     }));
   };
 
@@ -136,18 +142,14 @@ const ProMode = () => {
 
     setAnalyzing(true);
     try {
-      const proAnalysis = await getProModeAnalysis(
-        purchaseData,
-        questions,
-        answers
-      );
+      const proAnalysis = await getProModeAnalysis(purchaseData, questions, answers);
       setAnalysis(proAnalysis);
-      
+
       // Scroll to top to show results
       setTimeout(() => {
         window.scrollTo(0, 0);
       }, 0);
-      
+
       // Save to Firestore if authenticated - include enhanced question data
       if (firestore.isAuthenticated) {
         await firestore.saveProAnalysis({
@@ -155,7 +157,7 @@ const ProMode = () => {
           itemCost: purchaseData.itemCost,
           questions,
           answers,
-          analysis: proAnalysis
+          analysis: proAnalysis,
         });
       }
     } catch (error) {
@@ -172,13 +174,13 @@ const ProMode = () => {
 
   // Helper to get dimension label if available
   const getDimensionLabel = (dimension) => {
-  const labels = {
-    specs: '📋 Specifications',
-    constraints: '💰 Constraints',
-    timing: '🕐 Timing'  // Changed from ⏰ to 🕐 for better display
+    const labels = {
+      specs: '📋 Specifications',
+      constraints: '💰 Constraints',
+      timing: '🕐 Timing', // Changed from ⏰ to 🕐 for better display
+    };
+    return labels[dimension] || '';
   };
-  return labels[dimension] || '';
-};
 
   if (loading) {
     return (
@@ -286,11 +288,7 @@ const ProMode = () => {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="analyze-button"
-                  disabled={analyzing}
-                >
+                <button type="submit" className="analyze-button" disabled={analyzing}>
                   {analyzing ? (
                     <>
                       <span className="loading-spinner"></span>

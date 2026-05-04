@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useFirestore } from "../hooks/useFirestore";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useFirestore } from '../hooks/useFirestore';
 import { LocationService } from '../lib/locationService';
-import "../styles/FinancialProfile.css";
+import '../styles/FinancialProfile.css';
 
 const FinancialProfile = () => {
   const firestore = useFirestore();
@@ -10,57 +10,57 @@ const FinancialProfile = () => {
   // State for all form fields
   const [formData, setFormData] = useState({
     // Income
-    monthlyIncome: "",
-    incomeFrequency: "monthly",
-    otherIncomeSources: "",
+    monthlyIncome: '',
+    incomeFrequency: 'monthly',
+    otherIncomeSources: '',
 
     // Expenses
-    housingCost: "",
-    utilitiesCost: "",
-    foodCost: "",
-    transportationCost: "",
-    insuranceCost: "",
-    subscriptionsCost: "",
-    otherExpenses: "",
+    housingCost: '',
+    utilitiesCost: '',
+    foodCost: '',
+    transportationCost: '',
+    insuranceCost: '',
+    subscriptionsCost: '',
+    otherExpenses: '',
 
     // Debt
-    creditCardDebt: "",
-    creditCardPayment: "",
-    studentLoanDebt: "",
-    studentLoanPayment: "",
-    carLoanDebt: "",
-    carLoanPayment: "",
-    mortgageDebt: "",
-    mortgagePayment: "",
-    otherDebt: "",
-    otherDebtPayment: "",
+    creditCardDebt: '',
+    creditCardPayment: '',
+    studentLoanDebt: '',
+    studentLoanPayment: '',
+    carLoanDebt: '',
+    carLoanPayment: '',
+    mortgageDebt: '',
+    mortgagePayment: '',
+    otherDebt: '',
+    otherDebtPayment: '',
 
     // Credit
-    creditScore: "",
-    creditLimit: "",
-    currentCreditBalance: "",
+    creditScore: '',
+    creditLimit: '',
+    currentCreditBalance: '',
 
     // Savings
-    checkingSavingsBalance: "",
-    emergencyFund: "",
+    checkingSavingsBalance: '',
+    emergencyFund: '',
 
     // Investments
-    retirementAccounts: "",
-    stocksAndBonds: "",
-    realEstateValue: "",
-    otherInvestments: "",
+    retirementAccounts: '',
+    stocksAndBonds: '',
+    realEstateValue: '',
+    otherInvestments: '',
 
     // Goals
-    shortTermGoals: "",
-    midTermGoals: "",
-    longTermGoals: "",
+    shortTermGoals: '',
+    midTermGoals: '',
+    longTermGoals: '',
 
     // Purchase Timing
-    purchaseTimeframe: "now",
+    purchaseTimeframe: 'now',
 
     // Risk
-    riskTolerance: "moderate",
-    financialPriorities: ""
+    riskTolerance: 'moderate',
+    financialPriorities: '',
   });
 
   // Add to state
@@ -77,9 +77,8 @@ const FinancialProfile = () => {
     goals: false,
     timing: false,
     risk: false,
-    location: false
+    location: false,
   });
-
 
   // Load profile on mount and set up real-time listener
   useEffect(() => {
@@ -92,7 +91,7 @@ const FinancialProfile = () => {
         setFormData({
           ...formData,
           ...firestoreProfile,
-          summary: undefined // Remove summary from form data
+          summary: undefined, // Remove summary from form data
         });
         // Set location if available in profile
         if (firestoreProfile.location) {
@@ -106,7 +105,7 @@ const FinancialProfile = () => {
           setFormData({
             ...formData,
             ...parsed,
-            summary: undefined
+            summary: undefined,
           });
           // Set location if available in localStorage profile
           if (parsed.location) {
@@ -129,7 +128,7 @@ const FinancialProfile = () => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -137,17 +136,16 @@ const FinancialProfile = () => {
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
+      [section]: !prev[section],
     }));
   };
-
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const profileData = {
-      ...formData
+      ...formData,
     };
 
     // Save to Firestore if authenticated
@@ -164,106 +162,106 @@ const FinancialProfile = () => {
 
   // Reset form data
   const handleReset = async () => {
-    if (window.confirm("Are you sure you want to reset all financial information?")) {
+    if (window.confirm('Are you sure you want to reset all financial information?')) {
       setFormData({
         // Income
-        monthlyIncome: "",
-        incomeFrequency: "monthly",
-        otherIncomeSources: "",
+        monthlyIncome: '',
+        incomeFrequency: 'monthly',
+        otherIncomeSources: '',
 
         // Expenses
-        housingCost: "",
-        utilitiesCost: "",
-        foodCost: "",
-        transportationCost: "",
-        insuranceCost: "",
-        subscriptionsCost: "",
-        otherExpenses: "",
+        housingCost: '',
+        utilitiesCost: '',
+        foodCost: '',
+        transportationCost: '',
+        insuranceCost: '',
+        subscriptionsCost: '',
+        otherExpenses: '',
 
         // Debt
-        creditCardDebt: "",
-        creditCardPayment: "",
-        studentLoanDebt: "",
-        studentLoanPayment: "",
-        carLoanDebt: "",
-        carLoanPayment: "",
-        mortgageDebt: "",
-        mortgagePayment: "",
-        otherDebt: "",
-        otherDebtPayment: "",
+        creditCardDebt: '',
+        creditCardPayment: '',
+        studentLoanDebt: '',
+        studentLoanPayment: '',
+        carLoanDebt: '',
+        carLoanPayment: '',
+        mortgageDebt: '',
+        mortgagePayment: '',
+        otherDebt: '',
+        otherDebtPayment: '',
 
         // Credit
-        creditScore: "",
-        creditLimit: "",
-        currentCreditBalance: "",
+        creditScore: '',
+        creditLimit: '',
+        currentCreditBalance: '',
 
         // Savings
-        checkingSavingsBalance: "",
-        emergencyFund: "",
+        checkingSavingsBalance: '',
+        emergencyFund: '',
 
         // Investments
-        retirementAccounts: "",
-        stocksAndBonds: "",
-        realEstateValue: "",
-        otherInvestments: "",
+        retirementAccounts: '',
+        stocksAndBonds: '',
+        realEstateValue: '',
+        otherInvestments: '',
 
         // Goals
-        shortTermGoals: "",
-        midTermGoals: "",
-        longTermGoals: "",
+        shortTermGoals: '',
+        midTermGoals: '',
+        longTermGoals: '',
 
         // Purchase Timing
-        purchaseTimeframe: "now",
+        purchaseTimeframe: 'now',
 
         // Risk
-        riskTolerance: "moderate",
-        financialPriorities: ""
+        riskTolerance: 'moderate',
+        financialPriorities: '',
       });
 
       if (firestore.isAuthenticated) {
         // Clear from Firestore
         await firestore.saveProfile({
-          monthlyIncome: "",
-          incomeFrequency: "monthly",
-          otherIncomeSources: "",
-          housingCost: "",
-          utilitiesCost: "",
-          foodCost: "",
-          transportationCost: "",
-          insuranceCost: "",
-          subscriptionsCost: "",
-          otherExpenses: "",
-          creditCardDebt: "",
-          creditCardPayment: "",
-          studentLoanDebt: "",
-          studentLoanPayment: "",
-          carLoanDebt: "",
-          carLoanPayment: "",
-          mortgageDebt: "",
-          mortgagePayment: "",
-          otherDebt: "",
-          otherDebtPayment: "",
-          creditScore: "",
-          creditLimit: "",
-          currentCreditBalance: "",
-          checkingSavingsBalance: "",
-          emergencyFund: "",
-          retirementAccounts: "",
-          stocksAndBonds: "",
-          realEstateValue: "",
-          otherInvestments: "",
-          shortTermGoals: "",
-          midTermGoals: "",
-          longTermGoals: "",
-          purchaseTimeframe: "now",
-          riskTolerance: "moderate",
-          financialPriorities: "",
-          location: null
+          monthlyIncome: '',
+          incomeFrequency: 'monthly',
+          otherIncomeSources: '',
+          housingCost: '',
+          utilitiesCost: '',
+          foodCost: '',
+          transportationCost: '',
+          insuranceCost: '',
+          subscriptionsCost: '',
+          otherExpenses: '',
+          creditCardDebt: '',
+          creditCardPayment: '',
+          studentLoanDebt: '',
+          studentLoanPayment: '',
+          carLoanDebt: '',
+          carLoanPayment: '',
+          mortgageDebt: '',
+          mortgagePayment: '',
+          otherDebt: '',
+          otherDebtPayment: '',
+          creditScore: '',
+          creditLimit: '',
+          currentCreditBalance: '',
+          checkingSavingsBalance: '',
+          emergencyFund: '',
+          retirementAccounts: '',
+          stocksAndBonds: '',
+          realEstateValue: '',
+          otherInvestments: '',
+          shortTermGoals: '',
+          midTermGoals: '',
+          longTermGoals: '',
+          purchaseTimeframe: 'now',
+          riskTolerance: 'moderate',
+          financialPriorities: '',
+          location: null,
         });
       } else {
         localStorage.removeItem('financialProfile');
       }
-      
+
       // Reset location
       setUserLocation(null);
     }
@@ -283,17 +281,12 @@ const FinancialProfile = () => {
         <form className="financial-form" onSubmit={handleSubmit}>
           {/* Income Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('income')}
-            >
+            <div className="section-header" onClick={() => toggleSection('income')}>
               <h2>
                 <span className="section-icon">💵</span>
                 Income
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.income ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.income ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.income && (
@@ -332,7 +325,9 @@ const FinancialProfile = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="otherIncomeSources">Other Monthly Income (rentals, side gigs, etc.):</label>
+                  <label htmlFor="otherIncomeSources">
+                    Other Monthly Income (rentals, side gigs, etc.):
+                  </label>
                   <input
                     type="number"
                     id="otherIncomeSources"
@@ -349,17 +344,12 @@ const FinancialProfile = () => {
 
           {/* Expenses Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('expenses')}
-            >
+            <div className="section-header" onClick={() => toggleSection('expenses')}>
               <h2>
                 <span className="section-icon">📋</span>
                 Monthly Expenses
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.expenses ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.expenses ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.expenses && (
@@ -466,23 +456,21 @@ const FinancialProfile = () => {
 
           {/* Debt Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('debt')}
-            >
+            <div className="section-header" onClick={() => toggleSection('debt')}>
               <h2>
                 <span className="section-icon">🔄</span>
                 Debt Obligations
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.debt ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.debt ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.debt && (
               <div className="section-content">
                 <div className="section-description">
-                  <p>Your debt levels and monthly payments impact your ability to take on new purchases.</p>
+                  <p>
+                    Your debt levels and monthly payments impact your ability to take on new
+                    purchases.
+                  </p>
                 </div>
 
                 <div className="debt-entry">
@@ -645,17 +633,12 @@ const FinancialProfile = () => {
 
           {/* Credit Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('credit')}
-            >
+            <div className="section-header" onClick={() => toggleSection('credit')}>
               <h2>
                 <span className="section-icon">💳</span>
                 Credit Profile
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.credit ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.credit ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.credit && (
@@ -712,23 +695,21 @@ const FinancialProfile = () => {
 
           {/* Savings Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('savings')}
-            >
+            <div className="section-header" onClick={() => toggleSection('savings')}>
               <h2>
                 <span className="section-icon">🏦</span>
                 Savings
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.savings ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.savings ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.savings && (
               <div className="section-content">
                 <div className="section-description">
-                  <p>Your liquid assets provide a safety net and flexibility for discretionary purchases.</p>
+                  <p>
+                    Your liquid assets provide a safety net and flexibility for discretionary
+                    purchases.
+                  </p>
                 </div>
 
                 <div className="input-group">
@@ -764,28 +745,28 @@ const FinancialProfile = () => {
 
           {/* Investments Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('investments')}
-            >
+            <div className="section-header" onClick={() => toggleSection('investments')}>
               <h2>
                 <span className="section-icon">📈</span>
                 Investments
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.investments ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.investments ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.investments && (
               <div className="section-content">
                 <div className="section-description">
-                  <p>Your investment portfolio contributes to your overall net worth and long-term financial health.</p>
+                  <p>
+                    Your investment portfolio contributes to your overall net worth and long-term
+                    financial health.
+                  </p>
                 </div>
 
                 <div className="input-group">
                   <div className="form-group">
-                    <label htmlFor="retirementAccounts">Retirement Accounts (401k, IRA, etc.):</label>
+                    <label htmlFor="retirementAccounts">
+                      Retirement Accounts (401k, IRA, etc.):
+                    </label>
                     <input
                       type="number"
                       id="retirementAccounts"
@@ -844,17 +825,12 @@ const FinancialProfile = () => {
 
           {/* Goals Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('goals')}
-            >
+            <div className="section-header" onClick={() => toggleSection('goals')}>
               <h2>
                 <span className="section-icon">🎯</span>
                 Financial Goals
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.goals ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.goals ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.goals && (
@@ -904,23 +880,21 @@ const FinancialProfile = () => {
 
           {/* Timing Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('timing')}
-            >
+            <div className="section-header" onClick={() => toggleSection('timing')}>
               <h2>
                 <span className="section-icon">⏰</span>
                 Purchase Timing
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.timing ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.timing ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.timing && (
               <div className="section-content">
                 <div className="section-description">
-                  <p>When you typically prefer to make purchases affects the advice you&apos;ll receive.</p>
+                  <p>
+                    When you typically prefer to make purchases affects the advice you&apos;ll
+                    receive.
+                  </p>
                 </div>
 
                 <div className="form-group">
@@ -944,31 +918,32 @@ const FinancialProfile = () => {
 
           {/* Location Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('location')}
-            >
+            <div className="section-header" onClick={() => toggleSection('location')}>
               <h2>
                 <span className="section-icon">📍</span>
                 Location
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.location ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.location ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.location && (
               <div className="section-content">
                 <div className="section-description">
-                  <p>Your location helps provide personalized advice based on local market conditions and pricing.</p>
+                  <p>
+                    Your location helps provide personalized advice based on local market conditions
+                    and pricing.
+                  </p>
                 </div>
-                
+
                 <div className="location-display">
-                  <p><strong>Current Location:</strong> {userLocation ? LocationService.formatLocation(userLocation) : 'Not set'}</p>
+                  <p>
+                    <strong>Current Location:</strong>{' '}
+                    {userLocation ? LocationService.formatLocation(userLocation) : 'Not set'}
+                  </p>
                   {userLocation && (
                     <p className="location-accuracy">Accuracy: {userLocation.accuracy}</p>
                   )}
-                  <button 
+                  <button
                     type="button"
                     onClick={async () => {
                       try {
@@ -990,23 +965,21 @@ const FinancialProfile = () => {
 
           {/* Risk Section */}
           <div className="form-section">
-            <div
-              className="section-header"
-              onClick={() => toggleSection('risk')}
-            >
+            <div className="section-header" onClick={() => toggleSection('risk')}>
               <h2>
                 <span className="section-icon">⚖️</span>
                 Risk & Priorities
               </h2>
-              <span className="toggle-icon">
-                {expandedSections.risk ? '▼' : '▶'}
-              </span>
+              <span className="toggle-icon">{expandedSections.risk ? '▼' : '▶'}</span>
             </div>
 
             {expandedSections.risk && (
               <div className="section-content">
                 <div className="section-description">
-                  <p>Your risk tolerance and financial priorities help tailor purchase recommendations.</p>
+                  <p>
+                    Your risk tolerance and financial priorities help tailor purchase
+                    recommendations.
+                  </p>
                 </div>
 
                 <div className="form-group">
@@ -1018,9 +991,15 @@ const FinancialProfile = () => {
                     onChange={handleInputChange}
                     className="select-field"
                   >
-                    <option value="conservative">Conservative - Prefer safe, predictable choices</option>
-                    <option value="moderate">Moderate - Balance between safety and opportunity</option>
-                    <option value="aggressive">Aggressive - Willing to take risks for potential gains</option>
+                    <option value="conservative">
+                      Conservative - Prefer safe, predictable choices
+                    </option>
+                    <option value="moderate">
+                      Moderate - Balance between safety and opportunity
+                    </option>
+                    <option value="aggressive">
+                      Aggressive - Willing to take risks for potential gains
+                    </option>
                   </select>
                 </div>
 
@@ -1051,6 +1030,6 @@ const FinancialProfile = () => {
       </div>
     </div>
   );
-}
+};
 
 export default FinancialProfile;

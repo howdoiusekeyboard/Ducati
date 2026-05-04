@@ -8,16 +8,16 @@ interface MessageInputProps {
   placeholder?: string;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ 
-  onSendMessage, 
+const MessageInput: React.FC<MessageInputProps> = ({
+  onSendMessage,
   isLoading,
-  placeholder = "Type your message here..."
+  placeholder = 'Type your message here...',
 }) => {
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Input validation to prevent empty messages
     const trimmedMessage = message.trim();
     if (!trimmedMessage) {
@@ -76,6 +76,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
       </form>
     </div>
   );
-}
+};
 
 export default MessageInput;

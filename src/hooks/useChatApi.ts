@@ -8,7 +8,11 @@ interface ChatError {
 }
 
 interface UseChatApiReturn {
-  sendMessage: (message: string, history: Message[], profile?: Record<string, unknown> | null) => Promise<string | null>;
+  sendMessage: (
+    message: string,
+    history: Message[],
+    profile?: Record<string, unknown> | null
+  ) => Promise<string | null>;
   isLoading: boolean;
   error: ChatError | null;
   clearError: () => void;
@@ -19,73 +23,84 @@ export const useChatApi = (): UseChatApiReturn => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ChatError | null>(null);
-  const [lastRequest, setLastRequest] = useState<{ message: string; history: Message[]; profile?: Record<string, unknown> | null } | null>(null);
+  const [lastRequest, setLastRequest] = useState<{
+    message: string;
+    history: Message[];
+    profile?: Record<string, unknown> | null;
+  } | null>(null);
 
   const clearError = useCallback(() => {
     setError(null);
   }, []);
 
-  const sendMessage = useCallback(async (message: string, history: Message[], profile?: Record<string, unknown> | null): Promise<string | null> => {
-    setLastRequest({ message, history, profile });
-    setIsLoading(true);
-    setError(null);
+  const sendMessage = useCallback(
+    async (
+      message: string,
+      history: Message[],
+      profile?: Record<string, unknown> | null
+    ): Promise<string | null> => {
+      setLastRequest({ message, history, profile });
+      setIsLoading(true);
+      setError(null);
 
-    if (!user) {
-      setError({
-        message: 'Please sign in to chat with Ducati Advisor.',
-        type: ErrorType.API_ERROR,
-      });
-      setIsLoading(false);
-      return null;
-    }
-
-    try {
-      const idToken = await user.getIdToken();
-
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          message,
-          conversationHistory: history.map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
-          profile: profile ?? null,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        const errorType = data.errorType || getErrorTypeFromStatus(response.status);
-        const error = new Error(data.error || `HTTP error! status: ${response.status}`);
-        (error as any).errorType = errorType;
-        (error as any).status = response.status;
-        throw error;
+      if (!user) {
+        setError({
+          message: 'Please sign in to chat with Ducati Advisor.',
+          type: ErrorType.API_ERROR,
+        });
+        setIsLoading(false);
+        return null;
       }
 
-      if (data.error) {
-        const error = new Error(data.error);
-        (error as any).errorType = data.errorType || ErrorType.API_ERROR;
-        throw error;
-      }
+      try {
+        const idToken = await user.getIdToken();
 
-      return data.response;
-    } catch (err: any) {
-      const errorType = err.errorType || getErrorType(err);
-      setError({
-        message: getErrorMessage(err, errorType),
-        type: errorType
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            message,
+            conversationHistory: history.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+            })),
+            profile: profile ?? null,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errorType = data.errorType || getErrorTypeFromStatus(response.status);
+          const error = new Error(data.error || `HTTP error! status: ${response.status}`);
+          (error as any).errorType = errorType;
+          (error as any).status = response.status;
+          throw error;
+        }
+
+        if (data.error) {
+          const error = new Error(data.error);
+          (error as any).errorType = data.errorType || ErrorType.API_ERROR;
+          throw error;
+        }
+
+        return data.response;
+      } catch (err: any) {
+        const errorType = err.errorType || getErrorType(err);
+        setError({
+          message: getErrorMessage(err, errorType),
+          type: errorType,
+        });
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user]
+  );
 
   const retry = useCallback(async (): Promise<string | null> => {
     if (lastRequest) {
