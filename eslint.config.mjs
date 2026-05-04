@@ -1,21 +1,22 @@
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { FlatCompat } from '@eslint/eslintrc';
 import { defineConfig, globalIgnores } from 'eslint/config';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({ baseDirectory: __dirname });
+import nextVitals from 'eslint-config-next/core-web-vitals';
 
 export default defineConfig([
-  ...compat.extends('next/core-web-vitals'),
+  ...nextVitals,
   {
     rules: {
+      // Phase 4 overrides (preserved verbatim)
       'react/no-unescaped-entities': 'off',
       '@next/next/no-html-link-for-pages': 'warn',
       '@next/next/no-img-element': 'warn',
       'react-hooks/exhaustive-deps': 'warn',
+      // Phase 5: eslint-config-next@16 promotes these to error;
+      // pre-existing patterns in codebase — downgrade to warn,
+      // fix in a dedicated cleanup pass (backlog).
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/immutability': 'warn',
+      'react-hooks/preserve-manual-memoization': 'warn',
+      'react-hooks/static-components': 'warn',
     },
   },
   globalIgnores([
