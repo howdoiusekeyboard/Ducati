@@ -25,7 +25,9 @@ describe('Edge Cases and Boundary Conditions', () => {
       // Should still evaluate but with 0 affordability
       expect(result.scores.affordability.score).toBe(0);
       expect(result.scores.financialRisk.score).toBeGreaterThanOrEqual(0);
-      expect(result.decision).toBe("Don't Buy"); // Should reject most purchases
+      // Groceries are essential — necessity-floor (Phase 9) overrides zero-affordability rejection
+      expect(result.decision).toBe('Buy');
+      expect(result.decisionRationale).toBe('necessity-floor');
     });
 
     it('should handle negative cash flow persona', () => {

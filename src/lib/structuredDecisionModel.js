@@ -4,6 +4,10 @@
  * Based on academic decision-making frameworks
  */
 
+import { computeProjection, VALID_PAYMENT_METHODS } from './postPurchaseProjection';
+
+const PAYMENT_METHODS_SET = new Set(VALID_PAYMENT_METHODS);
+
 /**
  * Classify the type of item being purchased
  * @returns {string} 'consumable', 'service', 'durable', or 'digital'
@@ -553,8 +557,15 @@ export const calculateDecisionScores = (
   frequency,
   financialProfile,
   alternative,
-  location = null
+  location = null,
+  paymentMethod = 'cash'
 ) => {
+  if (!PAYMENT_METHODS_SET.has(paymentMethod)) {
+    throw new Error(
+      `Invalid paymentMethod: ${paymentMethod}. Expected one of ${[...PAYMENT_METHODS_SET].join(', ')}.`
+    );
+  }
+
   // Get risk tolerance from profile (default to moderate)
   const riskTolerance = financialProfile?.riskTolerance || 'moderate';
 
@@ -627,11 +638,26 @@ export const calculateDecisionScores = (
   // Normalize to 0-100 scale
   const finalScore = (totalWeightedScore / totalWeight) * 10;
 
+  // Necessity floor: essentials with high necessity must not be rejected on affordability
+  // alone. Sarah's-groceries case (necessity=10, affordability=2 because cost > monthlyNet,
+  // finalScore=48) currently scores "Don't Buy" — but groceries are not optional. The floor
+  // overrides the score-only mapping when necessity >= 9.
+  const necessityScore = scores.necessity?.score ?? 0;
+  const decisionRationale =
+    necessityScore >= 9 && finalScore < 60 ? 'necessity-floor' : 'score';
+  const decision =
+    decisionRationale === 'necessity-floor' || finalScore >= 60 ? 'Buy' : "Don't Buy";
+
+  // Post-purchase projection — null when profile data is insufficient.
+  const projection = computeProjection(financialProfile, cost, paymentMethod);
+
   return {
     scores,
     finalScore,
-    decision: finalScore >= 60 ? 'Buy' : "Don't Buy", // Keep as 'decision' for backward compatibility
+    decision,
     confidence: getConfidenceLevel(finalScore),
+    decisionRationale,
+    projection,
   };
 };
 

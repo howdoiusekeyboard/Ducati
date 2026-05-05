@@ -11,7 +11,7 @@ describe('Recommendation Flow Integration Tests', () => {
   describe('Persona A: Struggling Student Sarah', () => {
     const persona = personas.STRUGGLING_STUDENT;
 
-    it('should reject grocery shopping that exceeds monthly net income', () => {
+    it("should override Don't Buy via necessity-floor on essential groceries (cost > monthly net)", () => {
       const purchase = purchases.getPurchaseById('grocery-weekly');
 
       const result = calculateDecisionScores(
@@ -23,7 +23,8 @@ describe('Recommendation Flow Integration Tests', () => {
         null
       );
 
-      expect(result.decision).toBe("Don't Buy"); // Cost ($150) exceeds monthly net ($100); aff=0 dominates
+      expect(result.decision).toBe('Buy'); // necessity-floor: groceries are essential despite low affordability
+      expect(result.decisionRationale).toBe('necessity-floor');
       expect(result.scores.necessity.score).toBeGreaterThanOrEqual(8);
       expect(result.scores.frequencyOfUse.score).toBe(8);
     });
@@ -46,7 +47,7 @@ describe('Recommendation Flow Integration Tests', () => {
       expect(result.finalScore).toBeLessThan(50);
     });
 
-    it('should reject educational textbook at 80% of monthly net', () => {
+    it("should override Don't Buy via necessity-floor on essential textbook (education keyword)", () => {
       const purchase = purchases.getPurchaseById('textbook');
 
       const result = calculateDecisionScores(
@@ -58,7 +59,8 @@ describe('Recommendation Flow Integration Tests', () => {
         null
       );
 
-      expect(result.decision).toBe("Don't Buy"); // $80 textbook is 80% of $100 monthly net; aff=0 dominates
+      expect(result.decision).toBe('Buy'); // necessity-floor: education is essential despite affordability=0
+      expect(result.decisionRationale).toBe('necessity-floor');
       expect(result.scores.necessity.score).toBe(9); // Education keyword
       expect(result.scores.frequencyOfUse.score).toBe(10); // Daily use
     });
