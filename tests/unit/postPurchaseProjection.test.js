@@ -86,3 +86,37 @@ describe('computeProjection — cash branch', () => {
     expect(projection.projectedSavings).toBeCloseTo(8500, 5);
   });
 });
+
+describe('computeProjection — EMI branches', () => {
+  it('emi-12 raises DTI by monthly EMI / monthly income', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1200, 'emi-12');
+    // monthlyEmi = 1200 / 12 = 100; deltaDti = 100 / 5000 * 100 = 2
+    expect(projection.delta.dtiRatio).toBeCloseTo(2, 5);
+    expect(projection.projectedDtiRatio).toBeCloseTo(12, 5);
+  });
+
+  it('emi-3 raises DTI more than emi-36 for same cost', () => {
+    const fast = computeProjection(FE_SHAPE_PROFILE, 3600, 'emi-3');
+    const slow = computeProjection(FE_SHAPE_PROFILE, 3600, 'emi-36');
+    // emi-3 → 1200/mo; emi-36 → 100/mo
+    expect(fast.delta.dtiRatio).toBeGreaterThan(slow.delta.dtiRatio);
+  });
+
+  it('leaves projectedSavings unchanged on EMI', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1200, 'emi-12');
+    expect(projection.projectedSavings).toBe(10000);
+    expect(projection.delta.savings).toBe(0);
+  });
+
+  it('leaves projectedEmergencyFundMonths unchanged on EMI', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1200, 'emi-12');
+    expect(projection.delta.emergencyFundMonths).toBe(0);
+  });
+
+  it.each(['emi-3', 'emi-6', 'emi-12', 'emi-24', 'emi-36'])(
+    'accepts %s as a valid payment method',
+    (method) => {
+      expect(() => computeProjection(FE_SHAPE_PROFILE, 1000, method)).not.toThrow();
+    }
+  );
+});
