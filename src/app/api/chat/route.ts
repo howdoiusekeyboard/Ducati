@@ -274,7 +274,19 @@ export async function POST(
         }
         return NextResponse.json(parsed.questions as ProModeQuestion[]);
       } catch (parseError) {
-        console.error('Pro Mode JSON parse failed:', parseError);
+        // Phase 9: instrument for Bug 2 root-cause. Capture Gemini raw text + finish reason
+        // so the next production failure diagnoses itself from Vercel runtime logs.
+        const rawText = proModeResult.text ?? '';
+        const finishReason = proModeResult.candidates?.[0]?.finishReason;
+        const promptFeedback = (proModeResult as { promptFeedback?: unknown }).promptFeedback;
+        console.error('Pro Mode questions JSON parse failed', {
+          parseError: parseError instanceof Error ? parseError.message : String(parseError),
+          finishReason,
+          promptFeedback,
+          rawTextLength: rawText.length,
+          rawTextHead: rawText.slice(0, 500),
+          rawTextTail: rawText.length > 500 ? rawText.slice(-200) : null,
+        });
         return NextResponse.json(
           { error: 'Pro Mode response was not valid JSON', errorType: ErrorType.API_ERROR },
           { status: 500 }
@@ -328,7 +340,19 @@ export async function POST(
         }
         return NextResponse.json(parsed as ProModeAnalysis);
       } catch (parseError) {
-        console.error('Pro Mode analysis JSON parse failed:', parseError);
+        // Same instrumentation as the questions branch — capture Gemini raw text for
+        // root-causing schema-bind failures from Vercel runtime logs.
+        const rawText = analysisResult.text ?? '';
+        const finishReason = analysisResult.candidates?.[0]?.finishReason;
+        const promptFeedback = (analysisResult as { promptFeedback?: unknown }).promptFeedback;
+        console.error('Pro Mode analysis JSON parse failed', {
+          parseError: parseError instanceof Error ? parseError.message : String(parseError),
+          finishReason,
+          promptFeedback,
+          rawTextLength: rawText.length,
+          rawTextHead: rawText.slice(0, 500),
+          rawTextTail: rawText.length > 500 ? rawText.slice(-200) : null,
+        });
         return NextResponse.json(
           { error: 'Pro Mode analysis response was not valid JSON', errorType: ErrorType.API_ERROR },
           { status: 500 }
