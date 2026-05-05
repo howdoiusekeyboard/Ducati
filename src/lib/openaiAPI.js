@@ -142,7 +142,7 @@ export const getPurchaseRecommendation = async (
 
     Purchase Details:
     - Item: ${itemName}
-    - Cost: $${cost}`;
+    - Cost: AED ${cost}`;
 
     if (purpose) {
       prompt += `\n    - Purpose: ${purpose}`;
@@ -154,15 +154,15 @@ export const getPurchaseRecommendation = async (
 
     if (financialProfile && financialProfile.summary) {
       prompt += `\n\nFinancial Context:
-    - Monthly Net Income: $${financialProfile.summary.monthlyNetIncome}
+    - Monthly Net Income: AED ${financialProfile.summary.monthlyNetIncome}
     - Debt-to-Income Ratio: ${financialProfile.summary.debtToIncomeRatio}%
     - Emergency Fund: ${financialProfile.summary.emergencyFundMonths} months`;
     }
 
     if (alternative) {
       prompt += `\n\nCheaper Alternative Found:
-    - ${alternative.name} for $${alternative.price} at ${alternative.retailer}
-    - Potential savings: $${(cost - alternative.price).toFixed(2)}`;
+    - ${alternative.name} for AED ${alternative.price} at ${alternative.retailer}
+    - Potential savings: AED ${(cost - alternative.price).toFixed(2)}`;
     }
 
     // Add a timestamp to encourage unique responses
@@ -368,7 +368,7 @@ export const findCheaperAlternative = async (itemName, currentPrice, location = 
       - Sales tax implications`;
     }
 
-    const prompt = `Find a cheaper alternative to "${itemName}" which currently costs $${currentPrice}.
+    const prompt = `Find a cheaper alternative to "${itemName}" which currently costs AED ${currentPrice}.
     ${locationContext}
 
     Suggest alternatives available locally or online with reasonable shipping. Respond in JSON format:

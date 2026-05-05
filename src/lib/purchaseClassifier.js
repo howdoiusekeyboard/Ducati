@@ -88,21 +88,21 @@ const applyPriceRules = (cost) => {
   } else if (cost >= 51 && cost <= 299) {
     return CLASSIFICATION_CATEGORIES.DISCRETIONARY_MEDIUM;
   }
-  // For items under $50, we'll use AI to distinguish between essential and discretionary
+  // For items under AED 50, we'll use AI to distinguish between essential and discretionary
   return null;
 };
 
 /**
- * Call OpenAI API for purchase classification (only for items under $50)
+ * Call AI for purchase classification (only for items under AED 50)
  */
 const callClassificationAPI = async (itemName, cost) => {
-  const classificationPrompt = `You are a purchase classification system. Classify this purchase under $50 into exactly one category:
+  const classificationPrompt = `You are a purchase classification system. Classify this purchase under AED 50 into exactly one category:
 
 ESSENTIAL_DAILY: Basic necessities (sanitizer, paper towels, toothpaste, basic food items, hygiene products)
 DISCRETIONARY_SMALL: Non-essential items (coffee makers, phone cases, gadgets, entertainment, decorative items)
 
 Item: "${itemName}"
-Cost: $${cost}
+Cost: AED ${cost}
 
 Respond with ONLY the category name: ESSENTIAL_DAILY or DISCRETIONARY_SMALL`;
 
@@ -170,14 +170,14 @@ export const classifyPurchase = async (itemName, cost) => {
       };
     }
 
-    // For items under $50, use AI to classify between essential and discretionary
+    // For items under AED 50, use AI to classify between essential and discretionary
     const aiClassification = await callClassificationAPI(itemName, cost);
 
     let finalCategory;
     if (aiClassification) {
       finalCategory = aiClassification;
     } else {
-      // Fallback to DISCRETIONARY_SMALL for items under $50 on any error
+      // Fallback to DISCRETIONARY_SMALL for items under AED 50 on any error
       finalCategory = CLASSIFICATION_CATEGORIES.DISCRETIONARY_SMALL;
     }
 

@@ -271,7 +271,7 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
           content: [
             {
               type: 'input_text',
-              text: `User's Financial Context: Monthly income: $${financialProfile.monthlyIncome || 'not provided'}. Monthly expenses: $${financialProfile.monthlyExpenses || 'not provided'}. Savings: $${financialProfile.currentSavings || 'not provided'}. Emergency fund: ${financialProfile.hasEmergencyFund ? 'Yes' : 'No'}. Primary goal: ${financialProfile.financialGoal || 'not specified'}. Use this context to provide personalized financial advice.`,
+              text: `User's Financial Context: Monthly income: AED ${financialProfile.monthlyIncome || 'not provided'}. Monthly expenses: AED ${financialProfile.monthlyExpenses || 'not provided'}. Savings: AED ${financialProfile.currentSavings || 'not provided'}. Emergency fund: ${financialProfile.hasEmergencyFund ? 'Yes' : 'No'}. Primary goal: ${financialProfile.financialGoal || 'not specified'}. Use this context to provide personalized financial advice.`,
             },
           ],
         },
