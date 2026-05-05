@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 import { ErrorType } from '@/types';
 import { verifyAuthFromRequest, getProfileForUid } from '@/lib/firebase-admin';
 
-// Phase 1.7 interim: text-only chat on Gemini 2.5 Flash with grounding (search + URL context).
-// Vision, Pro Mode structured output, and Realtime/Live voice defer to Phase 8.
-// See docs/superpowers/specs/2026-05-02-dependency-modernization-design.md.
+// Phase 8a: text + vision (multimodal inlineData) + Pro Mode (responseJsonSchema) on Gemini.
+// Default text path keeps grounding (googleSearch + urlContext); Pro Mode branch is pure
+// structured output (no grounding — incompatible with responseJsonSchema per Gemini API).
+// Phase 8b will rewrite the Realtime voice token route on top of Gemini Live.
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
 const DEFAULT_TEMPERATURE = 1;
@@ -35,33 +36,6 @@ Rules:
 
 If you don't know something specific to the user (income, debts, goals), ask one question — not a triage form. One.`;
 
-const PRO_MODE_FALLBACK_QUESTIONS = [
-  {
-    id: 'q1',
-    text: 'What specific features or capabilities are most important to you in this purchase?',
-    placeholder: 'I need it for professional work, specific features like...',
-    dimension: 'specs',
-    answer_type: 'short_text',
-    search_hint: 'Will search for models with these specific features',
-  },
-  {
-    id: 'q2',
-    text: 'Have you researched alternatives? What made you choose this particular option?',
-    placeholder: 'I looked at X and Y, but this one has...',
-    dimension: 'constraints',
-    answer_type: 'short_text',
-    search_hint: 'Will compare with alternative options mentioned',
-  },
-  {
-    id: 'q3',
-    text: "How soon do you need this item, and are there any upcoming sales or releases you're aware of?",
-    placeholder: 'I need it by next month, Black Friday is coming...',
-    dimension: 'timing',
-    answer_type: 'short_text',
-    search_hint: 'Will check for sales and release timing',
-  },
-];
-
 interface ChatRequest {
   message: string;
   image?: string;
@@ -70,6 +44,7 @@ interface ChatRequest {
     content: string;
   }>;
   useWebSearch?: boolean;
+  proMode?: boolean;
   profile?: Record<string, unknown> | null;
 }
 
@@ -78,6 +53,15 @@ interface ChatResponse {
   error?: string;
   errorType?: ErrorType;
 }
+
+type ProModeQuestion = {
+  id: string;
+  dimension: string;
+  answer_type: string;
+  text: string;
+  placeholder: string;
+  search_hint: string;
+};
 
 function formatProfileContext(profile: Record<string, unknown> | null | undefined): string {
   if (!profile || typeof profile !== 'object') return '';
@@ -147,7 +131,7 @@ function formatProfileContext(profile: Record<string, unknown> | null | undefine
 
 export async function POST(
   request: NextRequest
-): Promise<NextResponse<ChatResponse | typeof PRO_MODE_FALLBACK_QUESTIONS>> {
+): Promise<NextResponse<ChatResponse | ProModeQuestion[]>> {
   try {
     if (!process.env.GOOGLE_API_KEY) {
       console.error('GOOGLE_API_KEY environment variable is required');
@@ -193,21 +177,96 @@ export async function POST(
       );
     }
 
-    const isProModeQuestions =
-      body.message.includes('exactly 3 probing questions') ||
-      body.message.includes('Generate exactly 3 probing questions');
-
-    if (isProModeQuestions) {
-      return NextResponse.json(PRO_MODE_FALLBACK_QUESTIONS);
-    }
-
+    // Phase 8a: parse + validate body.image as a data: URL with base64 payload.
+    // Reject malformed input rather than silently dropping it through to the text-only path.
+    let imagePart: { inlineData: { data: string; mimeType: string } } | null = null;
     if (body.image) {
-      console.warn(
-        'Phase 1.7: image input ignored; vision flow restored in Phase 8 (Gemini multimodal).'
-      );
+      const dataUrlMatch = /^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/.exec(body.image);
+      if (!dataUrlMatch) {
+        return NextResponse.json(
+          {
+            error: 'image must be a data: URL with base64 payload',
+            errorType: ErrorType.VALIDATION_ERROR,
+          },
+          { status: 400 }
+        );
+      }
+      imagePart = { inlineData: { mimeType: dataUrlMatch[1]!, data: dataUrlMatch[2]! } };
     }
 
-    const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
+    // Phase 8a: Pro Mode 3-question generation via responseJsonSchema (incompatible with grounding).
+    if (body.proMode === true) {
+      const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+
+      const profile = await getProfileForUid(authResult.uid);
+      const systemInstruction = SYSTEM_INSTRUCTION_BASE + formatProfileContext(profile);
+
+      const proModeResult = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: [{ role: 'user', parts: [{ text: body.message.trim() }] }],
+        config: {
+          systemInstruction,
+          temperature: DEFAULT_TEMPERATURE,
+          maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
+          responseMimeType: 'application/json',
+          responseJsonSchema: {
+            type: Type.OBJECT,
+            properties: {
+              questions: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    id: { type: Type.STRING },
+                    dimension: { type: Type.STRING },
+                    answer_type: { type: Type.STRING },
+                    text: { type: Type.STRING },
+                    placeholder: { type: Type.STRING },
+                    search_hint: { type: Type.STRING },
+                  },
+                  propertyOrdering: [
+                    'id',
+                    'dimension',
+                    'answer_type',
+                    'text',
+                    'placeholder',
+                    'search_hint',
+                  ],
+                  required: [
+                    'id',
+                    'dimension',
+                    'answer_type',
+                    'text',
+                    'placeholder',
+                    'search_hint',
+                  ],
+                },
+              },
+            },
+            required: ['questions'],
+          },
+        },
+      });
+
+      try {
+        const parsed = JSON.parse(proModeResult.text ?? '');
+        if (!Array.isArray(parsed.questions) || parsed.questions.length !== 3) {
+          throw new Error('responseJsonSchema returned invalid shape');
+        }
+        return NextResponse.json(parsed.questions as ProModeQuestion[]);
+      } catch (parseError) {
+        console.error('Pro Mode JSON parse failed:', parseError);
+        return NextResponse.json(
+          { error: 'Pro Mode response was not valid JSON', errorType: ErrorType.API_ERROR },
+          { status: 500 }
+        );
+      }
+    }
+
+    const contents: Array<{
+      role: 'user' | 'model';
+      parts: Array<{ text: string } | { inlineData: { data: string; mimeType: string } }>;
+    }> = [];
 
     if (body.conversationHistory && body.conversationHistory.length > 0) {
       for (const m of body.conversationHistory) {
@@ -220,10 +279,11 @@ export async function POST(
       }
     }
 
-    contents.push({
-      role: 'user',
-      parts: [{ text: body.message.trim() }],
-    });
+    const userParts: Array<{ text: string } | { inlineData: { data: string; mimeType: string } }> =
+      [];
+    if (imagePart) userParts.push(imagePart);
+    userParts.push({ text: body.message.trim() });
+    contents.push({ role: 'user', parts: userParts });
 
     // Phase 1.5: server-fetched profile defends against client tampering of body.profile.
     // body.profile is intentionally retained in the interface (FE still sends it for surgical

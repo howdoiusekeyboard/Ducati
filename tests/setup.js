@@ -46,7 +46,7 @@ process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = 'test-project';
 process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = 'test.appspot.com';
 process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = '123456789';
 process.env.NEXT_PUBLIC_FIREBASE_APP_ID = 'test-app-id';
-process.env.OPENAI_API_KEY = 'test-openai-key';
+process.env.GOOGLE_API_KEY = 'test-google-key';
 
 // Add custom matchers if needed
 expect.extend({

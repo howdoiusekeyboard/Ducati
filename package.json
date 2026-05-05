@@ -29,14 +29,13 @@
     "upload-media": "bun scripts/upload-media.js"
   },
   "dependencies": {
-    "@google/genai": "^1.51.0",
+    "@google/genai": "^1.52.0",
     "@tailwindcss/postcss": "^4.2.4",
     "dompurify": "^3.4.2",
     "firebase": "^12.12.1",
     "firebase-admin": "^13.8.0",
     "firebaseui": "^6.1.0",
     "next": "^16.2.4",
-    "openai": "^5.10.1",
     "postcss": "^8.5.13",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

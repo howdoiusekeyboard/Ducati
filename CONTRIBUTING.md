@@ -17,7 +17,7 @@ git clone https://github.com/howdoiusekeyboard/Ducati.git
 cd Ducati
 bun install
 cp .env.example .env.local
-# fill in OPENAI_API_KEY and the six NEXT_PUBLIC_FIREBASE_* values
+# fill in GOOGLE_API_KEY and the six NEXT_PUBLIC_FIREBASE_* values
 bun run check-env
 bun run dev
 ```

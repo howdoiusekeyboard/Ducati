@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generateProModeQuestions, getProModeAnalysis } from '../lib/ProModeAPI';
 import { useFirestore } from '../hooks/useFirestore';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/ProMode.css';
 
 const parseAndRenderLinks = (text) => {
@@ -41,6 +42,7 @@ const parseAndRenderLinks = (text) => {
 const ProMode = () => {
   const navigate = useNavigate();
   const firestore = useFirestore();
+  const { user } = useAuth();
   const [purchaseData, setPurchaseData] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
@@ -68,9 +70,12 @@ const ProMode = () => {
         const data = JSON.parse(storedData);
         setPurchaseData(data);
 
+        // Phase 8a: /api/chat is auth-gated; pass through current user's ID token.
+        const idToken = user ? await user.getIdToken() : null;
+
         // Generate tailored questions
         console.log('Generating questions for:', data);
-        const generatedQuestions = await generateProModeQuestions(data);
+        const generatedQuestions = await generateProModeQuestions(data, idToken);
         console.log('Generated questions:', generatedQuestions);
 
         // Ensure backward compatibility - questions work with or without new fields
@@ -94,7 +99,7 @@ const ProMode = () => {
     };
 
     loadPurchaseData();
-  }, [navigate]);
+  }, [navigate, user]);
 
   const handleAnswerChange = (questionId, answer) => {
     setAnswers((prev) => ({
@@ -142,7 +147,8 @@ const ProMode = () => {
 
     setAnalyzing(true);
     try {
-      const proAnalysis = await getProModeAnalysis(purchaseData, questions, answers);
+      const idToken = user ? await user.getIdToken() : null;
+      const proAnalysis = await getProModeAnalysis(purchaseData, questions, answers, idToken);
       setAnalysis(proAnalysis);
 
       // Scroll to top to show results

@@ -37,7 +37,7 @@ bun run dev                        # starts at http://localhost:3000
 
 See `.env.example`. You will need:
 
-- `OPENAI_API_KEY` — for chat, vision, and ephemeral Realtime tokens
+- `GOOGLE_API_KEY` — for Gemini chat, vision, grounded search, and structured Pro Mode output (Phase 8b will add Gemini Live for voice)
 - `NEXT_PUBLIC_FIREBASE_*` (six vars) — from your Firebase project's web app config
 - `NEXT_PUBLIC_APP_NAME` — display name (defaults to `Ducati`)
 

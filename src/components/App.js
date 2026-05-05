@@ -167,6 +167,15 @@ const AppInitializer = () => {
   return null; // This component doesn't render anything
 };
 
+// Phase 8a: gate FloatingVoiceButton on auth so anon /chat visits don't fire
+// /api/realtime/token (still on the OpenAI Realtime path until Phase 8b's
+// Gemini Live rewrite). Returning null keeps the realtime route inert end-to-end.
+const AuthedFloatingVoiceButton = () => {
+  const { user } = useAuth();
+  if (!user) return null;
+  return <FloatingVoiceButton />;
+};
+
 const App = () => {
   return (
     <AuthProvider>
@@ -179,7 +188,7 @@ const App = () => {
               <OfflineIndicator />
               <Header />
               {/* Add Voice Components */}
-              <FloatingVoiceButton />
+              <AuthedFloatingVoiceButton />
 
               <main className="main-content">
                 <Routes>

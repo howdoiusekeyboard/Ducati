@@ -102,9 +102,12 @@ const getFallbackPlaceholder = (dimension, itemName, itemCost) => {
 };
 
 /**
- * Generate tailored questions based on purchase context
+ * Generate tailored questions based on purchase context.
+ * Phase 8a: server-side route runs Gemini responseJsonSchema and returns the
+ * questions as a plain JSON array. Caller must pass an ID token (Phase 1.5
+ * auth gate enforces it server-side).
  */
-export const generateProModeQuestions = async (purchaseData) => {
+export const generateProModeQuestions = async (purchaseData, idToken) => {
   try {
     const { itemName, itemCost, analysisDetails } = purchaseData;
     const topNegativeFactors = analysisDetails?.topFactors?.negative || [];
@@ -116,28 +119,21 @@ Item: "${itemName}"
 Price: $${itemCost}
 Initial concerns (if any): ${concerns}
 
-**Output format (JSON only):**
-{
-  "questions": [
-    {"id":"q1","dimension":"specs","answer_type":"short_text","text":"...","placeholder":"...","search_hint":"..."},
-    {"id":"q2","dimension":"constraints","answer_type":"short_text","text":"...","placeholder":"...","search_hint":"..."},
-    {"id":"q3","dimension":"timing","answer_type":"short_text","text":"...","placeholder":"...","search_hint":"..."}
-  ]
-}
+Produce exactly 3 questions, one per dimension: (1) specs (use-case or must-have features), (2) constraints (budget/TCO/warranty/retailer/region), (3) timing (need-by date, willingness to wait for sales/upcoming releases).
 
-**Hard requirements:**
-- Produce **exactly 3** questions, one per **dimension**: (1) \`specs\` (use-case or must-have features), (2) \`constraints\` (budget/TCO/warranty/retailer/region), (3) \`timing\` (need-by date, willingness to wait for sales/upcoming releases).
-- Each object must include: \`id\` (\`q1|q2|q3\`), \`dimension\`, \`answer_type\`, \`text\`, \`placeholder\`, \`search_hint\`.
-- \`placeholder\` must be **first-person**, **≤120 chars**, and include **1–2 concrete, searchable entities** (e.g., brand/model, spec numbers, warranty months, retailer/ZIP, or a date window). Do **not** use quotes or prefixes like "e.g." or "Example:".
-- Make each \`text\` non-overlapping in scope (no near-duplicates).
-- Keep \`answer_type\` = \`short_text\` unless a number or multiple-choice is clearly better.
-- \`search_hint\` = one short line that explains how the answer will translate into search terms later.
-- Return **valid JSON only** (no markdown fences, no prose outside the JSON).`;
+Each question requires: id (q1|q2|q3), dimension, answer_type, text, placeholder, search_hint.
+- placeholder must be first-person, <=120 chars, and include 1-2 concrete searchable entities (brand/model, spec numbers, warranty months, retailer/ZIP, or a date window). No quotes or prefixes like "e.g." or "Example:".
+- Each text non-overlapping in scope (no near-duplicates).
+- Keep answer_type = short_text unless a number or multiple-choice is clearly better.
+- search_hint = one short line explaining how the answer translates into later search terms.`;
 
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: prompt }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+      },
+      body: JSON.stringify({ message: prompt, proMode: true }),
     });
 
     if (!response.ok) {
@@ -146,33 +142,15 @@ Initial concerns (if any): ${concerns}
 
     const data = await response.json();
 
-    if (data.error) {
+    if (data && typeof data === 'object' && 'error' in data) {
       throw new Error(`API Error: ${data.error}`);
     }
 
-    let questions;
-
-    // Handle direct array response from server
-    if (Array.isArray(data)) {
-      questions = data;
-    } else if (data.response) {
-      // Parse from response string
-      const cleanedResponse = data.response
-        .replace(/^```json\s*/, '')
-        .replace(/\s*```$/, '')
-        .trim();
-
-      try {
-        const parsed = JSON.parse(cleanedResponse);
-        questions = parsed.questions || parsed;
-      } catch (parseError) {
-        console.error('Failed to parse questions JSON:', parseError);
-        throw parseError;
-      }
+    if (!Array.isArray(data)) {
+      throw new Error('Pro Mode endpoint returned unexpected shape');
     }
 
-    // Validate and fix questions
-    questions = validateQuestions(questions);
+    let questions = validateQuestions(data);
 
     if (!questions) {
       throw new Error('Invalid question structure received');
@@ -235,9 +213,10 @@ Initial concerns (if any): ${concerns}
 };
 
 /**
- * Get comprehensive Pro Mode analysis with web search
+ * Get comprehensive Pro Mode analysis with web search.
+ * Phase 8a: caller must pass an ID token; route is Phase-1.5 auth-gated.
  */
-export const getProModeAnalysis = async (purchaseData, questions, answers) => {
+export const getProModeAnalysis = async (purchaseData, questions, answers, idToken) => {
   try {
     // Get user location
     const location = await LocationService.getUserLocation();
@@ -300,7 +279,10 @@ export const getProModeAnalysis = async (purchaseData, questions, answers) => {
 
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+      },
       body: JSON.stringify({
         message: prompt,
         useWebSearch: true,

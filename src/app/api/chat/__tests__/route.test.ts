@@ -1,359 +1,278 @@
 /**
- * Unit tests for chat API route logic
- * Tests OpenAI integration and error handling scenarios
+ * Unit tests for /api/chat route — Gemini migration (Phase 8a).
+ * Imports the actual handler and mocks @google/genai + firebase-admin.
  */
 
-import { ErrorType } from '@/types';
+import { NextRequest } from 'next/server';
 
-// Mock OpenAI
-const mockCreate = jest.fn();
-jest.mock('openai', () => {
+// ---- Mock @google/genai ----
+const mockGenerateContent = jest.fn();
+jest.mock('@google/genai', () => {
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      chat: {
-        completions: {
-          create: mockCreate,
-        },
+    GoogleGenAI: jest.fn().mockImplementation(() => ({
+      models: {
+        generateContent: mockGenerateContent,
       },
     })),
+    Type: {
+      OBJECT: 'OBJECT',
+      STRING: 'STRING',
+      ARRAY: 'ARRAY',
+      INTEGER: 'INTEGER',
+    },
   };
 });
 
-// Mock the openai-config module
-jest.mock('@/lib/openai-config', () => ({
-  validateEnvironment: jest.fn(() => ({ isValid: true })),
-  getOpenAIConfig: jest.fn(() => ({
-    model: 'gpt-4.1',
-    temperature: 0.7,
-    maxTokens: 150,
-  })),
-  logEnvironmentInfo: jest.fn(),
-  getCurrentEnvironment: jest.fn(() => 'test'),
+// ---- Mock firebase-admin via the project's wrapper ----
+const mockVerify = jest.fn();
+const mockGetProfile = jest.fn();
+jest.mock('@/lib/firebase-admin', () => ({
+  verifyAuthFromRequest: (...args: unknown[]) => mockVerify(...args),
+  getProfileForUid: (...args: unknown[]) => mockGetProfile(...args),
 }));
 
-import OpenAI from 'openai';
-import { validateEnvironment, getOpenAIConfig } from '@/lib/openai-config';
+import { POST } from '../route';
 
-describe('Chat API Route Logic', () => {
+const VALID_AUTH = { ok: true as const, uid: 'test-uid' };
+
+function makeRequest(body: unknown, headers: Record<string, string> = {}): NextRequest {
+  return new NextRequest('http://localhost/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body: JSON.stringify(body),
+  });
+}
+
+describe('/api/chat — Gemini route handler', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Setup default mock implementation
-    (OpenAI as jest.MockedClass<typeof OpenAI>).mockImplementation(
-      () =>
-        ({
-          chat: {
-            completions: {
-              create: mockCreate,
-            },
-          },
-        }) as any
-    );
-
-    // Set up environment variable
-    process.env.OPENAI_API_KEY = 'test-api-key';
+    process.env.GOOGLE_API_KEY = 'test-google-key';
+    mockVerify.mockResolvedValue(VALID_AUTH);
+    mockGetProfile.mockResolvedValue(null);
   });
 
   afterEach(() => {
-    delete process.env.OPENAI_API_KEY;
+    delete process.env.GOOGLE_API_KEY;
   });
 
-  describe('OpenAI Integration', () => {
-    it('should create OpenAI client and make successful request', async () => {
-      const mockResponse = {
-        choices: [
-          {
-            message: {
-              content: 'Hello! How can I help you today?',
+  describe('environment + auth gate', () => {
+    it('returns 500 when GOOGLE_API_KEY is missing', async () => {
+      delete process.env.GOOGLE_API_KEY;
+      const res = await POST(makeRequest({ message: 'hi' }));
+      expect(res.status).toBe(500);
+      const body = await res.json();
+      expect(body.error).toMatch(/GOOGLE_API_KEY/);
+      expect(mockGenerateContent).not.toHaveBeenCalled();
+    });
+
+    it('returns 401 when verifyAuthFromRequest fails', async () => {
+      mockVerify.mockResolvedValue({
+        ok: false,
+        status: 401,
+        error: 'Missing Authorization header',
+      });
+      const res = await POST(makeRequest({ message: 'hi' }));
+      expect(res.status).toBe(401);
+      expect(mockGenerateContent).not.toHaveBeenCalled();
+    });
+
+    it('does not call Gemini until auth has passed', async () => {
+      mockVerify.mockResolvedValue({
+        ok: false,
+        status: 401,
+        error: 'Invalid or expired ID token',
+      });
+      await POST(makeRequest({ message: 'hi' }));
+      expect(mockGenerateContent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('input validation', () => {
+    it('rejects empty message with 400', async () => {
+      const res = await POST(makeRequest({ message: '' }));
+      expect(res.status).toBe(400);
+      expect(mockGenerateContent).not.toHaveBeenCalled();
+    });
+
+    it('rejects whitespace-only message with 400', async () => {
+      const res = await POST(makeRequest({ message: '   ' }));
+      expect(res.status).toBe(400);
+    });
+
+    it('rejects malformed JSON body with 400', async () => {
+      const req = new NextRequest('http://localhost/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{not-json',
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+    });
+
+    it('rejects non-array conversationHistory with 400', async () => {
+      const res = await POST(makeRequest({ message: 'hi', conversationHistory: 'nope' }));
+      expect(res.status).toBe(400);
+    });
+  });
+
+  describe('default text path (Gemini grounding)', () => {
+    it('returns assistant text on success', async () => {
+      mockGenerateContent.mockResolvedValue({ text: 'Hello back.' });
+      const res = await POST(makeRequest({ message: 'hi' }));
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.response).toBe('Hello back.');
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: expect.stringMatching(/^gemini-/),
+          config: expect.objectContaining({
+            tools: expect.arrayContaining([expect.objectContaining({ googleSearch: {} })]),
+          }),
+        })
+      );
+    });
+
+    it('returns 500 when Gemini returns empty text', async () => {
+      mockGenerateContent.mockResolvedValue({ text: '' });
+      const res = await POST(makeRequest({ message: 'hi' }));
+      expect(res.status).toBe(500);
+    });
+
+    it('forwards conversationHistory to Gemini in user/model role shape', async () => {
+      mockGenerateContent.mockResolvedValue({ text: 'OK' });
+      await POST(
+        makeRequest({
+          message: 'follow-up',
+          conversationHistory: [
+            { role: 'user', content: 'previous question' },
+            { role: 'assistant', content: 'previous answer' },
+          ],
+        })
+      );
+      const arg = mockGenerateContent.mock.calls[0]![0]!;
+      expect(arg.contents).toEqual([
+        { role: 'user', parts: [{ text: 'previous question' }] },
+        { role: 'model', parts: [{ text: 'previous answer' }] },
+        { role: 'user', parts: [{ text: 'follow-up' }] },
+      ]);
+    });
+
+    it('maps 429 errors to RATE_LIMIT_ERROR + status 429', async () => {
+      const err: { status: number; message: string } = { status: 429, message: 'rate limit hit' };
+      mockGenerateContent.mockRejectedValue(err);
+      const res = await POST(makeRequest({ message: 'hi' }));
+      expect(res.status).toBe(429);
+      const body = await res.json();
+      expect(body.errorType).toBe('rate_limit_error');
+    });
+  });
+
+  describe('vision path (multimodal inlineData)', () => {
+    it('attaches base64 image as inlineData part when body.image is a data URL', async () => {
+      mockGenerateContent.mockResolvedValue({ text: 'I see a cat.' });
+      const dataUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRg==';
+      await POST(makeRequest({ message: 'what is this', image: dataUrl }));
+      const arg = mockGenerateContent.mock.calls[0]![0]!;
+      const userPart = arg.contents.find((c: { role: string }) => c.role === 'user');
+      expect(userPart.parts).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            inlineData: expect.objectContaining({
+              data: '/9j/4AAQSkZJRg==',
+              mimeType: 'image/jpeg',
+            }),
+          }),
+          { text: 'what is this' },
+        ])
+      );
+    });
+
+    it('rejects body.image that is not a data: URL with 400', async () => {
+      const res = await POST(makeRequest({ message: 'q', image: 'https://example.com/x.jpg' }));
+      expect(res.status).toBe(400);
+      expect(mockGenerateContent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Pro Mode (responseJsonSchema)', () => {
+    it('routes body.proMode === true to a structured-output call', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify({
+          questions: [
+            {
+              id: 'q1',
+              dimension: 'specs',
+              answer_type: 'short_text',
+              text: 'A',
+              placeholder: 'p1',
+              search_hint: 's1',
             },
-          },
-        ],
-      };
-
-      mockCreate.mockResolvedValue(mockResponse);
-
-      // Test the OpenAI client creation and API call
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      const config = getOpenAIConfig();
-      const completion = await openai.chat.completions.create({
-        model: config.model,
-        messages: [
-          {
-            role: 'user',
-            content: 'Hello, world!',
-          },
-        ],
-        temperature: config.temperature,
-        max_tokens: config.maxTokens,
-      });
-
-      expect(completion.choices[0]?.message?.content).toBe('Hello! How can I help you today?');
-      expect(mockCreate).toHaveBeenCalledWith({
-        model: 'gpt-4.1',
-        messages: [
-          {
-            role: 'user',
-            content: 'Hello, world!',
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 150,
-      });
-    });
-
-    it('should handle conversation history correctly', async () => {
-      const mockResponse = {
-        choices: [
-          {
-            message: {
-              content: 'I understand your previous question.',
+            {
+              id: 'q2',
+              dimension: 'constraints',
+              answer_type: 'short_text',
+              text: 'B',
+              placeholder: 'p2',
+              search_hint: 's2',
             },
-          },
-        ],
-      };
-
-      mockCreate.mockResolvedValue(mockResponse);
-
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      const config = getOpenAIConfig();
-      const messages = [
-        { role: 'user' as const, content: 'What is AI?' },
-        { role: 'assistant' as const, content: 'AI stands for Artificial Intelligence.' },
-        { role: 'user' as const, content: 'Can you elaborate?' },
-      ];
-
-      await openai.chat.completions.create({
-        model: config.model,
-        messages,
-        temperature: config.temperature,
-        max_tokens: config.maxTokens,
-      });
-
-      expect(mockCreate).toHaveBeenCalledWith({
-        model: 'gpt-4.1',
-        messages,
-        temperature: 0.7,
-        max_tokens: 150,
-      });
-    });
-
-    it('should handle OpenAI rate limit error', async () => {
-      const rateLimitError = new Error('Rate limit exceeded');
-      (rateLimitError as any).status = 429;
-      mockCreate.mockRejectedValue(rateLimitError);
-
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      const config = getOpenAIConfig();
-
-      try {
-        await openai.chat.completions.create({
-          model: config.model,
-          messages: [{ role: 'user', content: 'Hello' }],
-          temperature: config.temperature,
-          max_tokens: config.maxTokens,
-        });
-        fail('Expected error to be thrown');
-      } catch (error: any) {
-        expect(error.status).toBe(429);
-        expect(error.message).toBe('Rate limit exceeded');
-      }
-    });
-
-    it('should handle OpenAI authentication error', async () => {
-      const authError = new Error('Authentication failed');
-      (authError as any).status = 401;
-      mockCreate.mockRejectedValue(authError);
-
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      const config = getOpenAIConfig();
-
-      try {
-        await openai.chat.completions.create({
-          model: config.model,
-          messages: [{ role: 'user', content: 'Hello' }],
-          temperature: config.temperature,
-          max_tokens: config.maxTokens,
-        });
-        fail('Expected error to be thrown');
-      } catch (error: any) {
-        expect(error.status).toBe(401);
-        expect(error.message).toBe('Authentication failed');
-      }
-    });
-
-    it('should handle network connection error', async () => {
-      const networkError = new Error('Network error');
-      (networkError as any).code = 'ENOTFOUND';
-      mockCreate.mockRejectedValue(networkError);
-
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      const config = getOpenAIConfig();
-
-      try {
-        await openai.chat.completions.create({
-          model: config.model,
-          messages: [{ role: 'user', content: 'Hello' }],
-          temperature: config.temperature,
-          max_tokens: config.maxTokens,
-        });
-        fail('Expected error to be thrown');
-      } catch (error: any) {
-        expect(error.code).toBe('ENOTFOUND');
-        expect(error.message).toBe('Network error');
-      }
-    });
-
-    it('should handle empty OpenAI response', async () => {
-      const mockResponse = {
-        choices: [
-          {
-            message: {
-              content: null,
+            {
+              id: 'q3',
+              dimension: 'timing',
+              answer_type: 'short_text',
+              text: 'C',
+              placeholder: 'p3',
+              search_hint: 's3',
             },
-          },
-        ],
-      };
-
-      mockCreate.mockResolvedValue(mockResponse);
-
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
+          ],
+        }),
       });
-
-      const config = getOpenAIConfig();
-      const completion = await openai.chat.completions.create({
-        model: config.model,
-        messages: [{ role: 'user', content: 'Hello' }],
-        temperature: config.temperature,
-        max_tokens: config.maxTokens,
-      });
-
-      expect(completion.choices[0]?.message?.content).toBeNull();
+      const res = await POST(
+        makeRequest({ message: 'iPhone 17 Pro purchase context', proMode: true })
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(Array.isArray(body)).toBe(true);
+      expect(body).toHaveLength(3);
+      expect(body[0].id).toBe('q1');
+      const arg = mockGenerateContent.mock.calls[0]![0]!;
+      expect(arg.config.responseMimeType).toBe('application/json');
+      expect(arg.config.responseJsonSchema).toBeDefined();
+      expect(arg.config.tools).toBeUndefined(); // structured output incompatible with grounding
     });
 
-    it('should handle missing choices in OpenAI response', async () => {
-      const mockResponse = {
-        choices: [],
-      };
+    it('returns 500 when Pro Mode response is not valid JSON', async () => {
+      mockGenerateContent.mockResolvedValue({ text: 'not json at all' });
+      const res = await POST(makeRequest({ message: 'x', proMode: true }));
+      expect(res.status).toBe(500);
+    });
 
-      mockCreate.mockResolvedValue(mockResponse);
-
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      const config = getOpenAIConfig();
-      const completion = await openai.chat.completions.create({
-        model: config.model,
-        messages: [{ role: 'user', content: 'Hello' }],
-        temperature: config.temperature,
-        max_tokens: config.maxTokens,
-      });
-
-      expect(completion.choices).toHaveLength(0);
+    it('does not trigger Pro Mode for the legacy magic-string message', async () => {
+      mockGenerateContent.mockResolvedValue({ text: 'Default text response.' });
+      const res = await POST(
+        makeRequest({ message: 'Generate exactly 3 probing questions about X' })
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.response).toBe('Default text response.');
+      const arg = mockGenerateContent.mock.calls[0]![0]!;
+      expect(arg.config.responseJsonSchema).toBeUndefined();
     });
   });
 
-  describe('Input Validation Logic', () => {
-    it('should validate empty message', () => {
-      const message: string = '';
-      const isValid = !!(message && typeof message === 'string' && message.trim().length > 0);
-      expect(isValid).toBe(false);
-    });
-
-    it('should validate whitespace-only message', () => {
-      const message: string = '   ';
-      const isValid = !!(message && typeof message === 'string' && message.trim().length > 0);
-      expect(isValid).toBe(false);
-    });
-
-    it('should validate valid message', () => {
-      const message: string = 'Hello, world!';
-      const isValid = !!(message && typeof message === 'string' && message.trim().length > 0);
-      expect(isValid).toBe(true);
-    });
-
-    it('should validate conversation history format', () => {
-      const validHistory = [
-        { role: 'user', content: 'Hello' },
-        { role: 'assistant', content: 'Hi there!' },
-      ];
-      const invalidHistory = 'invalid format';
-
-      expect(Array.isArray(validHistory)).toBe(true);
-      expect(Array.isArray(invalidHistory)).toBe(false);
-    });
-
-    it('should trim message content', () => {
-      const message = '  Hello, world!  ';
-      const trimmed = message.trim();
-      expect(trimmed).toBe('Hello, world!');
-    });
-  });
-
-  describe('Error Type Classification', () => {
-    it('should classify error types correctly', () => {
-      expect(ErrorType.NETWORK_ERROR).toBe('network_error');
-      expect(ErrorType.API_ERROR).toBe('api_error');
-      expect(ErrorType.VALIDATION_ERROR).toBe('validation_error');
-      expect(ErrorType.RATE_LIMIT_ERROR).toBe('rate_limit_error');
-    });
-
-    it('should determine error type from status code', () => {
-      const getErrorType = (status: number) => {
-        if (status === 429) return ErrorType.RATE_LIMIT_ERROR;
-        if (status === 401) return ErrorType.API_ERROR;
-        if (status >= 400 && status < 500) return ErrorType.VALIDATION_ERROR;
-        return ErrorType.API_ERROR;
-      };
-
-      expect(getErrorType(429)).toBe(ErrorType.RATE_LIMIT_ERROR);
-      expect(getErrorType(401)).toBe(ErrorType.API_ERROR);
-      expect(getErrorType(400)).toBe(ErrorType.VALIDATION_ERROR);
-      expect(getErrorType(500)).toBe(ErrorType.API_ERROR);
-    });
-
-    it('should determine error type from error code', () => {
-      const getErrorTypeFromCode = (code: string) => {
-        if (code === 'ENOTFOUND' || code === 'ECONNREFUSED') {
-          return ErrorType.NETWORK_ERROR;
-        }
-        return ErrorType.API_ERROR;
-      };
-
-      expect(getErrorTypeFromCode('ENOTFOUND')).toBe(ErrorType.NETWORK_ERROR);
-      expect(getErrorTypeFromCode('ECONNREFUSED')).toBe(ErrorType.NETWORK_ERROR);
-      expect(getErrorTypeFromCode('OTHER')).toBe(ErrorType.API_ERROR);
-    });
-  });
-
-  describe('Environment Configuration', () => {
-    it('should validate environment correctly', () => {
-      const validation = validateEnvironment();
-      expect(validation.isValid).toBe(true);
-    });
-
-    it('should get OpenAI configuration', () => {
-      const config = getOpenAIConfig();
-      expect(config.model).toBe('gpt-4.1');
-      expect(config.temperature).toBe(0.7);
-      expect(config.maxTokens).toBe(150);
+  describe('profile injection (Phase 1.5)', () => {
+    it('injects server-fetched profile into systemInstruction; ignores body.profile', async () => {
+      mockGetProfile.mockResolvedValue({ monthlyIncome: 5000, creditScore: 750 });
+      mockGenerateContent.mockResolvedValue({ text: 'OK' });
+      await POST(
+        makeRequest({
+          message: 'hi',
+          profile: { monthlyIncome: 99999 }, // attempted client tamper
+        })
+      );
+      const arg = mockGenerateContent.mock.calls[0]![0]!;
+      expect(arg.config.systemInstruction).toContain('Monthly income: $5000');
+      expect(arg.config.systemInstruction).not.toContain('99999');
     });
   });
 });
