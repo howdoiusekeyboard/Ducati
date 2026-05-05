@@ -24,10 +24,15 @@ const AuthComponent: React.FC<AuthComponentProps> = ({ onSignInSuccess }) => {
       return;
     }
 
-    // Initialize FirebaseUI only once
+    // Initialize FirebaseUI. firebaseui maintains a global registry keyed by
+    // the Auth instance; calling `new AuthUI(auth)` twice for the same key
+    // throws "AuthUI instance already exists for the key '[DEFAULT]'".
+    // React StrictMode + Next.js fast-refresh both re-run this effect, so
+    // we must reuse the existing instance via getInstance() when available.
     if (!uiRef.current && auth) {
       try {
-        uiRef.current = new firebaseui.auth.AuthUI(auth);
+        uiRef.current =
+          firebaseui.auth.AuthUI.getInstance() ?? new firebaseui.auth.AuthUI(auth);
       } catch (error) {
         console.error('Failed to initialize FirebaseUI:', error);
         return;

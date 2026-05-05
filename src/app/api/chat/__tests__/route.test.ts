@@ -285,6 +285,48 @@ describe('/api/chat — Gemini route handler', () => {
       const arg = mockGenerateContent.mock.calls[0]![0]!;
       expect(arg.config.responseJsonSchema).toBeUndefined();
     });
+
+    it('proMode questions: falls back to gemini-2.5-flash-lite on 503 from primary', async () => {
+      const overload = Object.assign(new Error('503 UNAVAILABLE'), { status: 503 });
+      const validQuestionsJson = JSON.stringify({
+        questions: [
+          { id: 'q1', dimension: 'specs', answer_type: 'short_text', text: 'A', placeholder: 'p1', search_hint: 's1' },
+          { id: 'q2', dimension: 'constraints', answer_type: 'short_text', text: 'B', placeholder: 'p2', search_hint: 's2' },
+          { id: 'q3', dimension: 'timing', answer_type: 'short_text', text: 'C', placeholder: 'p3', search_hint: 's3' },
+        ],
+      });
+      mockGenerateContent
+        .mockRejectedValueOnce(overload)
+        .mockResolvedValueOnce({ text: validQuestionsJson });
+
+      const res = await POST(makeRequest({ message: 'x', proMode: true }));
+
+      expect(res.status).toBe(200);
+      expect(mockGenerateContent).toHaveBeenCalledTimes(2);
+      expect(mockGenerateContent.mock.calls[0]![0]!.model).toBe('gemini-2.5-flash');
+      expect(mockGenerateContent.mock.calls[1]![0]!.model).toBe('gemini-2.5-flash-lite');
+    });
+  });
+
+  describe('default text path 503 fallback (Phase 9 follow-up)', () => {
+    it('falls back to gemini-2.5-flash-lite preserving googleSearch + urlContext tools', async () => {
+      const overload = Object.assign(new Error('503 UNAVAILABLE'), { status: 503 });
+      mockGenerateContent
+        .mockRejectedValueOnce(overload)
+        .mockResolvedValueOnce({ text: 'Fallback response.' });
+
+      const res = await POST(makeRequest({ message: 'tell me about X' }));
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.response).toBe('Fallback response.');
+      expect(mockGenerateContent).toHaveBeenCalledTimes(2);
+      expect(mockGenerateContent.mock.calls[0]![0]!.model).toBe('gemini-2.5-flash');
+      expect(mockGenerateContent.mock.calls[1]![0]!.model).toBe('gemini-2.5-flash-lite');
+      // Both calls must carry the same grounding tool config.
+      const fallbackCall = mockGenerateContent.mock.calls[1]![0]!;
+      expect(fallbackCall.config.tools).toEqual([{ googleSearch: {} }, { urlContext: {} }]);
+    });
   });
 
   describe('profile injection (Phase 1.5)', () => {

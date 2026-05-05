@@ -755,9 +755,9 @@ export const generateStructuredRecommendation = (
     const fmt = (n, digits = 1) => Number(n).toFixed(digits);
     reasoning += `\n\n**Projection — paying via ${formatPaymentMethodLabel(projection.paymentMethod)}:**\n`;
     if (projection.delta.savings !== 0) {
-      reasoning += `• Savings: $${fmt(projection.projectedSavings - projection.delta.savings, 0)} → $${fmt(projection.projectedSavings, 0)}\n`;
+      reasoning += `• Savings: AED ${fmt(projection.projectedSavings - projection.delta.savings, 0)} → AED ${fmt(projection.projectedSavings, 0)}\n`;
     } else {
-      reasoning += `• Savings: unchanged ($${fmt(projection.projectedSavings, 0)})\n`;
+      reasoning += `• Savings: unchanged (AED ${fmt(projection.projectedSavings, 0)})\n`;
     }
     if (Math.abs(projection.delta.emergencyFundMonths) > 0.01) {
       reasoning += `• Emergency fund: ${fmt(projection.projectedEmergencyFundMonths - projection.delta.emergencyFundMonths)} mo → ${fmt(projection.projectedEmergencyFundMonths)} mo\n`;

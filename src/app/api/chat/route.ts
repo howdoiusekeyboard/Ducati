@@ -229,53 +229,71 @@ export async function POST(
       const profile = await getProfileForUid(authResult.uid);
       const systemInstruction = SYSTEM_INSTRUCTION_BASE + formatProfileContext(profile);
 
-      const proModeResult = await ai.models.generateContent({
-        model: GEMINI_MODEL,
-        contents: [{ role: 'user', parts: [{ text: body.message.trim() }] }],
-        config: {
-          systemInstruction,
-          temperature: DEFAULT_TEMPERATURE,
-          maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
-          thinkingConfig: { thinkingBudget: 0 },
-          responseMimeType: 'application/json',
-          responseJsonSchema: {
-            type: Type.OBJECT,
-            properties: {
-              questions: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    id: { type: Type.STRING },
-                    dimension: { type: Type.STRING },
-                    answer_type: { type: Type.STRING },
-                    text: { type: Type.STRING },
-                    placeholder: { type: Type.STRING },
-                    search_hint: { type: Type.STRING },
-                  },
-                  propertyOrdering: [
-                    'id',
-                    'dimension',
-                    'answer_type',
-                    'text',
-                    'placeholder',
-                    'search_hint',
-                  ],
-                  required: [
-                    'id',
-                    'dimension',
-                    'answer_type',
-                    'text',
-                    'placeholder',
-                    'search_hint',
-                  ],
+      const proModeContents = [
+        { role: 'user' as const, parts: [{ text: body.message.trim() }] },
+      ];
+      const proModeConfig = {
+        systemInstruction,
+        temperature: DEFAULT_TEMPERATURE,
+        maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
+        thinkingConfig: { thinkingBudget: 0 },
+        responseMimeType: 'application/json',
+        responseJsonSchema: {
+          type: Type.OBJECT,
+          properties: {
+            questions: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  id: { type: Type.STRING },
+                  dimension: { type: Type.STRING },
+                  answer_type: { type: Type.STRING },
+                  text: { type: Type.STRING },
+                  placeholder: { type: Type.STRING },
+                  search_hint: { type: Type.STRING },
                 },
+                propertyOrdering: [
+                  'id',
+                  'dimension',
+                  'answer_type',
+                  'text',
+                  'placeholder',
+                  'search_hint',
+                ],
+                required: [
+                  'id',
+                  'dimension',
+                  'answer_type',
+                  'text',
+                  'placeholder',
+                  'search_hint',
+                ],
               },
             },
-            required: ['questions'],
           },
+          required: ['questions'],
         },
-      });
+      };
+
+      let proModeResult;
+      try {
+        proModeResult = await ai.models.generateContent({
+          model: GEMINI_MODEL,
+          contents: proModeContents,
+          config: proModeConfig,
+        });
+      } catch (modelError) {
+        if ((modelError as { status?: number }).status !== 503) throw modelError;
+        console.warn(
+          'proMode questions: gemini-2.5-flash 503 UNAVAILABLE; retrying on gemini-2.5-flash-lite'
+        );
+        proModeResult = await ai.models.generateContent({
+          model: GEMINI_FALLBACK_MODEL,
+          contents: proModeContents,
+          config: proModeConfig,
+        });
+      }
 
       try {
         const parsed = JSON.parse(proModeResult.text ?? '');
@@ -421,19 +439,36 @@ export async function POST(
 
     const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
-    const result = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents,
-      config: {
-        systemInstruction,
-        temperature: DEFAULT_TEMPERATURE,
-        maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
-        thinkingConfig: {
-          thinkingBudget: 256,
-        },
-        tools: [{ googleSearch: {} }, { urlContext: {} }],
+    const defaultTextConfig = {
+      systemInstruction,
+      temperature: DEFAULT_TEMPERATURE,
+      maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
+      thinkingConfig: {
+        thinkingBudget: 256,
       },
-    });
+      tools: [{ googleSearch: {} }, { urlContext: {} }],
+    };
+
+    let result;
+    try {
+      result = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents,
+        config: defaultTextConfig,
+      });
+    } catch (modelError) {
+      if ((modelError as { status?: number }).status !== 503) throw modelError;
+      // gemini-2.5-flash-lite supports googleSearch + urlContext + thinking per
+      // ai.google.dev/gemini-api/docs/models — same tool config carries over.
+      console.warn(
+        'default text: gemini-2.5-flash 503 UNAVAILABLE; retrying on gemini-2.5-flash-lite'
+      );
+      result = await ai.models.generateContent({
+        model: GEMINI_FALLBACK_MODEL,
+        contents,
+        config: defaultTextConfig,
+      });
+    }
 
     const assistantMessage = result.text;
 
