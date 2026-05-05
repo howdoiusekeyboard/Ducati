@@ -302,4 +302,74 @@ describe('/api/chat — Gemini route handler', () => {
       expect(arg.config.systemInstruction).not.toContain('99999');
     });
   });
+
+  describe('proModeAnalysis (Phase 9 + fallback)', () => {
+    const validAnalysisJson = JSON.stringify({
+      fullAnalysis: 'Detailed analysis of the AED 9800 purchase.',
+      marketInsights: 'Market is currently competitive.',
+      recommendations: ['Wait for sale', 'Compare retailers', 'Check warranty'],
+      decisionConfidence: 78,
+    });
+
+    it('returns the parsed analysis on a successful structured-output call', async () => {
+      mockGenerateContent.mockResolvedValue({ text: validAnalysisJson });
+      const res = await POST(
+        makeRequest({ message: 'AED 9800 laptop analysis context', proModeAnalysis: true })
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.fullAnalysis).toMatch(/AED 9800/);
+      expect(body.recommendations).toHaveLength(3);
+      expect(body.decisionConfidence).toBe(78);
+      const arg = mockGenerateContent.mock.calls[0]![0]!;
+      expect(arg.model).toBe('gemini-2.5-flash');
+      expect(arg.config.thinkingConfig).toEqual({ thinkingBudget: 0 });
+    });
+
+    it('falls back to gemini-2.5-flash-lite on 503 UNAVAILABLE from primary model', async () => {
+      const overloadError = Object.assign(new Error('503 UNAVAILABLE'), { status: 503 });
+      mockGenerateContent
+        .mockRejectedValueOnce(overloadError)
+        .mockResolvedValueOnce({ text: validAnalysisJson });
+
+      const res = await POST(
+        makeRequest({ message: 'analyze this', proModeAnalysis: true })
+      );
+
+      expect(res.status).toBe(200);
+      expect(mockGenerateContent).toHaveBeenCalledTimes(2);
+      expect(mockGenerateContent.mock.calls[0]![0]!.model).toBe('gemini-2.5-flash');
+      expect(mockGenerateContent.mock.calls[1]![0]!.model).toBe('gemini-2.5-flash-lite');
+    });
+
+    it('does not fall back on non-503 errors; bubbles to outer catch', async () => {
+      const authError = Object.assign(new Error('401 UNAUTHENTICATED'), { status: 401 });
+      mockGenerateContent.mockRejectedValueOnce(authError);
+
+      const res = await POST(
+        makeRequest({ message: 'analyze this', proModeAnalysis: true })
+      );
+
+      expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+      // Outer catch maps 401 → "Authentication failed" with 500.
+      expect(res.status).toBe(500);
+      const body = await res.json();
+      expect(body.error).toMatch(/Authentication failed/i);
+    });
+
+    it('returns 503 NETWORK_ERROR when both primary and fallback 503', async () => {
+      const overloadError = Object.assign(new Error('503 UNAVAILABLE'), { status: 503 });
+      mockGenerateContent.mockRejectedValue(overloadError);
+
+      const res = await POST(
+        makeRequest({ message: 'analyze this', proModeAnalysis: true })
+      );
+
+      expect(mockGenerateContent).toHaveBeenCalledTimes(2);
+      expect(res.status).toBe(503);
+      const body = await res.json();
+      expect(body.errorType).toBe('network_error');
+      expect(body.error).toMatch(/temporarily unavailable/i);
+    });
+  });
 });

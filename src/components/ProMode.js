@@ -185,7 +185,9 @@ const ProMode = () => {
         navigate('/login');
         return;
       }
-      setError('Failed to generate analysis. Please try again.');
+      // Phase 9 follow-up: pass through the route's friendly message when present
+      // so transient overloads render as "...temporarily unavailable..." not generic.
+      setError(error.message || 'Failed to generate analysis. Please try again.');
     } finally {
       setAnalyzing(false);
     }

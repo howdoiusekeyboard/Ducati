@@ -311,7 +311,17 @@ export const getProModeAnalysis = async (purchaseData, questions, answers, idTok
       throw new Error(PRO_MODE_AUTH_ERROR);
     }
     if (!response.ok) {
-      throw new Error('Failed to get analysis');
+      // Phase 9 follow-up: surface the route's friendly errorType-aware message
+      // (e.g., "Ducati Advisor is temporarily unavailable...") instead of a generic
+      // "Failed to get analysis", so consumers render actionable state.
+      let routeMessage = 'Failed to get analysis';
+      try {
+        const body = await response.json();
+        if (body && typeof body.error === 'string') routeMessage = body.error;
+      } catch {
+        // body wasn't JSON; keep generic
+      }
+      throw new Error(routeMessage);
     }
 
     // Phase 9: route returns the parsed analysis object directly (responseJsonSchema-validated).

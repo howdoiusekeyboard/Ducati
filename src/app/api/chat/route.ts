@@ -9,8 +9,17 @@ import { verifyAuthFromRequest, getProfileForUid } from '@/lib/firebase-admin';
 // Phase 8b will rewrite the Realtime voice token route on top of Gemini Live.
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
+// Phase 9 follow-up: fallback model for proModeAnalysis when GEMINI_MODEL returns
+// 503 UNAVAILABLE (model overload — recurring on 2.5-flash, curl-confirmed). flash-lite
+// supports responseJsonSchema with feature parity. Quality degrades, but degraded
+// analysis beats a hard 503 for transient capacity events.
+const GEMINI_FALLBACK_MODEL = 'gemini-2.5-flash-lite';
 const DEFAULT_TEMPERATURE = 1;
-const DEFAULT_MAX_OUTPUT_TOKENS = 800;
+// Phase 9 follow-up: bumped 800 -> 1500. With grounding (googleSearch + urlContext) and
+// thinkingBudget=256, the effective response budget at 800 was ~544 tokens minus citation
+// overhead — frequently triggering MAX_TOKENS finishReason and an empty result.text, which
+// surfaced to users as a 500 "No response received". Matches the proModeAnalysis branch.
+const DEFAULT_MAX_OUTPUT_TOKENS = 1500;
 
 // Phase 8a: explicit allowlist of safe raster image types. Excludes image/svg+xml
 // because SVG can carry inline <script> — even though Gemini doesn't execute it,
@@ -227,6 +236,7 @@ export async function POST(
           systemInstruction,
           temperature: DEFAULT_TEMPERATURE,
           maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
+          thinkingConfig: { thinkingBudget: 0 },
           responseMimeType: 'application/json',
           responseJsonSchema: {
             type: Type.OBJECT,
@@ -303,30 +313,51 @@ export async function POST(
       const profile = await getProfileForUid(authResult.uid);
       const systemInstruction = SYSTEM_INSTRUCTION_BASE + formatProfileContext(profile);
 
-      const analysisResult = await ai.models.generateContent({
-        model: GEMINI_MODEL,
-        contents: [{ role: 'user', parts: [{ text: body.message.trim() }] }],
-        config: {
-          systemInstruction,
-          temperature: DEFAULT_TEMPERATURE,
-          maxOutputTokens: 1500,
-          responseMimeType: 'application/json',
-          responseJsonSchema: {
-            type: Type.OBJECT,
-            properties: {
-              fullAnalysis: { type: Type.STRING },
-              marketInsights: { type: Type.STRING },
-              recommendations: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-              },
-              decisionConfidence: { type: Type.INTEGER },
+      const analysisContents = [
+        { role: 'user' as const, parts: [{ text: body.message.trim() }] },
+      ];
+      const analysisConfig = {
+        systemInstruction,
+        temperature: DEFAULT_TEMPERATURE,
+        maxOutputTokens: 1500,
+        thinkingConfig: { thinkingBudget: 0 },
+        responseMimeType: 'application/json',
+        responseJsonSchema: {
+          type: Type.OBJECT,
+          properties: {
+            fullAnalysis: { type: Type.STRING },
+            marketInsights: { type: Type.STRING },
+            recommendations: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
             },
-            propertyOrdering: ['fullAnalysis', 'marketInsights', 'recommendations', 'decisionConfidence'],
-            required: ['fullAnalysis', 'marketInsights', 'recommendations', 'decisionConfidence'],
+            decisionConfidence: { type: Type.INTEGER },
           },
+          propertyOrdering: ['fullAnalysis', 'marketInsights', 'recommendations', 'decisionConfidence'],
+          required: ['fullAnalysis', 'marketInsights', 'recommendations', 'decisionConfidence'],
         },
-      });
+      };
+
+      let analysisResult;
+      try {
+        analysisResult = await ai.models.generateContent({
+          model: GEMINI_MODEL,
+          contents: analysisContents,
+          config: analysisConfig,
+        });
+      } catch (modelError) {
+        // Phase 9 follow-up: only intercept 503 UNAVAILABLE. Auth, quota, schema, and
+        // transport errors must bubble to the outer catch's existing classification.
+        if ((modelError as { status?: number }).status !== 503) throw modelError;
+        console.warn(
+          'proModeAnalysis: gemini-2.5-flash 503 UNAVAILABLE; retrying on gemini-2.5-flash-lite'
+        );
+        analysisResult = await ai.models.generateContent({
+          model: GEMINI_FALLBACK_MODEL,
+          contents: analysisContents,
+          config: analysisConfig,
+        });
+      }
 
       try {
         const parsed = JSON.parse(analysisResult.text ?? '');
@@ -407,6 +438,19 @@ export async function POST(
     const assistantMessage = result.text;
 
     if (!assistantMessage) {
+      // Phase 9 follow-up: instrument the empty-text branch so production 500s on the
+      // default text path self-diagnose from Vercel logs. Common causes: MAX_TOKENS
+      // finishReason from grounded responses + thinking overhead, SAFETY filter blocks,
+      // or RECITATION blocks.
+      const finishReason = result.candidates?.[0]?.finishReason;
+      const safetyRatings = result.candidates?.[0]?.safetyRatings;
+      const promptFeedback = (result as { promptFeedback?: unknown }).promptFeedback;
+      console.error('Default text path: empty assistantMessage', {
+        finishReason,
+        safetyRatings,
+        promptFeedback,
+        usageMetadata: (result as { usageMetadata?: unknown }).usageMetadata,
+      });
       return NextResponse.json(
         {
           error: 'No response received from Ducati Advisor service',
@@ -418,14 +462,31 @@ export async function POST(
 
     return NextResponse.json({ response: assistantMessage });
   } catch (error) {
-    console.error('Gemini API error:', error);
-
-    const apiError = error as {
+    // Phase 9 follow-up: structured error logging so Vercel runtime logs reveal which
+    // SDK error shape we hit (status / code / message / cause). Replaces the bare
+    // `console.error('Gemini API error:', error)` whose object pretty-print is hard to
+    // reason about in the Vercel UI.
+    const apiErrorForLog = error as {
       status?: number;
       statusCode?: number;
       code?: string;
       message?: string;
+      name?: string;
+      cause?: unknown;
     };
+    console.error('Gemini API error', {
+      name: apiErrorForLog.name,
+      status: apiErrorForLog.status,
+      statusCode: apiErrorForLog.statusCode,
+      code: apiErrorForLog.code,
+      message: apiErrorForLog.message,
+      cause:
+        apiErrorForLog.cause instanceof Error
+          ? { name: apiErrorForLog.cause.name, message: apiErrorForLog.cause.message }
+          : apiErrorForLog.cause,
+    });
+
+    const apiError = apiErrorForLog;
     const status = apiError.status ?? apiError.statusCode;
     const message = apiError.message ?? '';
 
@@ -436,6 +497,23 @@ export async function POST(
           errorType: ErrorType.RATE_LIMIT_ERROR,
         },
         { status: 429 }
+      );
+    }
+
+    // Upstream Gemini 5xx + transport failures collapse to a single 503 NETWORK_ERROR.
+    // MUST run BEFORE the 401/403 branch: a Gemini 503 whose body mentions "api key"
+    // would otherwise be misclassified as auth and surface a generic 500.
+    if (
+      (status !== undefined && status >= 500 && status < 600) ||
+      apiError.code === 'ENOTFOUND' ||
+      apiError.code === 'ECONNREFUSED'
+    ) {
+      return NextResponse.json(
+        {
+          error: 'Ducati Advisor is temporarily unavailable. Please try again in a moment.',
+          errorType: ErrorType.NETWORK_ERROR,
+        },
+        { status: 503 }
       );
     }
 
@@ -453,16 +531,6 @@ export async function POST(
           errorType: ErrorType.VALIDATION_ERROR,
         },
         { status: 400 }
-      );
-    }
-
-    if (apiError.code === 'ENOTFOUND' || apiError.code === 'ECONNREFUSED') {
-      return NextResponse.json(
-        {
-          error: 'Unable to connect to Ducati Advisor service. Please check your connection.',
-          errorType: ErrorType.NETWORK_ERROR,
-        },
-        { status: 503 }
       );
     }
 
