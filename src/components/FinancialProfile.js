@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DollarSign, TrendingUp, Target, Scale, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useFirestore } from '../hooks/useFirestore';
 import { LocationService } from '../lib/locationService';
@@ -283,7 +284,7 @@ const FinancialProfile = () => {
           <div className="form-section">
             <div className="section-header" onClick={() => toggleSection('income')}>
               <h2>
-                <span className="section-icon">💵</span>
+                <DollarSign className="section-icon" aria-hidden="true" />
                 Income
               </h2>
               <span className="toggle-icon">{expandedSections.income ? '▼' : '▶'}</span>
@@ -346,8 +347,8 @@ const FinancialProfile = () => {
           <div className="form-section">
             <div className="section-header" onClick={() => toggleSection('expenses')}>
               <h2>
-                <span className="section-icon">📋</span>
-                Monthly Expenses
+                <ClipboardList className="section-icon" aria-hidden="true" />
+                Monthly expenses
               </h2>
               <span className="toggle-icon">{expandedSections.expenses ? '▼' : '▶'}</span>
             </div>
@@ -747,7 +748,7 @@ const FinancialProfile = () => {
           <div className="form-section">
             <div className="section-header" onClick={() => toggleSection('investments')}>
               <h2>
-                <span className="section-icon">📈</span>
+                <TrendingUp className="section-icon" aria-hidden="true" />
                 Investments
               </h2>
               <span className="toggle-icon">{expandedSections.investments ? '▼' : '▶'}</span>
@@ -827,7 +828,7 @@ const FinancialProfile = () => {
           <div className="form-section">
             <div className="section-header" onClick={() => toggleSection('goals')}>
               <h2>
-                <span className="section-icon">🎯</span>
+                <Target className="section-icon" aria-hidden="true" />
                 Financial Goals
               </h2>
               <span className="toggle-icon">{expandedSections.goals ? '▼' : '▶'}</span>
@@ -967,7 +968,7 @@ const FinancialProfile = () => {
           <div className="form-section">
             <div className="section-header" onClick={() => toggleSection('risk')}>
               <h2>
-                <span className="section-icon">⚖️</span>
+                <Scale className="section-icon" aria-hidden="true" />
                 Risk & Priorities
               </h2>
               <span className="toggle-icon">{expandedSections.risk ? '▼' : '▶'}</span>

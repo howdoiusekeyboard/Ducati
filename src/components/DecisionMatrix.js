@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
+import { BarChart3, DollarSign, Brain, AlertTriangle, Wrench, Check } from 'lucide-react';
 import '../styles/DecisionMatrix.css';
 
-/**
- * Component to display the structured decision matrix results
- */
 const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -11,10 +9,11 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
     return null;
   }
 
+  // Score colors aligned with verdict-pill palette (D2 has no semantic green token).
   const getScoreColor = (score) => {
-    if (score >= 7) return '#10b981'; // Green
-    if (score >= 4) return '#f59e0b'; // Yellow
-    return '#ef4444'; // Red
+    if (score >= 7) return '#059669';
+    if (score >= 4) return '#b45309';
+    return '#b91c1c';
   };
 
   const getScoreLabel = (score) => {
@@ -33,8 +32,8 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
         aria-expanded={isExpanded}
       >
         <h3>
-          <span className="matrix-icon">📊</span>
-          Decision Analysis Matrix
+          <BarChart3 className="matrix-icon" aria-hidden="true" />
+          Decision matrix
         </h3>
         <div className="overall-score">
           <span className="score-label">Overall Score:</span>
@@ -59,8 +58,8 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
             {/* Financial Criteria */}
             <div className="matrix-section">
               <h4 className="section-title">
-                <span className="section-emoji">💰</span>
-                Financial Criteria
+                <DollarSign className="section-emoji" aria-hidden="true" />
+                Financial criteria
               </h4>
               <div className="criteria-list">
                 {decisionMatrix.financial.map((item, index) => (
@@ -91,8 +90,8 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
             {/* Psychological Criteria */}
             <div className="matrix-section">
               <h4 className="section-title">
-                <span className="section-emoji">🧠</span>
-                Psychological Criteria
+                <Brain className="section-emoji" aria-hidden="true" />
+                Psychological criteria
               </h4>
               <div className="criteria-list">
                 {decisionMatrix.psychological.map((item, index) => (
@@ -123,8 +122,8 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
             {/* Risk Criteria */}
             <div className="matrix-section">
               <h4 className="section-title">
-                <span className="section-emoji">⚠️</span>
-                Risk Assessment
+                <AlertTriangle className="section-emoji" aria-hidden="true" />
+                Risk assessment
               </h4>
               <div className="criteria-list">
                 {decisionMatrix.risk.map((item, index) => (
@@ -155,8 +154,8 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
             {/* Utility Criteria */}
             <div className="matrix-section">
               <h4 className="section-title">
-                <span className="section-emoji">🔧</span>
-                Utility Criteria
+                <Wrench className="section-emoji" aria-hidden="true" />
+                Utility criteria
               </h4>
               <div className="criteria-list">
                 {decisionMatrix.utility.map((item, index) => (
@@ -188,7 +187,10 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
           {/* Key Factors Summary */}
           <div className="factors-summary">
             <div className="positive-factors">
-              <h5>✅ Strengths</h5>
+              <h5>
+                <Check className="inline-icon" aria-hidden="true" />
+                Strengths
+              </h5>
               <ul>
                 {analysisDetails.topFactors.positive.map((factor, index) => (
                   <li key={index}>{factor}</li>
@@ -196,7 +198,10 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
               </ul>
             </div>
             <div className="negative-factors">
-              <h5>⚠️ Concerns</h5>
+              <h5>
+                <AlertTriangle className="inline-icon" aria-hidden="true" />
+                Concerns
+              </h5>
               <ul>
                 {analysisDetails.topFactors.negative.map((factor, index) => (
                   <li key={index}>{factor}</li>
@@ -205,12 +210,11 @@ const DecisionMatrix = ({ analysisDetails, decisionMatrix }) => {
             </div>
           </div>
 
-          {/* Decision Explanation */}
           <div className="decision-explanation">
             <p className="explanation-text">
-              This analysis uses a <strong>Weighted Decision Matrix</strong> based on academic
-              research in consumer behavior and financial decision-making. Each criterion is scored
-              from 0-10 and weighted by importance to calculate an overall recommendation score.
+              Weighted decision matrix based on consumer behavior and financial decision-making
+              research. Each criterion is scored 0-10 and weighted by importance to calculate the
+              overall recommendation.
             </p>
           </div>
         </div>

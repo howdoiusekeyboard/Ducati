@@ -1,6 +1,7 @@
 // src/components/Dashboard/Dashboard.js
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BarChart3, AlertTriangle, HardDrive, ShoppingCart, User, Wrench } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useFirestore } from '../../hooks/useFirestore';
 import HealthScoreWidget from './HealthScoreWidget';
@@ -305,7 +306,7 @@ const Dashboard = () => {
     return (
       <div className="dashboard-container">
         <div className="dashboard-error config-error">
-          <div className="error-icon">🔧</div>
+          <Wrench className="error-icon" aria-hidden="true" />
           <h2>Configuration Issue Detected</h2>
           <p>
             There's an issue with the database configuration that's preventing data from loading.
@@ -348,15 +349,15 @@ const Dashboard = () => {
     return (
       <div className="dashboard-container">
         <div className="dashboard-empty">
-          <div className="empty-icon">📊</div>
-          <h2>Welcome to Your Financial Dashboard!</h2>
-          <p>Start using Ducati to see your financial insights here.</p>
+          <BarChart3 className="empty-icon" aria-hidden="true" />
+          <h2>Set up your financial profile</h2>
+          <p>Add your profile and analyze a purchase to see insights here.</p>
           <div className="empty-actions">
             <button onClick={() => navigate('/profile')} className="btn btn-primary">
-              Set Up Financial Profile
+              Set up profile
             </button>
             <button onClick={() => navigate('/')} className="btn btn-secondary">
-              Analyze Your First Purchase
+              Analyze a purchase
             </button>
           </div>
         </div>
@@ -368,21 +369,21 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1>
-          <span className="dashboard-icon">📊</span>
-          Your Financial Dashboard
+          <BarChart3 className="dashboard-icon" aria-hidden="true" />
+          Dashboard
         </h1>
-        <p className="dashboard-subtitle">Track your progress toward financial freedom</p>
+        <p className="dashboard-subtitle">Track your progress.</p>
         {(hasLocalFallback || error) && (
           <div className="dashboard-status">
             {hasLocalFallback && (
               <span className="status-badge offline">
-                <span className="status-icon">💾</span>
+                <HardDrive className="status-icon" aria-hidden="true" />
                 Using local data
               </span>
             )}
             {error && errorType !== ERROR_TYPES.FIREBASE_CONFIG && (
               <span className="status-badge warning">
-                <span className="status-icon">⚠️</span>
+                <AlertTriangle className="status-icon" aria-hidden="true" />
                 Limited connectivity
               </span>
             )}
@@ -423,12 +424,12 @@ const Dashboard = () => {
       {/* Dashboard Actions */}
       <div className="dashboard-actions">
         <button onClick={() => navigate('/')} className="action-btn primary">
-          <span className="action-icon">🛒</span>
-          Analyze New Purchase
+          <ShoppingCart className="action-icon" aria-hidden="true" />
+          Analyze a purchase
         </button>
         <button onClick={() => navigate('/profile')} className="action-btn secondary">
-          <span className="action-icon">👤</span>
-          Update Profile
+          <User className="action-icon" aria-hidden="true" />
+          Update profile
         </button>
       </div>
 

@@ -9,30 +9,23 @@ const LoginPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleSignInSuccess = (user: any) => {
-    console.log('User signed in successfully:', user);
-    // Redirect to home page after successful login
+  const handleSignInSuccess = (signedInUser: unknown) => {
+    void signedInUser;
     navigate('/');
   };
 
   useEffect(() => {
-    // If user is already signed in, redirect to home
     if (user) {
       navigate('/');
     }
   }, [user, navigate]);
 
   if (user) {
-    // Show loading while redirecting
     return (
       <div className="login-page">
         <div className="login-container">
           <div className="login-header">
-            <div className="logo-section">
-              <span className="logo-icon">💰</span>
-              <h1>Welcome back!</h1>
-            </div>
-            <p className="login-subtitle">Redirecting you to Ducati...</p>
+            <h1>Signing you in</h1>
           </div>
           <div className="loading-container">
             <div className="loading-spinner"></div>
@@ -46,15 +39,11 @@ const LoginPage: React.FC = () => {
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-          <div className="logo-section">
-            <span className="logo-icon">💰</span>
-            <h1>Welcome to Ducati</h1>
-          </div>
-          <p className="login-subtitle">Get rational advice on your purchasing decisions</p>
+          <h1>Sign in to Ducati</h1>
+          <p className="login-subtitle">Ask before you buy.</p>
         </div>
 
         <div className="auth-section">
-          <h2>Sign in to continue</h2>
           <AuthComponent onSignInSuccess={handleSignInSuccess} />
         </div>
 
@@ -68,6 +57,7 @@ const LoginPage: React.FC = () => {
             <a href="/privacy" className="link">
               Privacy Policy
             </a>
+            .
           </p>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GraduationCap, Lightbulb, ShoppingCart } from 'lucide-react';
 import '../styles/FinanceFeed.css';
 
 const FinanceFeed = () => {
@@ -183,21 +184,20 @@ const FinanceFeed = () => {
             <h2>Why Financial Education Matters</h2>
             <div className="education-grid">
               <div className="education-card">
-                <span className="education-icon">🎓</span>
-                <h3>Build Knowledge</h3>
-                <p>Learn key financial concepts in bite-sized, easy-to-understand videos.</p>
+                <GraduationCap className="education-icon" aria-hidden="true" />
+                <h3>Build knowledge</h3>
+                <p>Short videos covering the basics.</p>
               </div>
 
               <div className="education-card">
-                <span className="education-icon">💡</span>
-                <h3>Make Better Decisions</h3>
-                <p>Apply what you learn directly to your daily financial choices.</p>
+                <Lightbulb className="education-icon" aria-hidden="true" />
+                <h3>Make better decisions</h3>
+                <p>Apply what you learn to daily financial choices.</p>
               </div>
 
               <div className="education-card">
-                <span className="education-icon">🚀</span>
-                <h3>Accelerate Growth</h3>
-                <p>Small improvements compound into significant wealth over time.</p>
+                <h3>Accelerate growth</h3>
+                <p>Small improvements compound over time.</p>
               </div>
             </div>
           </div>
@@ -218,7 +218,7 @@ const FinanceFeed = () => {
                 <span className="tip-number">2</span>
                 <div className="tip-content">
                   <h4>Track Your Spending</h4>
-                  <p>You can't manage what you don't measure. Use Ducati to analyze purchases!</p>
+                  <p>You can&apos;t manage what you don&apos;t measure. Use Ducati to analyze purchases.</p>
                 </div>
               </div>
 
@@ -250,11 +250,11 @@ const FinanceFeed = () => {
 
           {/* Call to Action */}
           <div className="feed-cta">
-            <h3>Ready to Put Knowledge into Action?</h3>
-            <p>Use Ducati's Purchase Advisor to make smarter financial decisions today.</p>
+            <h3>Put it into practice</h3>
+            <p>Use Ducati to weigh your next purchase.</p>
             <a href="/" className="cta-button">
-              <span className="btn-icon">🛒</span>
-              Analyze a Purchase
+              <ShoppingCart className="btn-icon" aria-hidden="true" />
+              Analyze a purchase
             </a>
           </div>
         </div>

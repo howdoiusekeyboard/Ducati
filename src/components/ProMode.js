@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Gem, Lightbulb, Copy, Search, BarChart3 } from 'lucide-react';
 import { generateProModeQuestions, getProModeAnalysis } from '../lib/ProModeAPI';
 import { useFirestore } from '../hooks/useFirestore';
 import { useAuth } from '../contexts/AuthContext';
@@ -197,9 +198,9 @@ const ProMode = () => {
   // Helper to get dimension label if available
   const getDimensionLabel = (dimension) => {
     const labels = {
-      specs: '📋 Specifications',
-      constraints: '💰 Constraints',
-      timing: '🕐 Timing', // Changed from ⏰ to 🕐 for better display
+      specs: 'Specifications',
+      constraints: 'Constraints',
+      timing: 'Timing',
     };
     return labels[dimension] || '';
   };
@@ -232,18 +233,18 @@ const ProMode = () => {
     <div className="pro-mode-container">
       <div className="pro-mode-header">
         <h1>
-          <span className="pro-icon">💎</span>
-          Pro Mode Analysis
+          <Gem className="pro-icon" aria-hidden="true" />
+          Pro Mode
         </h1>
         <p className="pro-subtitle">
-          Deep-dive analysis for {purchaseData?.itemName} (${purchaseData?.itemCost})
+          Deeper analysis for {purchaseData?.itemName} (${purchaseData?.itemCost})
         </p>
       </div>
 
       {!analysis ? (
         <div className="pro-mode-content">
           <div className="questions-section">
-            <h2>Answer these tailored questions for deeper insights:</h2>
+            <h2>Answer these questions for a deeper analysis</h2>
             <form onSubmit={handleSubmit} className="questions-form">
               {questions.map((question, index) => (
                 <div key={question.id} className="question-item">
@@ -259,7 +260,7 @@ const ProMode = () => {
                       aria-label={`${visibleHints[question.id] ? 'Hide' : 'Show'} hint for question ${index + 1}`}
                       title={`${visibleHints[question.id] ? 'Hide' : 'Show'} hint`}
                     >
-                      💡
+                      <Lightbulb aria-hidden="true" />
                     </button>
                   </div>
 
@@ -282,7 +283,8 @@ const ProMode = () => {
                             onClick={() => copyToClipboard(question.placeholder)}
                             title="Copy hint to clipboard"
                           >
-                            📋 Copy
+                            <Copy aria-hidden="true" />
+                            Copy
                           </button>
                         </div>
                       </div>
@@ -314,10 +316,10 @@ const ProMode = () => {
                   {analyzing ? (
                     <>
                       <span className="loading-spinner"></span>
-                      Analyzing with Web Search...
+                      Analyzing...
                     </>
                   ) : (
-                    'Get Pro Analysis'
+                    'Run analysis'
                   )}
                 </button>
               </div>
@@ -328,8 +330,8 @@ const ProMode = () => {
         <div className="pro-mode-results">
           <div className="analysis-card">
             <h2>
-              <span className="analysis-icon">🔍</span>
-              Comprehensive Analysis
+              <Search className="analysis-icon" aria-hidden="true" />
+              Analysis
             </h2>
             <div className="analysis-content">
               <p className="analysis-text">{parseAndRenderLinks(analysis.fullAnalysis)}</p>
@@ -337,8 +339,8 @@ const ProMode = () => {
               {analysis.marketInsights && (
                 <div className="market-insights">
                   <h3>
-                    <span className="insights-icon">📊</span>
-                    Current Market Conditions
+                    <BarChart3 className="insights-icon" aria-hidden="true" />
+                    Market conditions
                   </h3>
                   <p>{parseAndRenderLinks(analysis.marketInsights)}</p>
                 </div>
@@ -347,8 +349,8 @@ const ProMode = () => {
               {analysis.recommendations && (
                 <div className="recommendations-section">
                   <h3>
-                    <span className="recommendations-icon">💡</span>
-                    Key Recommendations
+                    <Lightbulb className="recommendations-icon" aria-hidden="true" />
+                    Recommendations
                   </h3>
                   <ul className="recommendations-list">
                     {analysis.recommendations.map((rec, index) => (
@@ -360,7 +362,7 @@ const ProMode = () => {
 
               {analysis.decisionConfidence && (
                 <div className="confidence-meter">
-                  <h3>Decision Confidence</h3>
+                  <h3>Confidence</h3>
                   <div className="confidence-bar">
                     <div
                       className="confidence-fill"
@@ -368,7 +370,7 @@ const ProMode = () => {
                     />
                   </div>
                   <span className="confidence-label">
-                    {analysis.decisionConfidence}% Confidence
+                    {analysis.decisionConfidence}% confidence
                   </span>
                 </div>
               )}
@@ -376,7 +378,7 @@ const ProMode = () => {
 
             <div className="results-actions">
               <button onClick={handleBack} className="back-to-home-button">
-                Back to Home
+                Back to home
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Bot } from 'lucide-react';
 
 interface LoadingIndicatorProps {
   isLoading: boolean;
@@ -35,7 +36,8 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ isLoading }) => {
           </div>
           <div className="ml-4">
             <div className="mb-1 flex items-center gap-2">
-              <span className="text-primary text-sm font-medium">🤖 Ducati Advisor</span>
+              <Bot className="text-primary size-4" aria-hidden="true" />
+              <span className="text-primary text-sm font-medium">Ducati</span>
             </div>
             <p className="text-text-medium text-sm italic">Thinking and generating response...</p>
           </div>

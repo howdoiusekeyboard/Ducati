@@ -1,6 +1,7 @@
 // src/components/Dashboard/SavingsTrackerWidget.js
 import React, { useState, useEffect } from 'react';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { Check, Pencil } from 'lucide-react';
 import { db } from '../../lib/firebase';
 
 const SavingsTrackerWidget = ({ totalSavings, userId }) => {
@@ -65,44 +66,44 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
     }).format(amount);
   };
 
-  // Milestone messages
   const getMilestoneMessage = () => {
-    if (progress >= 100) return '🎉 Goal achieved! Time to set a new one!';
-    if (progress >= 75) return '🔥 Almost there! Keep going!';
-    if (progress >= 50) return '💪 Halfway to your goal!';
-    if (progress >= 25) return '🚀 Great progress!';
-    return '🌟 Every dollar saved counts!';
+    if (progress >= 100) return 'Goal hit. Set a new one.';
+    if (progress >= 75) return 'Almost there.';
+    if (progress >= 50) return 'Halfway.';
+    if (progress >= 25) return 'On track.';
+    return 'Every dollar saved counts.';
   };
 
   return (
     <div className="widget savings-tracker-widget">
       <div className="widget-header">
-        <h3>
-          <span className="widget-icon">💰</span>
-          Ducati Savings Tracker
-        </h3>
+        <h3>Savings tracker</h3>
         <button
           className="edit-goal-btn"
           onClick={() => setIsEditingGoal(!isEditingGoal)}
           title="Edit savings goal"
+          aria-label={isEditingGoal ? 'Stop editing' : 'Edit goal'}
         >
-          {isEditingGoal ? '✓' : '✏️'}
+          {isEditingGoal ? (
+            <Check aria-hidden="true" />
+          ) : (
+            <Pencil aria-hidden="true" />
+          )}
         </button>
       </div>
 
       <div className="widget-content">
-        {/* Total Savings Display */}
         <div className="total-savings">
-          <div className="savings-label">Total Saved with Ducati</div>
+          <div className="savings-label">Total saved</div>
           <div className="savings-amount">{formatCurrency(totalSavings)}</div>
-          <div className="savings-sublabel">from smart purchase decisions</div>
+          <div className="savings-sublabel">from purchase decisions</div>
         </div>
 
         {/* Goal Editor */}
         {isEditingGoal ? (
           <div className="goal-editor">
             <div className="goal-input-group">
-              <label>Goal Description</label>
+              <label>Goal description</label>
               <input
                 type="text"
                 value={tempDescription}
@@ -112,7 +113,7 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
               />
             </div>
             <div className="goal-input-group">
-              <label>Goal Amount</label>
+              <label>Goal amount</label>
               <input
                 type="number"
                 value={tempGoal}
@@ -124,7 +125,7 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
             </div>
             <div className="goal-actions">
               <button onClick={saveGoal} className="btn-save">
-                Save Goal
+                Save
               </button>
               <button
                 onClick={() => {
@@ -156,7 +157,7 @@ const SavingsTrackerWidget = ({ totalSavings, userId }) => {
               style={{
                 width: `${progress}%`,
                 backgroundColor:
-                  progress >= 100 ? '#10b981' : progress >= 50 ? '#3b82f6' : '#8b5cf6',
+                  progress >= 100 ? '#059669' : 'var(--color-accent)',
               }}
             >
               <span className="progress-percentage">{progress.toFixed(0)}%</span>

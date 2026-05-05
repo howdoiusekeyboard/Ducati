@@ -1,5 +1,6 @@
 // src/components/Dashboard/PurchaseDecisionWidget.js
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { BarChart3, Check, X } from 'lucide-react';
 
 const PurchaseDecisionWidget = ({ breakdown }) => {
   const { buyTotal, dontBuyTotal, buyCount, dontBuyCount } = breakdown;
@@ -82,25 +83,24 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
       : 0;
 
   const getImpactMessage = () => {
-    if (impactScore >= 80) return '🌟 Outstanding financial discipline!';
-    if (impactScore >= 60) return '💪 Great job avoiding impulse buys!';
-    if (impactScore >= 40) return '📈 Good balance in your decisions!';
-    if (impactScore >= 20) return '💡 Consider being more selective!';
-    return "🎯 Let's work on those spending habits!";
+    if (impactScore >= 80) return 'Strong financial discipline.';
+    if (impactScore >= 60) return 'Avoiding impulse buys well.';
+    if (impactScore >= 40) return 'Decisions are well-balanced.';
+    if (impactScore >= 20) return 'Be more selective.';
+    return 'Tighten the spending pattern.';
   };
 
-  // Empty state
   if (totalAmount === 0) {
     return (
       <div className="widget purchase-decision-widget">
         <div className="widget-header">
           <h3>
-            <span className="widget-icon">📊</span>
-            Purchase Decision Analysis
+            <BarChart3 className="widget-icon" aria-hidden="true" />
+            Decisions
           </h3>
         </div>
         <div className="widget-content empty-state">
-          <p>No purchase decisions yet. Start analyzing purchases to see your spending patterns!</p>
+          <p>No decisions yet. Analyze a purchase to see the pattern.</p>
         </div>
       </div>
     );
@@ -110,8 +110,8 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
     <div className="widget purchase-decision-widget">
       <div className="widget-header">
         <h3>
-          <span className="widget-icon">📊</span>
-          Purchase Decision Analysis
+          <BarChart3 className="widget-icon" aria-hidden="true" />
+          Decisions
         </h3>
       </div>
 
@@ -143,7 +143,7 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
         <div className="decision-stats">
           <div className="stat-card buy">
             <div className="stat-header">
-              <span className="stat-icon">✅</span>
+              <Check className="stat-icon" aria-hidden="true" />
               <span className="stat-label">Approved</span>
             </div>
             <div className="stat-value">{formatCurrency(buyTotal)}</div>
@@ -154,7 +154,7 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
 
           <div className="stat-card dont-buy">
             <div className="stat-header">
-              <span className="stat-icon">❌</span>
+              <X className="stat-icon" aria-hidden="true" />
               <span className="stat-label">Avoided</span>
             </div>
             <div className="stat-value">{formatCurrency(dontBuyTotal)}</div>
@@ -165,9 +165,8 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
           </div>
         </div>
 
-        {/* Impact Score */}
         <div className="impact-section">
-          <h4>Decision Impact Score</h4>
+          <h4>Impact score</h4>
           <div className="impact-score-container">
             <div className="impact-score-bar">
               <div
@@ -175,7 +174,7 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
                 style={{
                   width: `${impactScore}%`,
                   backgroundColor:
-                    impactScore >= 60 ? '#10b981' : impactScore >= 30 ? '#f59e0b' : '#ef4444',
+                    impactScore >= 60 ? '#059669' : impactScore >= 30 ? '#b45309' : '#b91c1c',
                 }}
               />
             </div>
@@ -184,9 +183,8 @@ const PurchaseDecisionWidget = ({ breakdown }) => {
           <p className="impact-message">{getImpactMessage()}</p>
         </div>
 
-        {/* Key Insights */}
         <div className="insights">
-          <h4>💡 Key Insights</h4>
+          <h4>Insights</h4>
           <ul>
             <li>
               You've evaluated <strong>{buyCount + dontBuyCount}</strong> purchase decisions

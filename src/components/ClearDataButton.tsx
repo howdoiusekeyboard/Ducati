@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Trash2, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { useFirestore } from '@/hooks/useFirestore';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -56,14 +57,17 @@ export const ClearDataButton: React.FC = () => {
   return (
     <>
       <button onClick={handleClearClick} className="clear-data-button" aria-label="Clear all data">
-        <span className="button-icon">🗑️</span>
-        Clear All Data
+        <Trash2 className="button-icon" aria-hidden="true" />
+        Clear all data
       </button>
 
       {showConfirmDialog && (
         <div className="confirm-dialog-overlay">
           <div className="confirm-dialog">
-            <h2>⚠️ Clear All Data</h2>
+            <h2>
+              <AlertTriangle className="inline-icon" aria-hidden="true" />
+              Clear all data
+            </h2>
 
             {!clearResult ? (
               <>
@@ -80,7 +84,7 @@ export const ClearDataButton: React.FC = () => {
                     <li>All locally stored data</li>
                   </ul>
                   <p className="warning-text">
-                    <strong>⚠️ This action cannot be undone!</strong>
+                    <strong>This action cannot be undone.</strong>
                   </p>
                 </div>
 
@@ -122,15 +126,15 @@ export const ClearDataButton: React.FC = () => {
               <div className="result-message">
                 {clearResult.success ? (
                   <>
-                    <div className="success-icon">✅</div>
-                    <h3>Data Cleared Successfully</h3>
+                    <CheckCircle className="success-icon" aria-hidden="true" />
+                    <h3>Data cleared</h3>
                     <p>All your data has been removed.</p>
-                    <p className="redirect-message">Redirecting to home page...</p>
+                    <p className="redirect-message">Redirecting to home...</p>
                   </>
                 ) : (
                   <>
-                    <div className="error-icon">❌</div>
-                    <h3>Some Errors Occurred</h3>
+                    <XCircle className="error-icon" aria-hidden="true" />
+                    <h3>Some errors occurred</h3>
                     <ul className="error-list">
                       {clearResult.errors?.map((error: string, index: number) => (
                         <li key={index}>{error}</li>

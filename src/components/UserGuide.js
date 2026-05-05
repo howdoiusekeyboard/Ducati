@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ShoppingCart, MessageCircle, Mic, Lightbulb, BarChart3, User, Gem, Target, DollarSign, CheckCircle, XCircle } from 'lucide-react';
 import '../styles/UserGuide.css';
 
 const UserGuide = () => {
@@ -15,7 +16,7 @@ const UserGuide = () => {
       <div className="hero-section">
         <h1 className="hero-title">User Guide</h1>
         <p className="hero-subtitle">
-          Everything you need to know to master Ducati and make smarter financial decisions
+          How to use Ducati.
         </p>
       </div>
 
@@ -23,12 +24,12 @@ const UserGuide = () => {
       <div className="guide-container">
         <div className="guide-intro">
           <div className="intro-card">
-            <h2>Welcome to Ducati!</h2>
+            <h2>How Ducati works</h2>
             <p>
-              Ducati is your personal AI-powered financial advisor that helps you make smarter
-              purchasing decisions. Whether you're considering a small daily purchase or a major
-              investment, Ducati analyzes your financial situation and provides personalized
-              recommendations to help you reach your first million.
+              Ducati is a purchase advisor.
+              Describe what you want to buy and it returns a buy / wait / skip verdict based on your
+              financial profile and recent decisions.
+              
             </p>
           </div>
         </div>
@@ -45,7 +46,7 @@ const UserGuide = () => {
             >
               <h3>
                 <span className="section-number">1</span>
-                <span className="section-icon">🛒</span>
+                <ShoppingCart className="section-icon" aria-hidden="true" />
                 Purchase Analyzer Tool
               </h3>
               <span className="toggle-indicator">
@@ -89,7 +90,7 @@ const UserGuide = () => {
                       <li>📁 Drag and drop a file</li>
                     </ul>
                     <p className="tip">
-                      <strong>💡 Pro Tip:</strong> Adding a photo helps our AI better identify the
+                      <strong>Tip:</strong> Adding a photo helps our AI better identify the
                       item and provide more accurate pricing comparisons!
                     </p>
                   </div>
@@ -99,7 +100,7 @@ const UserGuide = () => {
                     <h4>Choose Analysis Options</h4>
                     <p>Select whether you want Ducati to:</p>
                     <ul>
-                      <li>✅ Find cheaper alternatives online (recommended)</li>
+                      <li>Find cheaper alternatives online (recommended)</li>
                     </ul>
                   </div>
 
@@ -128,7 +129,7 @@ const UserGuide = () => {
             >
               <h3>
                 <span className="section-number">2</span>
-                <span className="section-icon">💬</span>
+                <MessageCircle className="section-icon" aria-hidden="true" />
                 Ducati Advisor Chat
               </h3>
               <span className="toggle-indicator">
@@ -150,14 +151,14 @@ const UserGuide = () => {
                   <h4>Key Features</h4>
                   <div className="feature-grid">
                     <div className="feature-card">
-                      <span className="feature-icon">🎙️</span>
+                      <Mic className="feature-icon" aria-hidden="true" />
                       <h5>Voice Conversations</h5>
                       <p>
                         Talk naturally with Ducati using voice chat for hands-free financial advice.
                       </p>
                     </div>
                     <div className="feature-card">
-                      <span className="feature-icon">💡</span>
+                      <Lightbulb className="feature-icon" aria-hidden="true" />
                       <h5>Instant Advice</h5>
                       <p>Get quick recommendations on purchases without filling out forms.</p>
                     </div>
@@ -257,7 +258,7 @@ const UserGuide = () => {
             >
               <h3>
                 <span className="section-number">3</span>
-                <span className="section-icon">📊</span>
+                <BarChart3 className="section-icon" aria-hidden="true" />
                 Understanding Your Analysis Results
               </h3>
               <span className="toggle-indicator">
@@ -275,11 +276,11 @@ const UserGuide = () => {
                   <h4>1. Clear Decision</h4>
                   <div className="decision-examples">
                     <div className="decision-example buy">
-                      <span className="decision-icon">✅</span>
+                      <CheckCircle className="decision-icon" aria-hidden="true" />
                       <strong>Buy</strong> - This purchase aligns with your financial goals
                     </div>
                     <div className="decision-example dont-buy">
-                      <span className="decision-icon">❌</span>
+                      <XCircle className="decision-icon" aria-hidden="true" />
                       <strong>Don't Buy</strong> - Consider alternatives or wait
                     </div>
                   </div>
@@ -300,18 +301,18 @@ const UserGuide = () => {
                   </p>
                   <ul>
                     <li>
-                      <strong>💰 Financial Criteria:</strong> Affordability, value for money,
+                      <strong>Financial criteria:</strong> Affordability, value for money,
                       opportunity cost
                     </li>
                     <li>
-                      <strong>🧠 Psychological Criteria:</strong> Emotional value, social factors,
+                      <strong>Psychological criteria:</strong> Emotional value, social factors,
                       buyer's remorse risk
                     </li>
                     <li>
-                      <strong>⚠️ Risk Assessment:</strong> Financial risk, alternative availability
+                      <strong>Risk assessment:</strong> Financial risk, alternative availability
                     </li>
                     <li>
-                      <strong>🔧 Utility Criteria:</strong> Necessity, frequency of use, longevity
+                      <strong>Utility criteria:</strong> Necessity, frequency of use, longevity
                     </li>
                   </ul>
                 </div>
@@ -346,7 +347,7 @@ const UserGuide = () => {
             >
               <h3>
                 <span className="section-number">4</span>
-                <span className="section-icon">👤</span>
+                <User className="section-icon" aria-hidden="true" />
                 Your Financial Profile
               </h3>
               <span className="toggle-indicator">
@@ -363,10 +364,10 @@ const UserGuide = () => {
                     understanding your income, expenses, savings, and goals, Ducati can:
                   </p>
                   <ul>
-                    <li>📈 Assess how purchases impact your budget</li>
-                    <li>🎯 Align recommendations with your financial goals</li>
-                    <li>⚖️ Balance immediate needs with long-term wealth building</li>
-                    <li>🛡️ Protect your emergency fund and financial stability</li>
+                    <li>Assess how purchases impact your budget</li>
+                    <li>Align recommendations with your financial goals</li>
+                    <li>Balance immediate needs with long-term wealth building</li>
+                    <li>Protect your emergency fund and financial stability</li>
                   </ul>
                 </div>
 
@@ -421,7 +422,7 @@ const UserGuide = () => {
             >
               <h3>
                 <span className="section-number">5</span>
-                <span className="section-icon">💎</span>
+                <Gem className="section-icon" aria-hidden="true" />
                 Pro Mode for High-Value Purchases
               </h3>
               <span className="toggle-indicator">{expandedSection === 'pro-mode' ? '−' : '+'}</span>
@@ -436,11 +437,11 @@ const UserGuide = () => {
                     for high-value purchases (typically $300+). It provides:
                   </p>
                   <ul>
-                    <li>🔍 Deep-dive market analysis with web search</li>
-                    <li>📊 Current pricing trends and market conditions</li>
-                    <li>💡 Personalized questions to understand your specific needs</li>
-                    <li>🎯 Confidence scoring for your purchase decision</li>
-                    <li>📈 Expert recommendations based on real-time data</li>
+                    <li>Deep-dive market analysis with web search</li>
+                    <li>Current pricing trends and market conditions</li>
+                    <li>Personalized questions to understand your specific needs</li>
+                    <li>Confidence scoring for your purchase decision</li>
+                    <li>Expert recommendations based on real-time data</li>
                   </ul>
                 </div>
 
@@ -480,7 +481,7 @@ const UserGuide = () => {
             >
               <h3>
                 <span className="section-number">6</span>
-                <span className="section-icon">💡</span>
+                <Lightbulb className="section-icon" aria-hidden="true" />
                 Tips for Best Results
               </h3>
               <span className="toggle-indicator">{expandedSection === 'tips' ? '−' : '+'}</span>
@@ -490,7 +491,7 @@ const UserGuide = () => {
               <div className="section-content">
                 <div className="tips-grid">
                   <div className="tip-card">
-                    <span className="tip-icon">🎯</span>
+                    <Target className="tip-icon" aria-hidden="true" />
                     <h4>Be Specific</h4>
                     <p>
                       Include brand names and model numbers when possible for more accurate
@@ -515,7 +516,7 @@ const UserGuide = () => {
                   </div>
 
                   <div className="tip-card">
-                    <span className="tip-icon">📊</span>
+                    <BarChart3 className="tip-icon" aria-hidden="true" />
                     <h4>Review the Matrix</h4>
                     <p>
                       Always expand the Decision Matrix to understand the full reasoning behind
@@ -533,7 +534,7 @@ const UserGuide = () => {
                   </div>
 
                   <div className="tip-card">
-                    <span className="tip-icon">💰</span>
+                    <DollarSign className="tip-icon" aria-hidden="true" />
                     <h4>Track Your Savings</h4>
                     <p>
                       Click "million" in the tagline to see your savings tracker and path to
@@ -552,11 +553,11 @@ const UserGuide = () => {
           <p>Start with a quick chat or analyze your next purchase with confidence.</p>
           <div className="cta-buttons">
             <Link to="/chat" className="cta-button primary">
-              <span className="btn-icon">💬</span>
+              <MessageCircle className="btn-icon" aria-hidden="true" />
               Chat with Ducati
             </Link>
             <Link to="/" className="cta-button secondary">
-              <span className="btn-icon">🛒</span>
+              <ShoppingCart className="btn-icon" aria-hidden="true" />
               Analyze a Purchase
             </Link>
           </div>

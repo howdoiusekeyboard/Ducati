@@ -1,4 +1,5 @@
 // src/components/Dashboard/RecentActivityWidget.js
+import { Lightbulb, BarChart3, Check, X } from 'lucide-react';
 
 const RecentActivityWidget = ({ purchases, onViewAll }) => {
   // Format currency
@@ -66,7 +67,13 @@ const RecentActivityWidget = ({ purchases, onViewAll }) => {
         <div className="activity-list">
           {purchases.map((purchase, index) => (
             <div key={purchase.id || index} className="activity-item">
-              <div className="activity-icon">{purchase.decision === 'Buy' ? '✅' : '❌'}</div>
+              <div className="activity-icon">
+                {purchase.decision === 'Buy' ? (
+                  <Check aria-hidden="true" />
+                ) : (
+                  <X aria-hidden="true" />
+                )}
+              </div>
 
               <div className="activity-details">
                 <div className="activity-header">
@@ -94,7 +101,7 @@ const RecentActivityWidget = ({ purchases, onViewAll }) => {
 
                 {purchase.alternative && (
                   <div className="alternative-info">
-                    <span className="alternative-icon">💡</span>
+                    <Lightbulb className="alternative-icon" aria-hidden="true" />
                     Alternative: {purchase.alternative.name} (
                     {formatCurrency(purchase.alternative.price)})
                   </div>
@@ -104,16 +111,14 @@ const RecentActivityWidget = ({ purchases, onViewAll }) => {
           ))}
         </div>
 
-        {/* Activity Summary */}
         <div className="activity-summary">
           <div className="summary-stat">
-            <span className="stat-icon">📊</span>
+            <BarChart3 className="stat-icon" aria-hidden="true" />
             <span className="stat-text">
               {purchases.length} recent decision{purchases.length !== 1 ? 's' : ''}
             </span>
           </div>
           <div className="summary-stat">
-            <span className="stat-icon">💰</span>
             <span className="stat-text">
               {formatCurrency(
                 purchases.reduce((sum, p) => {

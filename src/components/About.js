@@ -1,81 +1,66 @@
 import { Link } from 'react-router-dom';
+import { Target, Bot, TrendingUp, Gem, ShoppingCart, User } from 'lucide-react';
 import '../styles/App.css';
 
 const About = () => {
   return (
     <div className="App">
-      {/* Hero Section */}
       <div className="hero-section">
         <h1 className="hero-title">About Ducati</h1>
-        <p className="hero-subtitle">
-          Your personal guide to financial freedom and your path to that first million
-        </p>
+        <p className="hero-subtitle">A purchase advisor for everyday financial decisions.</p>
       </div>
 
-      {/* About Content */}
       <div className="about-container">
         <div className="about-content">
           <div className="about-section">
-            <div className="about-icon">🎯</div>
-            <h2>Our Mission</h2>
+            <Target className="about-icon" aria-hidden="true" />
+            <h2>What Ducati does</h2>
             <p>
-              Every major financial milestone begins with small, daily choices. Yet, these everyday
-              financial decisions often feel insignificant, overlooked, or overwhelming. Ducati
-              transforms those moments into powerful stepping stones, aligning each purchase with
-              your ultimate goal: financial independence.
+              Every purchase shapes your financial trajectory. Ducati helps you decide which ones
+              are worth it. Describe what you want to buy and Ducati gives you a buy / wait / skip
+              verdict based on your financial profile.
             </p>
           </div>
 
           <div className="about-section">
-            <div className="about-icon">🤖</div>
-            <h2>AI-Driven Intelligence</h2>
+            <Bot className="about-icon" aria-hidden="true" />
+            <h2>How it works</h2>
             <p>
-              Our groundbreaking AI-driven platform doesn&apos;t just set goals—it actively guides
-              and advises you every step of the way, turning ordinary choices into extraordinary
-              growth. By seamlessly integrating your financial dreams with daily spending habits,
-              Ducati accelerates your journey toward becoming a millionaire, empowering you to
-              harness the incredible potential of compound growth.
+              Ducati looks at your income, savings goals, and recent decisions, then weighs the
+              proposed purchase against them. The output is a recommendation, not advice — you
+              decide.
             </p>
           </div>
 
           <div className="about-section">
-            <div className="about-icon">📈</div>
-            <h2>The Power of Compound Growth</h2>
+            <TrendingUp className="about-icon" aria-hidden="true" />
+            <h2>Compound growth</h2>
             <p>
-              Imagine each small decision, each dollar spent or saved, compounding into wealth that
-              frees you to live life on your terms. With Ducati, the dream of financial freedom
-              isn&apos;t distant—it&apos;s within your grasp, growing closer every day.
+              Small decisions add up. Skipping the wrong purchase today funds the right one
+              tomorrow. Ducati keeps the math in front of you so the trade-off is visible.
             </p>
           </div>
 
           <div className="about-section highlight">
-            <div className="about-icon">💎</div>
-            <h2>Your Path to the First Million</h2>
+            <Gem className="about-icon" aria-hidden="true" />
+            <h2>The first million</h2>
             <p>
-              Your first million is more attainable than you ever imagined. Let Ducati be your
-              personal AI advisor, your daily financial compass, and your partner in achieving the
-              extraordinary.
-            </p>
-            <p className="cta-text">
-              <strong>
-                Start today, and experience how small decisions can compound into monumental
-                success.
-              </strong>
+              Most paths to the first million are made of mundane choices. Ducati helps you make
+              them deliberately.
             </p>
           </div>
         </div>
 
-        {/* Call to Action */}
         <div className="about-cta">
-          <h3>Ready to Begin Your Journey?</h3>
+          <h3>Get started</h3>
           <div className="cta-buttons">
             <Link to="/" className="cta-button primary">
-              <span className="btn-icon">🛒</span>
-              Start Analyzing Purchases
+              <ShoppingCart className="btn-icon" aria-hidden="true" />
+              Analyze a purchase
             </Link>
             <Link to="/profile" className="cta-button secondary">
-              <span className="btn-icon">👤</span>
-              Set Up Your Profile
+              <User className="btn-icon" aria-hidden="true" />
+              Set up profile
             </Link>
           </div>
         </div>

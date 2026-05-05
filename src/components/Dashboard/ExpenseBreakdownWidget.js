@@ -12,6 +12,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { CircleDollarSign, BarChart3, PieChart as PieIcon, AlertTriangle, Check } from 'lucide-react';
 
 const ExpenseBreakdownWidget = ({ profile }) => {
   const [viewMode, setViewMode] = useState('bar'); // 'bar' or 'pie'
@@ -104,13 +105,13 @@ const ExpenseBreakdownWidget = ({ profile }) => {
       <div className="widget expense-breakdown-widget">
         <div className="widget-header">
           <h3>
-            <span className="widget-icon">💸</span>
-            Monthly Expense Breakdown
+            <CircleDollarSign className="widget-icon" aria-hidden="true" />
+            Expenses
           </h3>
         </div>
         <div className="widget-content empty-state">
           <p>
-            No expense data available. Update your financial profile to see your expense breakdown.
+            No expense data. Update your financial profile to see the breakdown.
           </p>
         </div>
       </div>
@@ -121,23 +122,25 @@ const ExpenseBreakdownWidget = ({ profile }) => {
     <div className="widget expense-breakdown-widget">
       <div className="widget-header">
         <h3>
-          <span className="widget-icon">💸</span>
-          Monthly Expense Breakdown
+          <CircleDollarSign className="widget-icon" aria-hidden="true" />
+          Expenses
         </h3>
         <div className="view-toggle">
           <button
             className={`toggle-btn ${viewMode === 'bar' ? 'active' : ''}`}
             onClick={() => setViewMode('bar')}
-            title="Bar chart view"
+            title="Bar chart"
+            aria-label="Bar chart view"
           >
-            📊
+            <BarChart3 aria-hidden="true" />
           </button>
           <button
             className={`toggle-btn ${viewMode === 'pie' ? 'active' : ''}`}
             onClick={() => setViewMode('pie')}
-            title="Pie chart view"
+            title="Pie chart"
+            aria-label="Pie chart view"
           >
-            🥧
+            <PieIcon aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -231,23 +234,24 @@ const ExpenseBreakdownWidget = ({ profile }) => {
 
         {/* Insights */}
         <div className="expense-insights">
-          <h4>💡 Quick Analysis</h4>
+          <h4>Analysis</h4>
           {largestExpense && (
             <p>
-              Your largest expense is <strong>{largestExpense.category}</strong> at{' '}
+              Largest expense: <strong>{largestExpense.category}</strong> at{' '}
               <strong>{formatCurrency(largestExpense.amount)}</strong> (
-              {largestExpense.percentage.toFixed(0)}% of total)
+              {largestExpense.percentage.toFixed(0)}% of total).
             </p>
           )}
           {expenseRatio > 90 && (
             <p className="warning-text">
-              ⚠️ Your expenses are {expenseRatio.toFixed(0)}% of income. Consider reducing
-              non-essential spending.
+              <AlertTriangle className="inline-icon" aria-hidden="true" /> Expenses are{' '}
+              {expenseRatio.toFixed(0)}% of income. Consider reducing non-essential spending.
             </p>
           )}
           {savingsRate >= 20 && (
             <p className="success-text">
-              ✅ Great job! You're saving {savingsRate.toFixed(0)}% of your income.
+              <Check className="inline-icon" aria-hidden="true" /> Saving{' '}
+              {savingsRate.toFixed(0)}% of income.
             </p>
           )}
         </div>

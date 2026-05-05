@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MessageCircle, Mic, Trash2, ShoppingCart, User } from 'lucide-react';
 import { Message } from '@/types/chat';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
@@ -347,10 +348,14 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
         <div className="chat-header">
           <div className="chat-header-content">
             <h2 className="chat-title">
-              <span className="chat-icon">💬</span>
+              <MessageCircle className="chat-icon" aria-hidden="true" />
               <span className="chat-title-text">
-                Ducati Advisor
-                {isSessionActive && <span className="voice-indicator">🎤 Live</span>}
+                Advisor
+                {isSessionActive && (
+                  <span className="voice-indicator">
+                    <Mic className="inline size-3" aria-hidden="true" /> Live
+                  </span>
+                )}
               </span>
             </h2>
             <div className="chat-controls">
@@ -359,7 +364,7 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
                   onClick={clearChatHistory}
                   className="btn btn-secondary btn-sm clear-history-btn"
                 >
-                  <span className="btn-icon-only">🗑️</span>
+                  <Trash2 className="btn-icon-only" aria-hidden="true" />
                   <span className="btn-text-desktop">Clear</span>
                 </button>
               )}
@@ -374,19 +379,19 @@ Tell me what you're thinking of buying — or just ask. The voice button works t
           isLoading={isLoading || isSessionActive}
           placeholder={
             isSessionActive
-              ? 'Voice session active - speak to Ducati Advisor!'
-              : 'Ask about a purchase or financial advice...'
+              ? 'Voice session active — speak to Ducati.'
+              : 'Ask about a purchase.'
           }
         />
 
         {/* Quick Actions */}
         <div className="quick-actions">
           <button onClick={() => navigate('/')} className="quick-action-btn">
-            <span className="quick-action-icon">🛒</span>
-            <span className="quick-action-text">Analyze Purchase</span>
+            <ShoppingCart className="quick-action-icon" aria-hidden="true" />
+            <span className="quick-action-text">Analyze purchase</span>
           </button>
           <button onClick={() => navigate('/profile')} className="quick-action-btn">
-            <span className="quick-action-icon">👤</span>
+            <User className="quick-action-icon" aria-hidden="true" />
             <span className="quick-action-text">Profile</span>
           </button>
         </div>

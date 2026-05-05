@@ -144,9 +144,9 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
       field: 'riskTolerance',
       type: 'choice',
       choices: [
-        { value: 'low', label: 'Low', emoji: '🛡️' },
-        { value: 'moderate', label: 'Moderate', emoji: '⚖️' },
-        { value: 'high', label: 'High', emoji: '🚀' },
+        { value: 'low', label: 'Low' },
+        { value: 'moderate', label: 'Moderate' },
+        { value: 'high', label: 'High' },
       ],
       help: 'How comfortable are you with financial risk?',
     },
@@ -164,10 +164,10 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
       field: 'financialGoal',
       type: 'choice',
       choices: [
-        { value: 'save', label: 'Build savings', emoji: '🏦' },
-        { value: 'debt', label: 'Pay off debt', emoji: '💳' },
-        { value: 'invest', label: 'Grow wealth', emoji: '📈' },
-        { value: 'balance', label: 'Balanced approach', emoji: '⚖️' },
+        { value: 'save', label: 'Build savings' },
+        { value: 'debt', label: 'Pay off debt' },
+        { value: 'invest', label: 'Grow wealth' },
+        { value: 'balance', label: 'Balanced approach' },
       ],
     },
   ];
@@ -448,7 +448,6 @@ const ProgressiveFinancialProfile = ({ onProfileUpdate, onClose }) => {
                     onClick={(e) => handleChoiceClick(e, choice.value)}
                     type="button"
                   >
-                    <span className="pfp-choice-emoji">{choice.emoji}</span>
                     <span className="pfp-choice-label">{choice.label}</span>
                   </button>
                 ))}

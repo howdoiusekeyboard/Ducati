@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Wrench } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import LoginPage from './LoginPage';
@@ -17,7 +18,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return (
       <div className="config-error-page">
         <div className="config-error-container">
-          <h1>🔧 Setup Required</h1>
+          <h1>
+            <Wrench className="inline-icon" aria-hidden="true" />
+            Setup required
+          </h1>
           <p>Firebase authentication is not configured yet.</p>
           <div className="setup-instructions">
             <h3>To get started:</h3>

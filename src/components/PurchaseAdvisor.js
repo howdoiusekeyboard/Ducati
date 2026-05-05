@@ -1,5 +1,6 @@
 // src/components/PurchaseAdvisor.js
 import React, { useState, useReducer, useCallback, useEffect } from 'react';
+import { User, Target, ShoppingCart } from 'lucide-react';
 import { analyzeImageWithOpenAI, findCheaperAlternative } from '../lib/openaiAPI';
 import { getEnhancedPurchaseRecommendation } from '../lib/enhancedOpenAIIntegration';
 import DecisionMatrix from './DecisionMatrix';
@@ -337,10 +338,9 @@ const PurchaseAdvisor = () => {
     // Check for financial profile
     if (!financialProfile && !hasSeenProfilePrompt) {
       const shouldSetupProfile = window.confirm(
-        '🎯 Get personalized advice!\n\n' +
-          'Add your financial info for recommendations tailored to your situation. ' +
-          'It only takes 2 minutes and helps us give you better advice.\n\n' +
-          'Would you like to set it up now?'
+        'Get advice tied to your financial profile.\n\n' +
+          'Adding your income, savings, and goals takes about 2 minutes and yields more useful recommendations.\n\n' +
+          'Set it up now?'
       );
 
       localStorage.setItem('hasSeenProfilePrompt', 'true');
@@ -455,21 +455,21 @@ const PurchaseAdvisor = () => {
 
   // Render helpers
   const getHealthScoreColor = (score) => {
-    if (score >= 70) return '#10b981';
-    if (score >= 40) return '#f59e0b';
-    return '#ef4444';
+    if (score >= 70) return '#059669';
+    if (score >= 40) return '#b45309';
+    return '#b91c1c';
   };
 
   const getHealthScoreLabel = (score) => {
     if (score >= 70) return 'Good';
     if (score >= 40) return 'Fair';
-    return 'Needs Attention';
+    return 'Poor';
   };
 
   return (
     <div className="App">
       <div className="hero-section">
-        <h1 className="hero-title">To Buy or not to Buy?</h1>
+        <h1 className="hero-title">Buy or not?</h1>
         <p className="hero-subtitle">
           That is the{' '}
           <span
@@ -480,7 +480,7 @@ const PurchaseAdvisor = () => {
           >
             million
           </span>{' '}
-          dollar question
+          dollar question.
         </p>
       </div>
 
@@ -489,8 +489,8 @@ const PurchaseAdvisor = () => {
         <div className="mini-profile enhanced">
           <div className="mini-profile-header">
             <h3>
-              <span className="profile-icon">👤</span>
-              Your Financial Snapshot
+              <User className="profile-icon" aria-hidden="true" />
+              Financial snapshot
             </h3>
             <button
               className="update-profile-btn"
@@ -504,7 +504,7 @@ const PurchaseAdvisor = () => {
           </div>
           <div className="mini-profile-stats">
             <div className="mini-stat">
-              <span className="stat-label">Monthly Net:</span>
+              <span className="stat-label">Monthly net:</span>
               <span
                 className={`stat-value ${financialProfile.summary.monthlyNetIncome >= 0 ? 'positive' : 'negative'}`}
               >
@@ -512,7 +512,7 @@ const PurchaseAdvisor = () => {
               </span>
             </div>
             <div className="mini-stat">
-              <span className="stat-label">Health Score:</span>
+              <span className="stat-label">Health score:</span>
               <span
                 className="stat-value"
                 style={{ color: getHealthScoreColor(financialProfile.summary.healthScore || 50) }}
@@ -533,28 +533,27 @@ const PurchaseAdvisor = () => {
       ) : (
         <div className="profile-prompt">
           <div className="prompt-content">
-            <span className="prompt-icon">🎯</span>
-            <p>Get personalized advice based on your financial situation</p>
+            <Target className="prompt-icon" aria-hidden="true" />
+            <p>Add your financial profile for advice tied to your situation.</p>
             <button
               className="setup-profile-btn"
               onClick={() =>
                 dispatchUI({ type: 'TOGGLE_MODAL', modal: 'showFinancialProfile', value: true })
               }
             >
-              Quick Setup (2 min)
+              Set up profile (2 min)
             </button>
           </div>
         </div>
       )}
 
-      {/* Main Purchase Analysis Card */}
       <div className="purchase-analysis-card">
         <div className="card-header">
           <h2 className="card-title">
-            <span className="card-icon">🛒</span>
-            Analyze Your Purchase
+            <ShoppingCart className="card-icon" aria-hidden="true" />
+            Analyze a purchase
           </h2>
-          <p className="card-subtitle">Tell us about the item you&apos;re considering</p>
+          <p className="card-subtitle">Describe the item.</p>
         </div>
 
         <div className="card-body">

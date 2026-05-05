@@ -82,36 +82,20 @@ const AuthComponent: React.FC<AuthComponentProps> = ({ onSignInSuccess }) => {
     };
   }, [onSignInSuccess, isConfigured, isAuthAvailable]);
 
-  // Show configuration error if Firebase is not configured
   if (!isConfigured) {
     return (
       <div className="auth-error">
-        <h3>Configuration Error</h3>
-        <p>Firebase is not properly configured. Please check your environment variables.</p>
-        <details>
-          <summary>Error Details</summary>
-          <p>Make sure all Firebase environment variables are set in your .env.local file.</p>
-        </details>
+        <h3>Configuration error</h3>
+        <p>Firebase environment variables are missing. Check the project&apos;s .env.local.</p>
       </div>
     );
   }
 
-  // Show loading state if auth is not available yet
   if (!isAuthAvailable) {
     return (
       <div className="auth-error">
-        <h3>Authentication Unavailable</h3>
-        <p>Firebase authentication could not be initialized.</p>
-        <details>
-          <summary>Troubleshooting</summary>
-          <p>This usually happens when:</p>
-          <ul>
-            <li>Firebase configuration is invalid</li>
-            <li>Network connectivity issues</li>
-            <li>Firebase project settings are incorrect</li>
-          </ul>
-          <p>Please check your Firebase console and environment variables.</p>
-        </details>
+        <h3>Authentication unavailable</h3>
+        <p>Could not initialize Firebase authentication. Verify the Firebase config in your environment.</p>
       </div>
     );
   }

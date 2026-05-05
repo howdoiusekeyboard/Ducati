@@ -1,5 +1,6 @@
 // src/components/EnvironmentChecker.tsx
 import React, { useState, useEffect } from 'react';
+import { CheckCircle, AlertTriangle } from 'lucide-react';
 import '../styles/EnvironmentChecker.css';
 
 interface ConfigIssue {
@@ -116,14 +117,14 @@ const EnvironmentChecker: React.FC = () => {
 
       {checkResult.isValid ? (
         <div className="check-success">
-          <div className="success-icon">✅</div>
-          <h3>Configuration Valid</h3>
+          <CheckCircle className="success-icon" aria-hidden="true" />
+          <h3>Configuration valid</h3>
           <p>All Firebase environment variables are properly configured.</p>
         </div>
       ) : (
         <div className="check-error">
-          <div className="error-icon">⚠️</div>
-          <h3>Configuration Issues Found</h3>
+          <AlertTriangle className="error-icon" aria-hidden="true" />
+          <h3>Configuration issues found</h3>
           <p>The following issues were detected in your environment variables:</p>
 
           <div className="issues-list">
