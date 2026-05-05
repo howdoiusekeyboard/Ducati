@@ -1,6 +1,8 @@
 /**
- * Enhanced OpenAI API integration with structured decision model
- * Combines AI insights with academic decision framework and purchase classification
+ * Enhanced AI advisor integration with structured decision model.
+ * Combines AI insights (Gemini via /api/chat) with academic decision framework
+ * and purchase classification. File was renamed from enhancedOpenAIIntegration.js
+ * in commit-pending-this-session to reflect the Phase 8a Gemini migration.
  */
 
 import {

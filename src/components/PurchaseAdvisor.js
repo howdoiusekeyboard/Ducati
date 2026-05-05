@@ -1,8 +1,8 @@
 // src/components/PurchaseAdvisor.js
 import React, { useState, useReducer, useCallback, useEffect } from 'react';
 import { User, Target, ShoppingCart } from 'lucide-react';
-import { analyzeImageWithOpenAI, findCheaperAlternative } from '../lib/openaiAPI';
-import { getEnhancedPurchaseRecommendation } from '../lib/enhancedOpenAIIntegration';
+import { analyzeImageWithOpenAI, findCheaperAlternative } from '../lib/aiAdvisorAPI';
+import { getEnhancedPurchaseRecommendation } from '../lib/enhancedAdvisorIntegration';
 import DecisionMatrix from './DecisionMatrix';
 import ProgressiveFinancialProfile from './ProgressiveFinancialProfile';
 import SavingsTracker from './SavingsTracker';
@@ -240,7 +240,7 @@ const PurchaseAdvisor = () => {
   const firestore = useFirestore();
 
   // Phase 8a (review fix): /api/chat is auth-gated since Phase 1.5;
-  // thread the user's ID token through to enhancedOpenAIIntegration.
+  // thread the user's ID token through to enhancedAdvisorIntegration.
   const { user } = useAuth();
 
   // Location hook

@@ -359,7 +359,7 @@ export const findCheaperAlternative = async (itemName, currentPrice, location = 
     let locationContext = '';
     if (location) {
       locationContext = `
-      User Location: ${location.city ? `${location.city}, ` : ''}${location.state || location.country || 'United States'}
+      User Location: ${location.city ? `${location.city}, ` : ''}${location.state || location.country || 'United Arab Emirates'}
       
       Consider:
       - Local store availability and prices

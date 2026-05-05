@@ -107,11 +107,16 @@ export const LocationService = {
   },
 
   getDefaultLocation() {
+    // App is AED-native and serves UAE users primarily. Default fallback
+    // when geolocation fails or is denied. city is left null because we
+    // don't want to hallucinate a specific UAE city (Dubai vs Abu Dhabi
+    // vs Sharjah etc.) — country alone gives the AI enough context for
+    // currency, retailers, shipping, and tax assumptions.
     return {
-      city: 'United States',
+      city: null,
       state: null,
-      country: 'United States',
-      countryCode: 'US',
+      country: 'United Arab Emirates',
+      countryCode: 'AE',
       source: 'default',
       accuracy: 'low',
     };
