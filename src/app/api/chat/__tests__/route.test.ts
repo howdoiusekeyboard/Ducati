@@ -247,6 +247,33 @@ describe('/api/chat — Gemini route handler', () => {
       expect(res.status).toBe(500);
     });
 
+    it('returns 500 when Pro Mode response has the wrong question count', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify({
+          questions: [
+            {
+              id: 'q1',
+              dimension: 'specs',
+              answer_type: 'short_text',
+              text: 'A',
+              placeholder: 'p',
+              search_hint: 's',
+            },
+          ],
+        }),
+      });
+      const res = await POST(makeRequest({ message: 'x', proMode: true }));
+      expect(res.status).toBe(500);
+    });
+
+    it('rejects image/svg+xml data URLs with 400', async () => {
+      const svgDataUrl =
+        'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=';
+      const res = await POST(makeRequest({ message: 'q', image: svgDataUrl }));
+      expect(res.status).toBe(400);
+      expect(mockGenerateContent).not.toHaveBeenCalled();
+    });
+
     it('does not trigger Pro Mode for the legacy magic-string message', async () => {
       mockGenerateContent.mockResolvedValue({ text: 'Default text response.' });
       const res = await POST(

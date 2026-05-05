@@ -107,8 +107,13 @@ const getFallbackPlaceholder = (dimension, itemName, itemCost) => {
  * questions as a plain JSON array. Caller must pass an ID token (Phase 1.5
  * auth gate enforces it server-side).
  */
+const PRO_MODE_AUTH_ERROR = 'Authentication required for Pro Mode';
+
 export const generateProModeQuestions = async (purchaseData, idToken) => {
   try {
+    if (!idToken) {
+      throw new Error(PRO_MODE_AUTH_ERROR);
+    }
     const { itemName, itemCost, analysisDetails } = purchaseData;
     const topNegativeFactors = analysisDetails?.topFactors?.negative || [];
     const concerns = topNegativeFactors.length > 0 ? topNegativeFactors.join(', ') : '';
@@ -131,11 +136,14 @@ Each question requires: id (q1|q2|q3), dimension, answer_type, text, placeholder
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+        Authorization: `Bearer ${idToken}`,
       },
       body: JSON.stringify({ message: prompt, proMode: true }),
     });
 
+    if (response.status === 401) {
+      throw new Error(PRO_MODE_AUTH_ERROR);
+    }
     if (!response.ok) {
       throw new Error('Failed to generate questions');
     }
@@ -182,7 +190,14 @@ Each question requires: id (q1|q2|q3), dimension, answer_type, text, placeholder
   } catch (error) {
     console.error('Error generating questions:', error);
 
-    // Enhanced fallback questions with all new fields
+    // Auth failures must NOT fall through to the hardcoded fallback — that
+    // would hand fake success to an unauthenticated caller. Caller (ProMode.js)
+    // surfaces this as an error state instead. Non-auth failures (Gemini down,
+    // network glitch, schema mismatch) keep the degraded-but-usable fallback.
+    if (error.message === PRO_MODE_AUTH_ERROR) {
+      throw error;
+    }
+
     return [
       {
         id: 'q1',
@@ -218,6 +233,9 @@ Each question requires: id (q1|q2|q3), dimension, answer_type, text, placeholder
  */
 export const getProModeAnalysis = async (purchaseData, questions, answers, idToken) => {
   try {
+    if (!idToken) {
+      throw new Error(PRO_MODE_AUTH_ERROR);
+    }
     // Get user location
     const location = await LocationService.getUserLocation();
 
@@ -281,7 +299,7 @@ export const getProModeAnalysis = async (purchaseData, questions, answers, idTok
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+        Authorization: `Bearer ${idToken}`,
       },
       body: JSON.stringify({
         message: prompt,
@@ -289,6 +307,9 @@ export const getProModeAnalysis = async (purchaseData, questions, answers, idTok
       }),
     });
 
+    if (response.status === 401) {
+      throw new Error(PRO_MODE_AUTH_ERROR);
+    }
     if (!response.ok) {
       throw new Error('Failed to get analysis');
     }

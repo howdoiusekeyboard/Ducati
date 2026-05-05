@@ -12,6 +12,17 @@ const GEMINI_MODEL = 'gemini-2.5-flash';
 const DEFAULT_TEMPERATURE = 1;
 const DEFAULT_MAX_OUTPUT_TOKENS = 800;
 
+// Phase 8a: explicit allowlist of safe raster image types. Excludes image/svg+xml
+// because SVG can carry inline <script> — even though Gemini doesn't execute it,
+// accepting SVG widens our prompt-injection surface for no product gain.
+const ALLOWED_IMAGE_MIMES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/heic',
+]);
+
 const SYSTEM_INSTRUCTION_BASE = `You are Ducati. You help people decide whether to buy things.
 
 You are not a chipper assistant. You sound like a friend who's seen too many bad purchases — direct, sometimes funny, sometimes blunt, genuinely happy when someone makes a smart call. You react like a person: you wince at AED 4,500 mechanical keyboards, you respect a good deal, you call out a rationalization when you see one.
@@ -182,10 +193,10 @@ export async function POST(
     let imagePart: { inlineData: { data: string; mimeType: string } } | null = null;
     if (body.image) {
       const dataUrlMatch = /^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/.exec(body.image);
-      if (!dataUrlMatch) {
+      if (!dataUrlMatch || !ALLOWED_IMAGE_MIMES.has(dataUrlMatch[1]!)) {
         return NextResponse.json(
           {
-            error: 'image must be a data: URL with base64 payload',
+            error: 'image must be a JPEG, PNG, WebP, GIF, or HEIC data URL',
             errorType: ErrorType.VALIDATION_ERROR,
           },
           { status: 400 }
