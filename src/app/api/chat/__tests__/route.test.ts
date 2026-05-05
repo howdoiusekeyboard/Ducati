@@ -323,9 +323,12 @@ describe('/api/chat — Gemini route handler', () => {
       expect(mockGenerateContent).toHaveBeenCalledTimes(2);
       expect(mockGenerateContent.mock.calls[0]![0]!.model).toBe('gemini-2.5-flash');
       expect(mockGenerateContent.mock.calls[1]![0]!.model).toBe('gemini-2.5-flash-lite');
-      // Both calls must carry the same grounding tool config.
+      // Tools (googleSearch + urlContext) carry over to the fallback unchanged.
       const fallbackCall = mockGenerateContent.mock.calls[1]![0]!;
       expect(fallbackCall.config.tools).toEqual([{ googleSearch: {} }, { urlContext: {} }]);
+      // thinkingBudget is overridden to 0 because flash-lite rejects
+      // thinkingBudget=256 (its valid range is 512–24576).
+      expect(fallbackCall.config.thinkingConfig).toEqual({ thinkingBudget: 0 });
     });
   });
 

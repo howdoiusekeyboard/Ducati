@@ -465,17 +465,21 @@ export async function POST(
     } catch (modelError) {
       const status = (modelError as { status?: number }).status;
       // 503 = upstream overload, 429 = per-model daily quota exhausted.
-      // flash-lite supports googleSearch + urlContext + thinking with full
-      // feature parity per ai.google.dev/gemini-api/docs/models AND has a
-      // separate quota pool, so the same tool config recovers both failures.
+      // flash-lite has a separate quota pool, so the fallback recovers both.
+      // Anything else bubbles unchanged.
       if (status !== 503 && status !== 429) throw modelError;
       console.warn(
         `default text: gemini-2.5-flash unavailable (status ${status}); retrying on gemini-2.5-flash-lite`
       );
+      // flash-lite rejects thinkingBudget=256 with INVALID_ARGUMENT (the
+      // valid non-zero range is 512–24576 for that model). Setting it to 0
+      // disables extended thinking on the fallback — degraded reasoning is
+      // an acceptable trade for not losing the request entirely. Tools
+      // (googleSearch + urlContext) carry over unchanged.
       result = await ai.models.generateContent({
         model: GEMINI_FALLBACK_MODEL,
         contents,
-        config: defaultTextConfig,
+        config: { ...defaultTextConfig, thinkingConfig: { thinkingBudget: 0 } },
       });
     }
 
