@@ -82,9 +82,9 @@ const ExpenseBreakdownWidget = ({ profile }) => {
 
   // Format currency
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-AE', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'AED',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -184,7 +184,7 @@ const ExpenseBreakdownWidget = ({ profile }) => {
                   interval={0}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis tickFormatter={(value) => `$${value}`} tick={{ fontSize: 12 }} />
+                <YAxis tickFormatter={(value) => `AED ${value}`} tick={{ fontSize: 12 }} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
                   {chartData.map((entry, index) => (

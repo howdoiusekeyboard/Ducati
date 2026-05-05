@@ -39,19 +39,23 @@ export const safeNumber = (value, defaultValue = 0) => {
   return isNaN(num) ? defaultValue : num;
 };
 
+// Phase 9: AED-first regional default. App is targeted at Dubai/UAE users; the
+// Gemini system instruction also mandates AED-first quoting. UI currency must match.
+const aedFormatter = new Intl.NumberFormat('en-AE', {
+  style: 'currency',
+  currency: 'AED',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
 /**
- * Safely formats currency values
+ * Safely formats currency values in AED (en-AE locale).
  * @param {any} amount - The amount to format
- * @returns {string} - Formatted currency string
+ * @returns {string} - Formatted AED currency string (e.g., "AED 4,500")
  */
 export const formatCurrency = (amount) => {
   const num = safeNumber(amount, 0);
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(num);
+  return aedFormatter.format(num);
 };
 
 /**

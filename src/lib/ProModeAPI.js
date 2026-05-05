@@ -94,7 +94,7 @@ const validateQuestions = (questions) => {
 const getFallbackPlaceholder = (dimension, itemName, itemCost) => {
   const placeholders = {
     specs: `I need ${itemName || 'it'} for gaming, 16GB RAM minimum`,
-    constraints: `Budget under $${Math.round(itemCost * 1.2)}, must have warranty`,
+    constraints: `Budget under AED ${Math.round(itemCost * 1.2)}, must have warranty`,
     timing: `Need by Dec 15; can wait 30 days for sales`,
   };
 
@@ -121,7 +121,7 @@ export const generateProModeQuestions = async (purchaseData, idToken) => {
     const prompt = `You are a financial advisor generating exactly 3 probing questions to improve web search and market analysis for a potential purchase.
 
 Item: "${itemName}"
-Price: $${itemCost}
+Price: AED ${itemCost}
 Initial concerns (if any): ${concerns}
 
 Produce exactly 3 questions, one per dimension: (1) specs (use-case or must-have features), (2) constraints (budget/TCO/warranty/retailer/region), (3) timing (need-by date, willingness to wait for sales/upcoming releases).
@@ -210,7 +210,7 @@ Each question requires: id (q1|q2|q3), dimension, answer_type, text, placeholder
       {
         id: 'q2',
         text: 'What are your budget constraints and requirements (warranty, retailer preference)?',
-        placeholder: `Max $${Math.round((purchaseData?.itemCost || 1000) * 1.2)}, 2-year warranty, Amazon preferred`,
+        placeholder: `Max AED ${Math.round((purchaseData?.itemCost || 1000) * 1.2)}, 2-year warranty, Noon preferred`,
         dimension: 'constraints',
         answer_type: 'short_text',
         search_hint: 'Will filter results by price and vendor requirements',
@@ -272,7 +272,7 @@ export const getProModeAnalysis = async (purchaseData, questions, answers, idTok
   
   Purchase Details:
   - Item: ${purchaseData.itemName}
-  - Cost: $${purchaseData.itemCost}
+  - Cost: AED ${purchaseData.itemCost}
   - Initial Decision: ${purchaseData.decision}
   - Initial Analysis: ${purchaseData.summary}
   

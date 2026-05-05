@@ -298,7 +298,7 @@ describe('/api/chat — Gemini route handler', () => {
         })
       );
       const arg = mockGenerateContent.mock.calls[0]![0]!;
-      expect(arg.config.systemInstruction).toContain('Monthly income: $5000');
+      expect(arg.config.systemInstruction).toContain('Monthly income: AED 5000');
       expect(arg.config.systemInstruction).not.toContain('99999');
     });
   });

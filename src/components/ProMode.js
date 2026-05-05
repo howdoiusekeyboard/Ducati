@@ -237,7 +237,7 @@ const ProMode = () => {
           Pro Mode
         </h1>
         <p className="pro-subtitle">
-          Deeper analysis for {purchaseData?.itemName} (${purchaseData?.itemCost})
+          Deeper analysis for {purchaseData?.itemName} (AED {purchaseData?.itemCost})
         </p>
       </div>
 

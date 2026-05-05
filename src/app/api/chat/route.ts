@@ -99,7 +99,7 @@ function formatProfileContext(profile: Record<string, unknown> | null | undefine
   };
 
   const monthlyIncome = num('monthlyIncome');
-  if (monthlyIncome !== null) lines.push(`Monthly income: $${monthlyIncome}`);
+  if (monthlyIncome !== null) lines.push(`Monthly income: AED ${monthlyIncome}`);
 
   const expenseKeys = [
     'housingCost',
@@ -114,7 +114,7 @@ function formatProfileContext(profile: Record<string, unknown> | null | undefine
     .map(num)
     .filter((n): n is number => n !== null)
     .reduce((a, b) => a + b, 0);
-  if (expenses > 0) lines.push(`Monthly expenses (sum): $${expenses}`);
+  if (expenses > 0) lines.push(`Monthly expenses (sum): AED ${expenses}`);
 
   const debtKeys = [
     'creditCardDebt',
@@ -127,13 +127,13 @@ function formatProfileContext(profile: Record<string, unknown> | null | undefine
     .map(num)
     .filter((n): n is number => n !== null)
     .reduce((a, b) => a + b, 0);
-  if (debt > 0) lines.push(`Total debt: $${debt}`);
+  if (debt > 0) lines.push(`Total debt: AED ${debt}`);
 
   const emergencyFund = num('emergencyFund');
-  if (emergencyFund !== null) lines.push(`Emergency fund: $${emergencyFund}`);
+  if (emergencyFund !== null) lines.push(`Emergency fund: AED ${emergencyFund}`);
 
   const checkingSavings = num('checkingSavingsBalance');
-  if (checkingSavings !== null) lines.push(`Cash on hand: $${checkingSavings}`);
+  if (checkingSavings !== null) lines.push(`Cash on hand: AED ${checkingSavings}`);
 
   const creditScore = num('creditScore');
   if (creditScore !== null) lines.push(`Credit score: ${creditScore}`);

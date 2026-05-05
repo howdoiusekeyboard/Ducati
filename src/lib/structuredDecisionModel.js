@@ -747,7 +747,7 @@ export const generateStructuredRecommendation = (
   }
 
   if (alternative && alternative.price < cost) {
-    reasoning += `\n\n**Note:** A cheaper alternative (${alternative.name}) is available for $${alternative.price}, which could save you $${(cost - alternative.price).toFixed(2)}.`;
+    reasoning += `\n\n**Note:** A cheaper alternative (${alternative.name}) is available for AED ${alternative.price}, which could save you AED ${(cost - alternative.price).toFixed(2)}.`;
   }
 
   // Phase 9: projection prose — declarative, factual, quantified.

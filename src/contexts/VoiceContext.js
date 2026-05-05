@@ -90,9 +90,9 @@ USER'S FINANCIAL CONTEXT:
 ${
   financialProfile
     ? `
-- Monthly Income: $${financialProfile.monthlyIncome || 'not set'}
-- Monthly Expenses: $${financialProfile.monthlyExpenses || 'not set'}
-- Savings: $${financialProfile.currentSavings || 'not set'}
+- Monthly Income: AED ${financialProfile.monthlyIncome || 'not set'}
+- Monthly Expenses: AED ${financialProfile.monthlyExpenses || 'not set'}
+- Savings: AED ${financialProfile.currentSavings || 'not set'}
 - Financial Goal: ${financialProfile.financialGoal || 'not set'}
 `
     : 'No financial profile set up yet - encourage them to do the Quick Setup for personalized advice!'
@@ -103,7 +103,7 @@ Be enthusiastic and helpful! Guide them through using the app effectively.`,
     } else if (pathname === '/chat') {
       return {
         type: 'chat_page',
-        context: `You're in the Ducati Advisor chat interface. Provide financial advice and help with purchase decisions. ${financialProfile ? `User's monthly net income: $${financialProfile.monthlyIncome - financialProfile.monthlyExpenses}` : ''}`,
+        context: `You're in the Ducati Advisor chat interface. Provide financial advice and help with purchase decisions. ${financialProfile ? `User's monthly net income: AED ${financialProfile.monthlyIncome - financialProfile.monthlyExpenses}` : ''}`,
       };
     } else if (pathname === '/profile') {
       return {

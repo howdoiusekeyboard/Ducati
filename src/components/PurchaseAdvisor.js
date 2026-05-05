@@ -581,7 +581,7 @@ const PurchaseAdvisor = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="itemCost">Cost ($):</label>
+                <label htmlFor="itemCost">Cost (AED):</label>
                 <input
                   id="itemCost"
                   type="number"
