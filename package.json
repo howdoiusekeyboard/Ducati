@@ -31,16 +31,20 @@
   "dependencies": {
     "@google/genai": "^1.52.0",
     "@tailwindcss/postcss": "^4.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "dompurify": "^3.4.2",
     "firebase": "^12.12.1",
     "firebase-admin": "^13.8.0",
     "firebaseui": "^6.1.0",
+    "lucide-react": "^1.14.0",
     "next": "^16.2.4",
     "postcss": "^8.5.13",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "recharts": "^3.8.1",
+    "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.4"
   },
   "overrides": {
@@ -53,6 +57,7 @@
     "@babel/preset-env": "^7.29.3",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
+    "@playwright/test": "^1.59.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

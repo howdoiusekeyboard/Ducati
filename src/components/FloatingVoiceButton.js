@@ -82,9 +82,6 @@ const FloatingVoiceButton = () => {
           ) : (
             <>
               <span className="voice-btn-icon">🎤</span>
-              <div className="voice-sparkle sparkle-1">✨</div>
-              <div className="voice-sparkle sparkle-2">✨</div>
-              <div className="voice-sparkle sparkle-3">✨</div>
             </>
           )}
         </div>

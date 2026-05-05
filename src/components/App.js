@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import {
+  MessageCircle,
+  BarChart3,
+  Newspaper,
+  LogIn,
+  BookOpen,
+  Info,
+  User,
+  ShoppingCart,
+} from 'lucide-react';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { VoiceProvider } from '../contexts/VoiceContext';
 import { FirestoreErrorBoundary } from './FirestoreErrorBoundary';
@@ -41,7 +51,6 @@ const Header = () => {
       <header className="top-header">
         <div className="header-content">
           <Link to="/" className="logo" onClick={closeMenu}>
-            <span className="logo-icon">💰</span>
             Ducati
           </Link>
           <div className="header-right">
@@ -68,24 +77,24 @@ const Header = () => {
             className={`nav-drawer-link ${location.pathname === '/chat' ? 'active' : ''}`}
             onClick={closeMenu}
           >
-            <span className="nav-drawer-icon">💬</span>
-            Ducati Advisor
+            <MessageCircle className="nav-drawer-icon" aria-hidden="true" />
+            Advisor
           </Link>
           <Link
             to="/dashboard"
             className={`nav-drawer-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
             onClick={closeMenu}
           >
-            <span className="nav-drawer-icon">📊</span>
-            Financial Dashboard
+            <BarChart3 className="nav-drawer-icon" aria-hidden="true" />
+            Dashboard
           </Link>
           <Link
             to="/finance-feed"
             className={`nav-drawer-link ${location.pathname === '/finance-feed' ? 'active' : ''}`}
             onClick={closeMenu}
           >
-            <span className="nav-drawer-icon">📺</span>
-            Finance Feed
+            <Newspaper className="nav-drawer-icon" aria-hidden="true" />
+            Finance feed
           </Link>
           {!user && (
             <Link
@@ -93,8 +102,8 @@ const Header = () => {
               className={`nav-drawer-link ${location.pathname === '/login' ? 'active' : ''}`}
               onClick={closeMenu}
             >
-              <span className="nav-drawer-icon">🔐</span>
-              Sign In
+              <LogIn className="nav-drawer-icon" aria-hidden="true" />
+              Sign in
             </Link>
           )}
           <Link
@@ -102,15 +111,15 @@ const Header = () => {
             className={`nav-drawer-link ${location.pathname === '/user-guide' ? 'active' : ''}`}
             onClick={closeMenu}
           >
-            <span className="nav-drawer-icon">📖</span>
-            User Guide
+            <BookOpen className="nav-drawer-icon" aria-hidden="true" />
+            User guide
           </Link>
           <Link
             to="/about"
             className={`nav-drawer-link ${location.pathname === '/about' ? 'active' : ''}`}
             onClick={closeMenu}
           >
-            <span className="nav-drawer-icon">ℹ️</span>
+            <Info className="nav-drawer-icon" aria-hidden="true" />
             About
           </Link>
         </nav>
@@ -126,7 +135,7 @@ const Header = () => {
 const Footer = () => {
   return (
     <footer className="app-footer">
-      <p>Based on proven investment principles and decision-making framework</p>
+      <p>Based on proven investment principles.</p>
     </footer>
   );
 };
@@ -144,13 +153,13 @@ const Navigation = () => {
     <div className="nav-container">
       {location.pathname === '/' ? (
         <Link to="/profile" className="nav-button">
-          <span className="nav-icon">👤</span>
-          My Financial Profile
+          <User className="nav-icon" aria-hidden="true" />
+          Profile
         </Link>
       ) : (
         <Link to="/" className="nav-button">
-          <span className="nav-icon">🛒</span>
-          Purchase Advisor
+          <ShoppingCart className="nav-icon" aria-hidden="true" />
+          Advisor
         </Link>
       )}
     </div>

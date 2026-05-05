@@ -1,69 +1,160 @@
-/* Style refactored — Tailwind v4 idiomatic */
+/* Tailwind v4 + Phase 9 Linear-canonical (D2) palette.
+   Two naming surfaces side-by-side:
+   - D2 canonical (--color-bg / --color-surface / --color-text-strong / ...) — used by app code
+   - shadcn-compat (--color-background / --color-foreground / --color-primary / ...) — used by shadcn/ui primitives
+   Backward-compat aliases keep legacy App.css consumers rendering. */
 
 @import 'tailwindcss';
 
 @theme {
-  /* === Tailwind v4 color tokens (drive utility-class generation) === */
-  --color-primary: #6366f1;
-  --color-primary-dark: #4f46e5;
-  --color-accent: #10b981;
-  --color-accent-hover: #059669;
-  --color-background-light: #f9fafb;
-  --color-background-card: #ffffff;
-  --color-text-dark: #1f2937;
-  --color-text-medium: #4b5563;
-  --color-text-light: #6b7280;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
-  --color-success: #10b981;
+  /* === D2 palette — canonical names === */
+  --color-bg: #f9fafb;
+  --color-surface: #ffffff;
   --color-border: #e5e7eb;
-  --color-purple-primary: #6366f1;
-  --color-purple-secondary: #8b5cf6;
+  --color-border-hover: #d1d5db;
+  --color-text-strong: #111827;
+  --color-text: #374151;
+  --color-text-muted: #6b7280;
+  --color-accent: #5b6fb0;
+  --color-accent-bg: #eef0f9;
+  --color-danger: #ef4444;
 
-  /* === Shadows === */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.4);
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-message: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  /* === shadcn/ui-compat names — same palette, shadcn-expected variable names === */
+  --color-background: #f9fafb;
+  --color-foreground: #374151;
+  --color-card: #ffffff;
+  --color-card-foreground: #111827;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #111827;
+  --color-primary: #5b6fb0;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #eef0f9;
+  --color-secondary-foreground: #5b6fb0;
+  --color-muted: #f9fafb;
+  --color-muted-foreground: #6b7280;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-input: #e5e7eb;
+  --color-ring: #5b6fb0;
 
-  /* === Border radius === */
-  --radius-sm: 4px;
+  /* === D2 shadows === */
+  --shadow-card: 0 1px 0 rgba(17, 24, 39, 0.04);
+  --shadow-card-hover:
+    0 4px 12px rgba(17, 24, 39, 0.08), 0 1px 0 rgba(17, 24, 39, 0.04);
+  --shadow-focus: 0 0 0 3px rgba(91, 111, 176, 0.4);
+
+  /* === Radii === */
   --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-lg: 10px;
 
-  /* === Spacing additions (Tailwind v4 has built-in scale; we ADD just the custom ones) === */
-  --spacing-18: 4.5rem;
-  --spacing-88: 22rem;
-
-  /* === Font family === */
+  /* === Fonts (next/font CSS vars wired in layout.tsx) === */
   --font-sans:
-    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
+    var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
 
-  /* === Animations (keyframes defined below) === */
-  --animate-fadeIn: fadeIn 0.5s ease-out;
-  --animate-slideIn: slideIn 0.4s ease-out;
-  --animate-dot-flashing: dot-flashing 1s infinite linear alternate;
+/* === Backward-compat aliases (TODO: retire in post-Phase-9 cleanup) ===
+   Old token names from App.css#:root and component CSS files — kept resolvable
+   so unmigrated rules render with D2 colors during the route-by-route migration. */
+:root {
+  /* indigo / primary collapse */
+  --primary-color: var(--color-accent);
+  --primary-dark: var(--color-accent);
+  --primary-light: var(--color-accent-bg);
+  --primary-hover: var(--color-accent);
 
-  /* === Legacy alias bridges (defensive — App.css#:root currently authoritative;
-       these aliases keep things resolvable if App.css is ever moved/removed) === */
-  --primary-color: var(--color-primary);
-  --primary-dark: var(--color-primary-dark);
+  /* old "accent" / green collapse to D2 accent (D2 has no green) */
   --accent-color: var(--color-accent);
-  --accent-dark: var(--color-accent-hover);
-  --background-card: var(--color-background-card);
-  --background-light: var(--color-background-light);
-  --text-dark: var(--color-text-dark);
-  --text-medium: var(--color-text-medium);
-  --text-light: var(--color-text-light);
-  --danger-color: var(--color-danger);
+  --accent-dark: var(--color-accent);
+  --accent-light: var(--color-accent-bg);
+  --accent-hover: var(--color-accent);
+
+  /* semantics */
+  --success-color: var(--color-accent);
+  --warning-color: #f59e0b;
   --error-color: var(--color-danger);
-  --warning-color: var(--color-warning);
-  --success-color: var(--color-success);
+  --danger-color: var(--color-danger);
+  --info-color: var(--color-accent);
+
+  /* neutrals — collapse 11-step grayscale to D2's 4-tone */
+  --white: var(--color-surface);
+  --gray-50: var(--color-bg);
+  --gray-100: var(--color-bg);
+  --gray-200: var(--color-border);
+  --gray-300: var(--color-border-hover);
+  --gray-400: var(--color-text-muted);
+  --gray-500: var(--color-text-muted);
+  --gray-600: var(--color-text);
+  --gray-700: var(--color-text);
+  --gray-800: var(--color-text-strong);
+  --gray-900: var(--color-text-strong);
+
+  /* backgrounds */
+  --bg-primary: var(--color-surface);
+  --bg-secondary: var(--color-bg);
+  --bg-tertiary: var(--color-bg);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --background-card: var(--color-surface);
+  --background-light: var(--color-bg);
+
+  /* text */
+  --text-primary: var(--color-text-strong);
+  --text-secondary: var(--color-text-muted);
+  --text-tertiary: var(--color-text-muted);
+  --text-inverse: var(--color-surface);
+  --text-dark: var(--color-text-strong);
+  --text-medium: var(--color-text);
+  --text-light: var(--color-text-muted);
+
+  /* borders */
+  --border-light: var(--color-border);
+  --border-medium: var(--color-border-hover);
+  --border-dark: var(--color-text-muted);
   --border-color: var(--color-border);
+
+  /* purple legacy */
+  --purple-primary: var(--color-accent);
+  --purple-secondary: var(--color-accent);
+
+  /* shadow legacy aliases */
+  --shadow-sm: var(--shadow-card);
+  --shadow-md: var(--shadow-card);
+  --shadow-lg: var(--shadow-card-hover);
+  --shadow-xl: var(--shadow-card-hover);
+  --shadow-message: var(--shadow-card);
+
+  /* radius legacy */
+  --radius-sm: 4px;
+  --radius-xl: 14px;
+  --radius-full: 9999px;
+
+  /* spacing legacy */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* transitions legacy */
+  --transition-fast: 150ms ease-out;
+  --transition-base: 200ms ease-out;
+  --transition-slow: 300ms ease-out;
+  --transition-all: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* font-size legacy */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  /* font-family legacy */
+  --font-family-sans: var(--font-sans);
 }
 
 @keyframes fadeIn {
@@ -88,23 +179,37 @@
 
 @keyframes dot-flashing {
   0% {
-    background-color: var(--color-primary);
+    background-color: var(--color-accent);
   }
   50%,
   100% {
-    background-color: rgba(99, 102, 241, 0.2);
+    background-color: var(--color-accent-bg);
   }
 }
 
 @layer base {
   body {
     font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  * {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-bg);
+    color: var(--color-text-strong);
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
   }
 }

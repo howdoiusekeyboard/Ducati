@@ -1,11 +1,21 @@
 // src/app/layout.tsx
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import React from 'react';
 import './globals.css';
 import '../styles/App.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+});
 
 const siteUrl = 'https://ducati.kushagragolash.tech';
 
@@ -70,8 +80,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Referrer policy for better external image loading */}
         <meta name="referrer" content="no-referrer-when-downgrade" />
       </head>
-      {/* The body tag includes the font class from Next/Font and Tailwind's antialiased class for smoother text. */}
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body
+        className={`${inter.variable} ${jetBrainsMono.variable} font-sans antialiased`}
+      >
+        {children}
+      </body>
     </html>
   );
 }

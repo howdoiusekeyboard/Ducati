@@ -42,108 +42,7 @@
    15. PRINT STYLES
    ============================================ */
 
-/* ============================================
-   1. CSS CUSTOM PROPERTIES
-   ============================================ */
-:root {
-  /* Primary Colors */
-  --primary-color: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --primary-hover: #5b21b6;
-
-  /* Accent Colors */
-  --accent-color: #10b981;
-  --accent-dark: #059669;
-  --accent-light: #34d399;
-  --accent-hover: #059669;
-
-  /* Semantic Colors */
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
-  --error-color: #ef4444;
-  --danger-color: #ef4444;
-  --info-color: #3b82f6;
-
-  /* Neutral Colors */
-  --white: #ffffff;
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
-
-  /* Background Colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --bg-overlay: rgba(0, 0, 0, 0.5);
-  --background-card: #ffffff;
-  --background-light: #f9fafb;
-
-  /* Text Colors */
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --text-inverse: #ffffff;
-  --text-dark: #1f2937;
-  --text-medium: #4b5563;
-  --text-light: #6b7280;
-
-  /* Border Colors */
-  --border-light: #e5e7eb;
-  --border-medium: #d1d5db;
-  --border-dark: #9ca3af;
-  --border-color: #e5e7eb;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.4);
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
-
-  /* Spacing */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
-
-  /* Typography */
-  --font-family-sans:
-    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
-
-  /* Transitions */
-  --transition-fast: 0.15s ease-out;
-  --transition-base: 0.2s ease-out;
-  --transition-slow: 0.3s ease-out;
-  --transition-all: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* === 1. CSS CUSTOM PROPERTIES — moved to globals.css#@theme (D2 palette) + :root aliases (legacy compat) === */
 
 /* ============================================
    2. GLOBAL RESET & BASE STYLES
@@ -305,26 +204,22 @@ body {
   padding: 0 var(--spacing-md);
 }
 
-/* ============================================
-   5. HEADER & NAVIGATION
-   ============================================ */
+/* === 5. HEADER & NAVIGATION (D2 Linear-canonical: hairline borders, flat surfaces, no animation entry) === */
 .top-header {
-  background: var(--white);
-  color: var(--primary-color);
-  padding: var(--spacing-md) var(--spacing-lg);
-  box-shadow: var(--shadow-md);
+  background: var(--color-surface);
+  color: var(--color-text-strong);
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 100;
-  animation: slideDown 0.6s ease-out;
-  border-bottom: 1px solid var(--border-light);
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   width: 100%;
 }
@@ -332,55 +227,53 @@ body {
 .header-right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 16px;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  font-size: var(--font-size-xl);
+  gap: 8px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--primary-color);
+  letter-spacing: -0.01em;
+  color: var(--color-text-strong);
   text-decoration: none;
-  transition: var(--transition-all);
+  transition: color 200ms ease;
 }
 
 .logo:hover {
-  color: var(--primary-dark);
-  transform: scale(1.05);
+  color: var(--color-accent);
 }
 
-.logo-icon {
-  font-size: 1.5em;
-}
-
-/* Hamburger Menu */
+/* Hamburger Menu (D2: thinner, accent on hover, no scale) */
 .hamburger-menu {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 18px;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
   z-index: 1001;
-  transition: var(--transition-all);
-}
-
-.hamburger-menu:hover {
-  transform: scale(1.1);
 }
 
 .hamburger-line {
   width: 100%;
-  height: 2px;
-  background-color: var(--primary-color);
-  border-radius: 2px;
-  transition: var(--transition-all);
+  height: 1.5px;
+  background-color: var(--color-text-strong);
+  border-radius: 1px;
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease,
+    background-color 200ms ease;
   transform-origin: center;
+}
+
+.hamburger-menu:hover .hamburger-line {
+  background-color: var(--color-accent);
 }
 
 .hamburger-menu.active .hamburger-line:nth-child(1) {
@@ -395,18 +288,18 @@ body {
   transform: rotate(-45deg) translate(7px, -6px);
 }
 
-/* Navigation Drawer */
+/* Navigation Drawer (D2: hairline border, subtle hover, no gradients) */
 .nav-drawer {
   position: fixed;
   top: 0;
   right: -300px;
   width: 300px;
   height: 100vh;
-  background-color: var(--bg-primary);
-  box-shadow: var(--shadow-xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-card-hover);
   z-index: 1000;
-  transition: right 0.3s ease-out;
-  border-left: 1px solid var(--border-light);
+  transition: right 250ms ease-out;
+  border-left: 1px solid var(--color-border);
 }
 
 .nav-drawer.open {
@@ -414,44 +307,49 @@ body {
 }
 
 .nav-drawer-content {
-  padding: var(--spacing-xl) var(--spacing-lg);
-  padding-top: 80px;
+  padding: 24px 16px;
+  padding-top: 72px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 4px;
 }
 
 .nav-drawer-link {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) var(--spacing-lg);
-  color: var(--text-primary);
+  gap: 12px;
+  padding: 10px 12px;
+  color: var(--color-text);
   text-decoration: none;
-  border-radius: var(--radius-lg);
+  border-radius: 6px;
   font-weight: 500;
-  font-size: var(--font-size-base);
-  transition: var(--transition-all);
+  font-size: 14px;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
   border: 1px solid transparent;
 }
 
 .nav-drawer-link:hover {
-  background-color: var(--bg-secondary);
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  transform: translateX(4px);
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--color-text-strong);
 }
 
 .nav-drawer-link.active {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  color: var(--text-inverse);
-  box-shadow: var(--shadow-md);
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
 }
 
 .nav-drawer-icon {
-  font-size: 1.2em;
-  width: 24px;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  width: 18px;
+  height: 18px;
+}
+
+.nav-drawer-icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .nav-overlay {
@@ -460,67 +358,68 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--bg-overlay);
+  background-color: rgba(0, 0, 0, 0.32);
   z-index: 999;
   opacity: 0;
-  animation: fadeIn 0.3s ease-out forwards;
+  animation: fadeIn 200ms ease-out forwards;
 }
 
-/* ============================================
-   6. FOOTER
-   ============================================ */
+/* === 6. FOOTER (D2: light surface with hairline; not a dark band) === */
 .app-footer {
-  background-color: var(--gray-800);
-  color: var(--gray-300);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
   text-align: center;
-  padding: var(--spacing-lg);
+  padding: 24px;
   margin-top: auto;
-  font-size: var(--font-size-sm);
-  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+  border-top: 1px solid var(--color-border);
 }
 
 .app-footer p {
   margin: 0;
-  opacity: 0.8;
 }
 
-/* ============================================
-   7. FLOATING NAV BUTTON
-   ============================================ */
+/* === 7. FLOATING NAV BUTTON (D2: surface pill, hairline border, accent on hover) === */
 .nav-container {
   position: fixed;
-  bottom: var(--spacing-lg);
-  right: var(--spacing-lg);
+  bottom: 24px;
+  right: 24px;
   z-index: 1000;
-  animation: fadeInUp 0.8s ease-out;
 }
 
 .nav-button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
-  color: var(--text-inverse);
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-surface);
+  color: var(--color-text-strong);
   text-decoration: none;
-  border-radius: var(--radius-full);
+  border-radius: 9999px;
   font-weight: 500;
-  font-size: var(--font-size-base);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-  transition: var(--transition-all);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card-hover);
+  transition:
+    color 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
 }
 
 .nav-button:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
-  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-color) 100%);
+  color: var(--color-accent);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
 }
 
 .nav-icon {
-  font-size: 1.2em;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* ============================================
