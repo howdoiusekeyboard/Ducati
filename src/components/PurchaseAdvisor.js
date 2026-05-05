@@ -19,6 +19,7 @@ const INITIAL_FORM_STATE = {
   itemCost: '',
   purpose: '',
   frequency: '',
+  paymentMethod: 'cash',
   searchForAlternative: true,
 };
 
@@ -396,7 +397,8 @@ const PurchaseAdvisor = () => {
         financialProfile,
         alternative,
         currentLocation,
-        idToken
+        idToken,
+        formState.paymentMethod
       );
       console.log('Recommendation received:', recommendation);
 
@@ -629,6 +631,33 @@ const PurchaseAdvisor = () => {
                   <option value="Monthly">Monthly</option>
                   <option value="Rarely">Rarely</option>
                   <option value="One-time">One-time use</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="paymentMethod">Payment Method:</label>
+                <select
+                  id="paymentMethod"
+                  value={formState.paymentMethod}
+                  onChange={(e) =>
+                    dispatchForm({
+                      type: 'UPDATE_FIELD',
+                      field: 'paymentMethod',
+                      value: e.target.value,
+                    })
+                  }
+                  disabled={uiState.loading}
+                  className="select-field"
+                >
+                  <option value="cash">Cash</option>
+                  <option value="credit">Credit Card</option>
+                  <option value="emi-3">EMI: 3 months</option>
+                  <option value="emi-6">EMI: 6 months</option>
+                  <option value="emi-12">EMI: 12 months</option>
+                  <option value="emi-24">EMI: 24 months</option>
+                  <option value="emi-36">EMI: 36 months</option>
                 </select>
               </div>
             </div>
