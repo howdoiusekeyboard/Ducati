@@ -10,8 +10,14 @@ import {
 import { classifyPurchase } from './purchaseClassifier';
 import { getPromptForCategory } from './promptTemplates';
 
+const PURCHASE_AUTH_ERROR = 'Authentication required for purchase recommendation';
+
 /**
- * Get enhanced purchase recommendation combining structured model with AI insights
+ * Get enhanced purchase recommendation combining structured model with AI insights.
+ * Phase 8a (review fix): /api/chat is auth-gated since Phase 1.5; caller must thread
+ * an ID token. Without one, the call would silently 401 and the catch below would
+ * fall through to the structured-only fallback — handing the user math-without-AI
+ * results without any indication that authentication failed.
  */
 export const getEnhancedPurchaseRecommendation = async (
   itemName,
@@ -20,9 +26,13 @@ export const getEnhancedPurchaseRecommendation = async (
   frequency,
   financialProfile,
   alternative,
-  location = null // Add location parameter
+  location = null,
+  idToken = null
 ) => {
   try {
+    if (!idToken) {
+      throw new Error(PURCHASE_AUTH_ERROR);
+    }
     // First, classify the purchase to determine appropriate prompt strategy
     const classificationResult = await classifyPurchase(itemName, cost);
     const purchaseCategory = classificationResult.category;
@@ -69,10 +79,16 @@ export const getEnhancedPurchaseRecommendation = async (
 
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
+      },
       body: JSON.stringify({ message: aiPrompt }),
     });
 
+    if (response.status === 401) {
+      throw new Error(PURCHASE_AUTH_ERROR);
+    }
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -113,7 +129,14 @@ export const getEnhancedPurchaseRecommendation = async (
   } catch (error) {
     console.error('Error in enhanced purchase recommendation:', error);
 
-    // Fall back to pure structured analysis if AI fails
+    // Auth failures must NOT fall through to the structured-only fallback —
+    // the user would silently get math-without-AI results without any signal
+    // that they need to sign in. Caller surfaces this as an error state.
+    if (error.message === PURCHASE_AUTH_ERROR) {
+      throw error;
+    }
+
+    // Fall back to pure structured analysis if AI fails (non-auth failure)
     const decisionAnalysis = calculateDecisionScores(
       itemName,
       cost,

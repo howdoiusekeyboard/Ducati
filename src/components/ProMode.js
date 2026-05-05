@@ -42,7 +42,7 @@ const parseAndRenderLinks = (text) => {
 const ProMode = () => {
   const navigate = useNavigate();
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [purchaseData, setPurchaseData] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
@@ -60,7 +60,13 @@ const ProMode = () => {
     }, 0);
 
     const loadPurchaseData = async () => {
+      // Wait for AuthContext to resolve before deciding whether to fetch.
+      // Without this guard, the effect fires on initial mount with user=null,
+      // ProModeAPI throws PRO_MODE_AUTH_ERROR, and the catch leaves a sticky
+      // error state that the second (authenticated) run won't clear.
+      if (authLoading) return;
       try {
+        setError(null);
         const storedData = sessionStorage.getItem('proModePurchase');
         if (!storedData) {
           navigate('/');
@@ -93,13 +99,19 @@ const ProMode = () => {
         setLoading(false);
       } catch (error) {
         console.error('Error loading Pro Mode:', error);
+        if (error.message === 'Authentication required for Pro Mode') {
+          navigate('/login');
+          return;
+        }
         setError('Failed to load Pro Mode. Please try again.');
         setLoading(false);
       }
     };
 
     loadPurchaseData();
-  }, [navigate, user]);
+    // user?.uid (not user) avoids hourly Firebase token-refresh churn that
+    // would otherwise re-fetch questions and wipe in-progress answers.
+  }, [navigate, user?.uid, authLoading]);
 
   const handleAnswerChange = (questionId, answer) => {
     setAnswers((prev) => ({
@@ -168,6 +180,10 @@ const ProMode = () => {
       }
     } catch (error) {
       console.error('Error getting pro analysis:', error);
+      if (error.message === 'Authentication required for Pro Mode') {
+        navigate('/login');
+        return;
+      }
       setError('Failed to generate analysis. Please try again.');
     } finally {
       setAnalyzing(false);

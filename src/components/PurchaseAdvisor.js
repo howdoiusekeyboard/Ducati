@@ -10,6 +10,7 @@ import ResultBubble from './ResultBubble';
 import { useFirestore } from '../hooks/useFirestore';
 import { useLocation } from '../hooks/useLocation';
 import { LocationService } from '../lib/locationService';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/App.css';
 
 // Constants
@@ -236,6 +237,10 @@ const PurchaseAdvisor = () => {
   // Firestore hook
   const firestore = useFirestore();
 
+  // Phase 8a (review fix): /api/chat is auth-gated since Phase 1.5;
+  // thread the user's ID token through to enhancedOpenAIIntegration.
+  const { user } = useAuth();
+
   // Location hook
   const { location, isLoading: locationLoading, requestPermission } = useLocation();
 
@@ -382,6 +387,7 @@ const PurchaseAdvisor = () => {
 
       // Get recommendation
       console.log('Getting recommendation...');
+      const idToken = user ? await user.getIdToken() : null;
       const recommendation = await getEnhancedPurchaseRecommendation(
         recognizedItemName,
         costValue,
@@ -389,7 +395,8 @@ const PurchaseAdvisor = () => {
         formState.frequency,
         financialProfile,
         alternative,
-        currentLocation // Pass location
+        currentLocation,
+        idToken
       );
       console.log('Recommendation received:', recommendation);
 
