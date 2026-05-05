@@ -2,24 +2,34 @@
 import { db } from '@/lib/firebase';
 import { enableNetwork, disableNetwork } from 'firebase/firestore';
 
+// Anchor the singleton on globalThis so Next.js fast-refresh can't spawn a
+// duplicate instance with its own intervals/listeners. Without this, every
+// hot-reload leaks an orphaned manager whose enableNetwork() calls collide
+// with the new instance's listeners ("Target ID already exists").
+const GLOBAL_KEY = '__ducati_firestore_connection_manager__';
+type GlobalWithManager = typeof globalThis & {
+  [GLOBAL_KEY]?: FirestoreConnectionManager;
+};
+
 export class FirestoreConnectionManager {
-  private static instance: FirestoreConnectionManager;
   private isConnected: boolean = false;
   private connectionPromise: Promise<void> | null = null;
   private listeners: Set<(connected: boolean) => void> = new Set();
-  private connectionCheckInterval: NodeJS.Timeout | null = null;
 
   private constructor() {
     this.initializeConnection();
     this.setupNetworkListeners();
-    this.startConnectionMonitoring();
+    // No 5s polling interval — Firestore SDK has its own connection retry
+    // with backoff. Polling enableNetwork() on a sub-second cadence
+    // corrupts Firestore's internal listener-target state under churn.
   }
 
   public static getInstance(): FirestoreConnectionManager {
-    if (!FirestoreConnectionManager.instance) {
-      FirestoreConnectionManager.instance = new FirestoreConnectionManager();
+    const g = globalThis as GlobalWithManager;
+    if (!g[GLOBAL_KEY]) {
+      g[GLOBAL_KEY] = new FirestoreConnectionManager();
     }
-    return FirestoreConnectionManager.instance;
+    return g[GLOBAL_KEY];
   }
 
   private async initializeConnection(): Promise<void> {
@@ -39,20 +49,11 @@ export class FirestoreConnectionManager {
     }
   }
 
-  private startConnectionMonitoring(): void {
-    this.connectionCheckInterval = setInterval(async () => {
-      if (!this.isConnected && navigator.onLine && db) {
-        await this.initializeConnection();
-      }
-    }, 5000);
-  }
-
   private setupNetworkListeners(): void {
     if (typeof window === 'undefined') return;
 
     window.addEventListener('online', this.handleOnline.bind(this));
     window.addEventListener('offline', this.handleOffline.bind(this));
-    window.addEventListener('beforeunload', this.cleanup.bind(this));
   }
 
   private async handleOnline(): Promise<void> {
@@ -70,13 +71,6 @@ export class FirestoreConnectionManager {
       } catch (error) {
         console.error('Failed to disable Firestore network:', error);
       }
-    }
-  }
-
-  private cleanup(): void {
-    if (this.connectionCheckInterval) {
-      clearInterval(this.connectionCheckInterval);
-      this.connectionCheckInterval = null;
     }
   }
 

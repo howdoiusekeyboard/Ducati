@@ -513,7 +513,7 @@ const PurchaseAdvisor = () => {
               <span
                 className={`stat-value ${financialProfile.summary.monthlyNetIncome >= 0 ? 'positive' : 'negative'}`}
               >
-                ${Math.abs(financialProfile.summary.monthlyNetIncome).toFixed(0)}
+                AED {Math.abs(financialProfile.summary.monthlyNetIncome).toFixed(0)}
               </span>
             </div>
             <div className="mini-stat">

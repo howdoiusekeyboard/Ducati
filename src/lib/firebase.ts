@@ -177,21 +177,11 @@ const initializeFirebase = (): boolean => {
     console.log('✅ Firebase initialized successfully');
     console.log('📊 Services ready: Auth:', !!auth, '| Firestore:', !!db);
 
-    // Optional: Test Firestore connection
-    if (db && process.env.NODE_ENV === 'development') {
-      import('firebase/firestore').then(({ doc, getDoc }) => {
-        const testRef = doc(db!, '_test_', 'connection');
-        getDoc(testRef)
-          .then(() => console.log('✅ Firestore connection verified'))
-          .catch((error) => {
-            if (error.code === 'permission-denied') {
-              console.log('✅ Firestore reachable (permission test passed)');
-            } else {
-              console.warn('⚠️ Firestore connection test failed:', error.message);
-            }
-          });
-      });
-    }
+    // No reachability test — calling getDoc() on a /_test_ path inside the
+    // init flow gives Firestore SDK a stray listener target that sometimes
+    // races with the first real listener under StrictMode + fast-refresh,
+    // surfacing as "Target ID already exists". Firestore retries on its own
+    // when real reads/writes happen.
 
     return true;
   } catch (error) {

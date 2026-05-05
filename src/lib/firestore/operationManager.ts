@@ -15,8 +15,15 @@ interface CacheEntry<T> {
   expiresAt: number;
 }
 
+// Singleton anchored on globalThis so Next.js fast-refresh can't leak
+// orphaned instances with their own setIntervals (each leak compounds the
+// "Target ID already exists" race in the Firestore SDK's listener registry).
+const OP_GLOBAL_KEY = '__ducati_firestore_operation_manager__';
+type GlobalWithOpManager = typeof globalThis & {
+  [OP_GLOBAL_KEY]?: FirestoreOperationManager;
+};
+
 export class FirestoreOperationManager {
-  private static instance: FirestoreOperationManager;
   private cache = new Map<string, CacheEntry<any>>();
   private pendingOperations = new Map<string, Promise<any>>();
 
@@ -33,10 +40,11 @@ export class FirestoreOperationManager {
   }
 
   public static getInstance(): FirestoreOperationManager {
-    if (!FirestoreOperationManager.instance) {
-      FirestoreOperationManager.instance = new FirestoreOperationManager();
+    const g = globalThis as GlobalWithOpManager;
+    if (!g[OP_GLOBAL_KEY]) {
+      g[OP_GLOBAL_KEY] = new FirestoreOperationManager();
     }
-    return FirestoreOperationManager.instance;
+    return g[OP_GLOBAL_KEY];
   }
 
   private startCacheCleanup(): void {

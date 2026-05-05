@@ -204,34 +204,6 @@
   line-height: 1.4;
 }
 
-.auth-loader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 20px;
-  color: #666;
-}
-
-.loader-spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #6366f1;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 /* User Profile */
 .user-profile {
   position: relative;
@@ -385,33 +357,6 @@
   border-top: 3px solid #6366f1;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-}
-
-/* FirebaseUI customizations */
-.firebaseui-auth-container {
-  max-width: none;
-}
-
-.firebaseui-container {
-  background-color: transparent;
-  box-shadow: none;
-  max-width: none;
-  width: 100%;
-}
-
-.firebaseui-card-content {
-  padding: 0;
-}
-
-.firebaseui-idp-button {
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.firebaseui-idp-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Responsive design */
