@@ -120,3 +120,86 @@ describe('computeProjection — EMI branches', () => {
     }
   );
 });
+
+describe('computeProjection — credit branch', () => {
+  it('raises DTI by 5% credit minimum-payment service', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'credit');
+    // addedMonthlyService = 1500 * 0.05 = 75; deltaDti = 75 / 5000 * 100 = 1.5
+    expect(projection.delta.dtiRatio).toBeCloseTo(1.5, 5);
+    expect(projection.projectedDtiRatio).toBeCloseTo(11.5, 5);
+  });
+
+  it('leaves projectedSavings unchanged on credit', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'credit');
+    expect(projection.projectedSavings).toBe(10000);
+    expect(projection.delta.savings).toBe(0);
+  });
+});
+
+describe('computeProjection — null cases', () => {
+  it('returns null when profile is missing', () => {
+    expect(computeProjection(null, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when profile.summary is missing', () => {
+    expect(computeProjection({ monthlyIncome: '5000' }, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when monthlyNetIncome is zero or negative', () => {
+    const broken = { ...FE_SHAPE_PROFILE, summary: { ...FE_SHAPE_PROFILE.summary, monthlyNetIncome: 0 } };
+    expect(computeProjection(broken, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when monthlyIncome is missing', () => {
+    const broken = { ...FE_SHAPE_PROFILE, monthlyIncome: '' };
+    expect(computeProjection(broken, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when emergencyFundMonths is zero (cannot derive monthlyBurn)', () => {
+    const broken = {
+      ...FE_SHAPE_PROFILE,
+      summary: { ...FE_SHAPE_PROFILE.summary, emergencyFundMonths: 0 },
+    };
+    expect(computeProjection(broken, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when currentSavings is zero', () => {
+    const broken = { ...FE_SHAPE_PROFILE, currentSavings: '0' };
+    expect(computeProjection(broken, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null on negative cost', () => {
+    expect(computeProjection(FE_SHAPE_PROFILE, -100, 'cash')).toBe(null);
+  });
+
+  it('returns null on NaN cost', () => {
+    expect(computeProjection(FE_SHAPE_PROFILE, NaN, 'cash')).toBe(null);
+  });
+});
+
+describe('computeProjection — paymentMethod validation', () => {
+  it('throws on unknown payment method', () => {
+    expect(() => computeProjection(FE_SHAPE_PROFILE, 1500, 'crypto')).toThrow(/Invalid paymentMethod/);
+  });
+
+  it('throws on uppercase payment method (case-sensitive)', () => {
+    expect(() => computeProjection(FE_SHAPE_PROFILE, 1500, 'CASH')).toThrow(/Invalid paymentMethod/);
+  });
+
+  it('throws on emi-N with unsupported N (e.g., emi-9)', () => {
+    expect(() => computeProjection(FE_SHAPE_PROFILE, 1500, 'emi-9')).toThrow(/Invalid paymentMethod/);
+  });
+
+  it('VALID_PAYMENT_METHODS export is frozen', () => {
+    expect(Object.isFrozen(VALID_PAYMENT_METHODS)).toBe(true);
+    expect(VALID_PAYMENT_METHODS).toEqual([
+      'cash',
+      'credit',
+      'emi-3',
+      'emi-6',
+      'emi-12',
+      'emi-24',
+      'emi-36',
+    ]);
+  });
+});
