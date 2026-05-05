@@ -56,6 +56,7 @@ interface ChatRequest {
   }>;
   useWebSearch?: boolean;
   proMode?: boolean;
+  proModeAnalysis?: boolean;
   profile?: Record<string, unknown> | null;
 }
 
@@ -72,6 +73,13 @@ type ProModeQuestion = {
   text: string;
   placeholder: string;
   search_hint: string;
+};
+
+type ProModeAnalysis = {
+  fullAnalysis: string;
+  marketInsights: string;
+  recommendations: string[];
+  decisionConfidence: number;
 };
 
 function formatProfileContext(profile: Record<string, unknown> | null | undefined): string {
@@ -142,7 +150,7 @@ function formatProfileContext(profile: Record<string, unknown> | null | undefine
 
 export async function POST(
   request: NextRequest
-): Promise<NextResponse<ChatResponse | ProModeQuestion[]>> {
+): Promise<NextResponse<ChatResponse | ProModeQuestion[] | ProModeAnalysis>> {
   try {
     if (!process.env.GOOGLE_API_KEY) {
       console.error('GOOGLE_API_KEY environment variable is required');
@@ -269,6 +277,60 @@ export async function POST(
         console.error('Pro Mode JSON parse failed:', parseError);
         return NextResponse.json(
           { error: 'Pro Mode response was not valid JSON', errorType: ErrorType.API_ERROR },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Phase 9: Pro Mode comprehensive analysis via responseJsonSchema. Same constraint
+    // as questions branch — incompatible with grounding tools, so no googleSearch/urlContext.
+    // Web-search-grounded synthesis is deferred (would need a two-call pattern).
+    if (body.proModeAnalysis === true) {
+      const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+
+      const profile = await getProfileForUid(authResult.uid);
+      const systemInstruction = SYSTEM_INSTRUCTION_BASE + formatProfileContext(profile);
+
+      const analysisResult = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: [{ role: 'user', parts: [{ text: body.message.trim() }] }],
+        config: {
+          systemInstruction,
+          temperature: DEFAULT_TEMPERATURE,
+          maxOutputTokens: 1500,
+          responseMimeType: 'application/json',
+          responseJsonSchema: {
+            type: Type.OBJECT,
+            properties: {
+              fullAnalysis: { type: Type.STRING },
+              marketInsights: { type: Type.STRING },
+              recommendations: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+              },
+              decisionConfidence: { type: Type.INTEGER },
+            },
+            propertyOrdering: ['fullAnalysis', 'marketInsights', 'recommendations', 'decisionConfidence'],
+            required: ['fullAnalysis', 'marketInsights', 'recommendations', 'decisionConfidence'],
+          },
+        },
+      });
+
+      try {
+        const parsed = JSON.parse(analysisResult.text ?? '');
+        if (
+          typeof parsed.fullAnalysis !== 'string' ||
+          typeof parsed.marketInsights !== 'string' ||
+          !Array.isArray(parsed.recommendations) ||
+          typeof parsed.decisionConfidence !== 'number'
+        ) {
+          throw new Error('responseJsonSchema returned invalid analysis shape');
+        }
+        return NextResponse.json(parsed as ProModeAnalysis);
+      } catch (parseError) {
+        console.error('Pro Mode analysis JSON parse failed:', parseError);
+        return NextResponse.json(
+          { error: 'Pro Mode analysis response was not valid JSON', errorType: ErrorType.API_ERROR },
           { status: 500 }
         );
       }

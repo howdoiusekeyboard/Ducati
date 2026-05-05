@@ -303,7 +303,7 @@ export const getProModeAnalysis = async (purchaseData, questions, answers, idTok
       },
       body: JSON.stringify({
         message: prompt,
-        useWebSearch: true,
+        proModeAnalysis: true,
       }),
     });
 
@@ -314,15 +314,9 @@ export const getProModeAnalysis = async (purchaseData, questions, answers, idTok
       throw new Error('Failed to get analysis');
     }
 
-    const data = await response.json();
-
-    const jsonMatch = data.response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No valid JSON object found in the API response.');
-    }
-    const jsonString = jsonMatch[0];
-
-    return JSON.parse(jsonString);
+    // Phase 9: route returns the parsed analysis object directly (responseJsonSchema-validated).
+    // Shape: { fullAnalysis, marketInsights, recommendations: string[], decisionConfidence: number }.
+    return await response.json();
   } catch (error) {
     console.error('Error getting pro analysis:', error);
     throw error;
