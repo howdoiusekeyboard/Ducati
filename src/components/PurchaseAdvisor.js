@@ -372,6 +372,9 @@ const PurchaseAdvisor = () => {
       // Get current location if not already loaded
       const currentLocation = location || (await LocationService.getUserLocation());
 
+      // Acquire ID token once for both findCheaperAlternative + getEnhancedPurchaseRecommendation
+      const idToken = user ? await user.getIdToken() : null;
+
       // Find alternatives if requested
       if (formState.searchForAlternative) {
         console.log('Finding alternatives...');
@@ -379,7 +382,8 @@ const PurchaseAdvisor = () => {
         alternative = await findCheaperAlternative(
           recognizedItemName,
           costValue,
-          currentLocation // Pass location
+          currentLocation, // Pass location
+          idToken
         );
         dispatchUI({ type: 'SET_FINDING_ALTERNATIVES', value: false });
         console.log('Alternatives found:', alternative);
@@ -387,7 +391,6 @@ const PurchaseAdvisor = () => {
 
       // Get recommendation
       console.log('Getting recommendation...');
-      const idToken = user ? await user.getIdToken() : null;
       const recommendation = await getEnhancedPurchaseRecommendation(
         recognizedItemName,
         costValue,

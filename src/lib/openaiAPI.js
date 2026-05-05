@@ -348,7 +348,12 @@ export const getPurchaseRecommendation = async (
  * @param {Object} location - User location object (optional)
  * @returns {Promise<{name: string, price: number, retailer: string, locallyAvailable: boolean, estimatedTotalCost: number} | null>}
  */
-export const findCheaperAlternative = async (itemName, currentPrice, location = null) => {
+const FIND_ALTERNATIVE_AUTH_ERROR = 'Authentication required for finding alternatives';
+
+export const findCheaperAlternative = async (itemName, currentPrice, location = null, idToken) => {
+  if (!idToken) {
+    throw new Error(FIND_ALTERNATIVE_AUTH_ERROR);
+  }
   try {
     // Build location context
     let locationContext = '';
@@ -390,11 +395,16 @@ export const findCheaperAlternative = async (itemName, currentPrice, location = 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
       },
       body: JSON.stringify({
         message: prompt,
       }),
     });
+
+    if (response.status === 401) {
+      throw new Error(FIND_ALTERNATIVE_AUTH_ERROR);
+    }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -437,6 +447,9 @@ export const findCheaperAlternative = async (itemName, currentPrice, location = 
       return null;
     }
   } catch (error) {
+    if (error && error.message === FIND_ALTERNATIVE_AUTH_ERROR) {
+      throw error;
+    }
     console.error('Error finding cheaper alternative:', error);
     return null;
   }
