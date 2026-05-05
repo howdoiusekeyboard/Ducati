@@ -47,11 +47,31 @@ const ProjectionPanel = ({ projection }) => {
         {typeof projection.projectedDtiRatio === 'number' && (
           <div className="projection-row">
             <dt>DTI after</dt>
-            <dd className="num">{(projection.projectedDtiRatio * 100).toFixed(0)}%</dd>
+            <dd className="num">{projection.projectedDtiRatio.toFixed(1)}%</dd>
           </div>
         )}
       </dl>
-      {projection.delta && <p className="projection-delta">{projection.delta}</p>}
+      {projection.delta && (
+        <p className="projection-delta">
+          {projection.delta.savings !== 0 && (
+            <span>
+              Savings change: {formatAED(projection.delta.savings)}.{' '}
+            </span>
+          )}
+          {Math.abs(projection.delta.dtiRatio) > 0.01 && (
+            <span>
+              DTI change: {projection.delta.dtiRatio > 0 ? '+' : ''}
+              {projection.delta.dtiRatio.toFixed(1)}%.{' '}
+            </span>
+          )}
+          {Math.abs(projection.delta.healthScore) >= 1 && (
+            <span>
+              Health score change: {projection.delta.healthScore > 0 ? '+' : ''}
+              {Math.round(projection.delta.healthScore)}.
+            </span>
+          )}
+        </p>
+      )}
     </div>
   );
 };
