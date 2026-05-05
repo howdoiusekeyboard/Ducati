@@ -61,11 +61,13 @@ const ProMode = () => {
     }, 0);
 
     const loadPurchaseData = async () => {
-      // Wait for AuthContext to resolve before deciding whether to fetch.
-      // Without this guard, the effect fires on initial mount with user=null,
-      // ProModeAPI throws PRO_MODE_AUTH_ERROR, and the catch leaves a sticky
+      // Wait for AuthContext to fully resolve — both authLoading must be done
+      // AND user must be populated. authLoading flips to false right when
+      // onAuthStateChanged fires, but user state may still be null in the same
+      // render cycle. Without the !user guard, ProModeAPI throws
+      // PRO_MODE_AUTH_ERROR on the transient null and the catch leaves a sticky
       // error state that the second (authenticated) run won't clear.
-      if (authLoading) return;
+      if (authLoading || !user) return;
       try {
         setError(null);
         const storedData = sessionStorage.getItem('proModePurchase');

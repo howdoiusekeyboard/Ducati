@@ -284,9 +284,13 @@ export async function POST(
           config: proModeConfig,
         });
       } catch (modelError) {
-        if ((modelError as { status?: number }).status !== 503) throw modelError;
+        const status = (modelError as { status?: number }).status;
+        // 503 = upstream overload (UNAVAILABLE); 429 = quota exhausted
+        // (RESOURCE_EXHAUSTED). Both are recoverable on flash-lite, which has
+        // a separate quota pool and capacity. Anything else bubbles unchanged.
+        if (status !== 503 && status !== 429) throw modelError;
         console.warn(
-          'proMode questions: gemini-2.5-flash 503 UNAVAILABLE; retrying on gemini-2.5-flash-lite'
+          `proMode questions: gemini-2.5-flash unavailable (status ${status}); retrying on gemini-2.5-flash-lite`
         );
         proModeResult = await ai.models.generateContent({
           model: GEMINI_FALLBACK_MODEL,
@@ -364,11 +368,13 @@ export async function POST(
           config: analysisConfig,
         });
       } catch (modelError) {
-        // Phase 9 follow-up: only intercept 503 UNAVAILABLE. Auth, quota, schema, and
-        // transport errors must bubble to the outer catch's existing classification.
-        if ((modelError as { status?: number }).status !== 503) throw modelError;
+        const status = (modelError as { status?: number }).status;
+        // 503 = upstream overload, 429 = per-model daily quota exhausted.
+        // flash-lite has its own quota pool, so the fallback recovers both.
+        // Auth/schema/transport errors bubble to the outer catch unchanged.
+        if (status !== 503 && status !== 429) throw modelError;
         console.warn(
-          'proModeAnalysis: gemini-2.5-flash 503 UNAVAILABLE; retrying on gemini-2.5-flash-lite'
+          `proModeAnalysis: gemini-2.5-flash unavailable (status ${status}); retrying on gemini-2.5-flash-lite`
         );
         analysisResult = await ai.models.generateContent({
           model: GEMINI_FALLBACK_MODEL,
@@ -457,11 +463,14 @@ export async function POST(
         config: defaultTextConfig,
       });
     } catch (modelError) {
-      if ((modelError as { status?: number }).status !== 503) throw modelError;
-      // gemini-2.5-flash-lite supports googleSearch + urlContext + thinking per
-      // ai.google.dev/gemini-api/docs/models — same tool config carries over.
+      const status = (modelError as { status?: number }).status;
+      // 503 = upstream overload, 429 = per-model daily quota exhausted.
+      // flash-lite supports googleSearch + urlContext + thinking with full
+      // feature parity per ai.google.dev/gemini-api/docs/models AND has a
+      // separate quota pool, so the same tool config recovers both failures.
+      if (status !== 503 && status !== 429) throw modelError;
       console.warn(
-        'default text: gemini-2.5-flash 503 UNAVAILABLE; retrying on gemini-2.5-flash-lite'
+        `default text: gemini-2.5-flash unavailable (status ${status}); retrying on gemini-2.5-flash-lite`
       );
       result = await ai.models.generateContent({
         model: GEMINI_FALLBACK_MODEL,
