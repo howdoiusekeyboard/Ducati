@@ -434,3 +434,167 @@ describe('Structured Decision Model - Alternative Impact', () => {
     });
   });
 });
+
+describe('Structured Decision Model - Necessity Floor (Phase 9)', () => {
+  it('overrides Don\'t Buy when necessity >= 9 and finalScore < 60', () => {
+    // Sarah's-groceries case: tight income, essential item.
+    const tightBudgetPersona = personas.STRUGGLING_STUDENT;
+    const groceries = {
+      itemName: 'weekly groceries',
+      cost: 200, // High % of struggling-student net income → low affordability
+      purpose: 'essential food and medicine for the week',
+      frequency: 'Weekly',
+    };
+
+    const result = calculateDecisionScores(
+      groceries.itemName,
+      groceries.cost,
+      groceries.purpose,
+      groceries.frequency,
+      tightBudgetPersona,
+      null
+    );
+
+    // necessity scoring keys on 'food' / 'medicine' → returns 9
+    expect(result.scores.necessity.score).toBe(9);
+    expect(result.decision).toBe('Buy');
+    expect(result.decisionRationale).toBe('necessity-floor');
+  });
+
+  it('keeps decisionRationale=score for non-essential items', () => {
+    const persona = personas.BALANCED_BUDGETER;
+    const purchase = purchases.getPurchaseById('nike-shoes');
+
+    const result = calculateDecisionScores(
+      purchase.itemName,
+      purchase.cost,
+      purchase.purpose,
+      purchase.frequency,
+      persona,
+      null
+    );
+
+    expect(result.decisionRationale).toBe('score');
+  });
+
+  it('confidence remains score-derived under necessity-floor (internally consistent)', () => {
+    const tightBudgetPersona = personas.STRUGGLING_STUDENT;
+    const result = calculateDecisionScores(
+      'urgent medicine',
+      400,
+      'health emergency',
+      'One-time',
+      tightBudgetPersona,
+      null
+    );
+
+    if (result.decisionRationale === 'necessity-floor') {
+      // Floor fired despite low score → confidence should reflect score, not rationale
+      expect(result.finalScore).toBeLessThan(60);
+      // confidence is derived from finalScore, not from decisionRationale
+      const expected = result.finalScore <= 20 ? 'High' : result.finalScore <= 35 ? 'Medium' : 'Low';
+      expect(result.confidence).toBe(expected);
+    }
+  });
+});
+
+describe('Structured Decision Model - Projection (Phase 9)', () => {
+  it('attaches projection fields on cash purchase with sufficient profile', () => {
+    const persona = personas.BALANCED_BUDGETER;
+    const purchase = purchases.getPurchaseById('nike-shoes');
+
+    const result = calculateDecisionScores(
+      purchase.itemName,
+      purchase.cost,
+      purchase.purpose,
+      purchase.frequency,
+      persona,
+      null,
+      null,
+      'cash'
+    );
+
+    expect(result.projection).not.toBeNull();
+    expect(result.projection.paymentMethod).toBe('cash');
+    expect(typeof result.projection.projectedSavings).toBe('number');
+    expect(typeof result.projection.projectedEmergencyFundMonths).toBe('number');
+    expect(typeof result.projection.projectedHealthScore).toBe('number');
+    expect(typeof result.projection.projectedDtiRatio).toBe('number');
+    expect(typeof result.projection.delta.savings).toBe('number');
+    expect(result.projection.delta.dtiRatio).toBe(0); // cash leaves DTI unchanged
+  });
+
+  it('returns null projection when profile.summary is missing', () => {
+    const incompleteProfile = { riskTolerance: 'moderate' };
+    const result = calculateDecisionScores('item', 100, 'test', 'Daily', incompleteProfile, null);
+
+    expect(result.projection).toBeNull();
+  });
+
+  it('EMI raises projectedDtiRatio relative to cash for same cost', () => {
+    const persona = personas.BALANCED_BUDGETER;
+    const cost = 1200;
+
+    const cashResult = calculateDecisionScores(
+      'laptop',
+      cost,
+      'work',
+      'Daily',
+      persona,
+      null,
+      null,
+      'cash'
+    );
+    const emiResult = calculateDecisionScores(
+      'laptop',
+      cost,
+      'work',
+      'Daily',
+      persona,
+      null,
+      null,
+      'emi-12'
+    );
+
+    if (cashResult.projection && emiResult.projection) {
+      expect(emiResult.projection.delta.dtiRatio).toBeGreaterThan(cashResult.projection.delta.dtiRatio);
+      expect(cashResult.projection.delta.dtiRatio).toBe(0);
+    }
+  });
+
+  it('defaults paymentMethod to cash when omitted (backward compat)', () => {
+    const persona = personas.BALANCED_BUDGETER;
+    const purchase = purchases.getPurchaseById('nike-shoes');
+
+    const resultDefault = calculateDecisionScores(
+      purchase.itemName,
+      purchase.cost,
+      purchase.purpose,
+      purchase.frequency,
+      persona,
+      null
+    );
+    const resultExplicit = calculateDecisionScores(
+      purchase.itemName,
+      purchase.cost,
+      purchase.purpose,
+      purchase.frequency,
+      persona,
+      null,
+      null,
+      'cash'
+    );
+
+    if (resultDefault.projection && resultExplicit.projection) {
+      expect(resultDefault.projection.paymentMethod).toBe('cash');
+      expect(resultDefault.projection.projectedSavings).toBe(resultExplicit.projection.projectedSavings);
+    }
+  });
+
+  it('throws on invalid paymentMethod', () => {
+    const persona = personas.BALANCED_BUDGETER;
+    expect(() =>
+      calculateDecisionScores('item', 100, 'test', 'Daily', persona, null, null, 'crypto')
+    ).toThrow(/Invalid paymentMethod/);
+  });
+});

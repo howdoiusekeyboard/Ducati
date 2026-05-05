@@ -27,7 +27,8 @@ export const getEnhancedPurchaseRecommendation = async (
   financialProfile,
   alternative,
   location = null,
-  idToken = null
+  idToken = null,
+  paymentMethod = 'cash'
 ) => {
   try {
     if (!idToken) {
@@ -45,7 +46,8 @@ export const getEnhancedPurchaseRecommendation = async (
       frequency,
       financialProfile,
       alternative,
-      location // Pass location to scoring
+      location,
+      paymentMethod
     );
 
     const structuredRec = generateStructuredRecommendation(
@@ -74,7 +76,7 @@ export const getEnhancedPurchaseRecommendation = async (
       purchaseCategory,
       initialSummary,
       finalDecision,
-      locationContext // Pass location context
+      locationContext
     );
 
     const response = await fetch('/api/chat', {
@@ -94,7 +96,7 @@ export const getEnhancedPurchaseRecommendation = async (
     }
 
     const data = await response.json();
-    let finalSummary = initialSummary; // Fallback to the original summary
+    let finalSummary = initialSummary;
 
     try {
       const cleanedResponse = data.response
@@ -107,31 +109,30 @@ export const getEnhancedPurchaseRecommendation = async (
       }
     } catch (parseError) {
       console.error('Error parsing AI summary response:', parseError);
-      // Fallback to the initial summary is already handled
     }
 
     const quote = selectQuote(structuredRec.decision, decisionAnalysis.finalScore);
 
     return {
       decision: structuredRec.decision,
-      summary: finalSummary, // Use the new summary
-      reasoning: structuredRec.reasoning, // Keep for the matrix details
+      summary: finalSummary,
+      reasoning: structuredRec.reasoning,
       quote,
       analysisDetails: {
         ...structuredRec.analysisDetails,
-        purchaseCategory: purchaseCategory, // Add purchase category
+        purchaseCategory: purchaseCategory,
         itemName: itemName,
         itemCost: cost,
       },
       alternative,
       decisionMatrix: formatDecisionMatrix(decisionAnalysis.scores),
+      // Phase 9: surface projection + rationale to UI consumers.
+      decisionRationale: decisionAnalysis.decisionRationale,
+      projection: decisionAnalysis.projection,
     };
   } catch (error) {
     console.error('Error in enhanced purchase recommendation:', error);
 
-    // Auth failures must NOT fall through to the structured-only fallback —
-    // the user would silently get math-without-AI results without any signal
-    // that they need to sign in. Caller surfaces this as an error state.
     if (error.message === PURCHASE_AUTH_ERROR) {
       throw error;
     }
@@ -144,7 +145,8 @@ export const getEnhancedPurchaseRecommendation = async (
       frequency,
       financialProfile,
       alternative,
-      location // Pass location to fallback scoring too
+      location,
+      paymentMethod
     );
 
     const structuredRec = generateStructuredRecommendation(
@@ -156,17 +158,19 @@ export const getEnhancedPurchaseRecommendation = async (
 
     return {
       decision: structuredRec.decision,
-      summary: structuredRec.summary, // Use summary in fallback
+      summary: structuredRec.summary,
       reasoning: structuredRec.reasoning,
       quote: 'Price is what you pay. Value is what you get.',
       analysisDetails: {
         ...structuredRec.analysisDetails,
-        purchaseCategory: 'HIGH_VALUE', // Default to HIGH_VALUE if classification fails
+        purchaseCategory: 'HIGH_VALUE',
         itemName: itemName,
         itemCost: cost,
       },
       alternative,
       decisionMatrix: formatDecisionMatrix(decisionAnalysis.scores),
+      decisionRationale: decisionAnalysis.decisionRationale,
+      projection: decisionAnalysis.projection,
     };
   }
 };

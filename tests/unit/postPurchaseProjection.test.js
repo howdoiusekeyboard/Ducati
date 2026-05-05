@@ -1,0 +1,205 @@
+/**
+ * Unit Tests for Post-Purchase Projection Helper
+ * Phase 9 product-logic — additive consequence-projection on top of decision model.
+ */
+
+import {
+  computeProjection,
+  VALID_PAYMENT_METHODS,
+} from '../../src/lib/postPurchaseProjection';
+
+const FE_SHAPE_PROFILE = {
+  monthlyIncome: '5000',
+  monthlyExpenses: '3000',
+  currentSavings: '10000',
+  debtPayments: '500',
+  summary: {
+    monthlyNetIncome: 1500,
+    emergencyFundMonths: 10000 / 3000, // 3.333
+    debtToIncomeRatio: (500 / 5000) * 100, // 10
+    healthScore: 70,
+  },
+};
+
+const FIRESTORE_SHAPE_PROFILE = {
+  monthlyIncome: '5000',
+  housingCost: '1500',
+  utilitiesCost: '300',
+  foodCost: '600',
+  transportationCost: '400',
+  insuranceCost: '100',
+  subscriptionsCost: '50',
+  otherExpenses: '50',
+  creditCardPayment: '300',
+  studentLoanPayment: '200',
+  carLoanPayment: '0',
+  mortgagePayment: '0',
+  otherDebtPayment: '0',
+  checkingSavingsBalance: '4000',
+  emergencyFund: '5000',
+  retirementAccounts: '1000',
+  stocksAndBonds: '0',
+  summary: {
+    monthlyNetIncome: 5000 - 3000 - 500,
+    emergencyFundMonths: 10000 / 3000,
+    debtToIncomeRatio: 10,
+    healthScore: 72,
+  },
+};
+
+describe('computeProjection — cash branch', () => {
+  it('reduces projectedSavings by cost', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'cash');
+    expect(projection.projectedSavings).toBeCloseTo(8500, 5);
+    expect(projection.delta.savings).toBeCloseTo(-1500, 5);
+  });
+
+  it('reduces projectedEmergencyFundMonths proportionally', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'cash');
+    // monthlyBurn = 10000 / 3.333 = 3000
+    // newSavings = 8500; newEmergencyFundMonths = 8500 / 3000 = 2.833
+    expect(projection.projectedEmergencyFundMonths).toBeCloseTo(8500 / 3000, 4);
+    expect(projection.delta.emergencyFundMonths).toBeCloseTo(8500 / 3000 - 10000 / 3000, 4);
+  });
+
+  it('leaves projectedDtiRatio unchanged on cash', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'cash');
+    expect(projection.projectedDtiRatio).toBeCloseTo(10, 5);
+    expect(projection.delta.dtiRatio).toBe(0);
+  });
+
+  it('echoes paymentMethod', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'cash');
+    expect(projection.paymentMethod).toBe('cash');
+  });
+
+  it('drops projectedHealthScore when emergency fund crosses 3-month threshold', () => {
+    // currentEmergencyFundMonths = 3.333 → projected = 8500/3000 = 2.833 (crosses below 3)
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'cash');
+    expect(projection.delta.healthScore).toBeLessThan(0);
+  });
+
+  it('uses Firestore-shape totals when no FE-shape currentSavings', () => {
+    const projection = computeProjection(FIRESTORE_SHAPE_PROFILE, 1500, 'cash');
+    // currentSavings (Firestore) = 4000+5000+1000+0 = 10000
+    // newSavings = 10000 - 1500 = 8500
+    expect(projection.projectedSavings).toBeCloseTo(8500, 5);
+  });
+});
+
+describe('computeProjection — EMI branches', () => {
+  it('emi-12 raises DTI by monthly EMI / monthly income', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1200, 'emi-12');
+    // monthlyEmi = 1200 / 12 = 100; deltaDti = 100 / 5000 * 100 = 2
+    expect(projection.delta.dtiRatio).toBeCloseTo(2, 5);
+    expect(projection.projectedDtiRatio).toBeCloseTo(12, 5);
+  });
+
+  it('emi-3 raises DTI more than emi-36 for same cost', () => {
+    const fast = computeProjection(FE_SHAPE_PROFILE, 3600, 'emi-3');
+    const slow = computeProjection(FE_SHAPE_PROFILE, 3600, 'emi-36');
+    // emi-3 → 1200/mo; emi-36 → 100/mo
+    expect(fast.delta.dtiRatio).toBeGreaterThan(slow.delta.dtiRatio);
+  });
+
+  it('leaves projectedSavings unchanged on EMI', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1200, 'emi-12');
+    expect(projection.projectedSavings).toBe(10000);
+    expect(projection.delta.savings).toBe(0);
+  });
+
+  it('leaves projectedEmergencyFundMonths unchanged on EMI', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1200, 'emi-12');
+    expect(projection.delta.emergencyFundMonths).toBe(0);
+  });
+
+  it.each(['emi-3', 'emi-6', 'emi-12', 'emi-24', 'emi-36'])(
+    'accepts %s as a valid payment method',
+    (method) => {
+      expect(() => computeProjection(FE_SHAPE_PROFILE, 1000, method)).not.toThrow();
+    }
+  );
+});
+
+describe('computeProjection — credit branch', () => {
+  it('raises DTI by 5% credit minimum-payment service', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'credit');
+    // addedMonthlyService = 1500 * 0.05 = 75; deltaDti = 75 / 5000 * 100 = 1.5
+    expect(projection.delta.dtiRatio).toBeCloseTo(1.5, 5);
+    expect(projection.projectedDtiRatio).toBeCloseTo(11.5, 5);
+  });
+
+  it('leaves projectedSavings unchanged on credit', () => {
+    const projection = computeProjection(FE_SHAPE_PROFILE, 1500, 'credit');
+    expect(projection.projectedSavings).toBe(10000);
+    expect(projection.delta.savings).toBe(0);
+  });
+});
+
+describe('computeProjection — null cases', () => {
+  it('returns null when profile is missing', () => {
+    expect(computeProjection(null, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when profile.summary is missing', () => {
+    expect(computeProjection({ monthlyIncome: '5000' }, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when monthlyNetIncome is zero or negative', () => {
+    const broken = { ...FE_SHAPE_PROFILE, summary: { ...FE_SHAPE_PROFILE.summary, monthlyNetIncome: 0 } };
+    expect(computeProjection(broken, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when monthlyIncome is missing', () => {
+    const broken = { ...FE_SHAPE_PROFILE, monthlyIncome: '' };
+    expect(computeProjection(broken, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when emergencyFundMonths is zero (cannot derive monthlyBurn)', () => {
+    const broken = {
+      ...FE_SHAPE_PROFILE,
+      summary: { ...FE_SHAPE_PROFILE.summary, emergencyFundMonths: 0 },
+    };
+    expect(computeProjection(broken, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null when currentSavings is zero', () => {
+    const broken = { ...FE_SHAPE_PROFILE, currentSavings: '0' };
+    expect(computeProjection(broken, 1500, 'cash')).toBe(null);
+  });
+
+  it('returns null on negative cost', () => {
+    expect(computeProjection(FE_SHAPE_PROFILE, -100, 'cash')).toBe(null);
+  });
+
+  it('returns null on NaN cost', () => {
+    expect(computeProjection(FE_SHAPE_PROFILE, NaN, 'cash')).toBe(null);
+  });
+});
+
+describe('computeProjection — paymentMethod validation', () => {
+  it('throws on unknown payment method', () => {
+    expect(() => computeProjection(FE_SHAPE_PROFILE, 1500, 'crypto')).toThrow(/Invalid paymentMethod/);
+  });
+
+  it('throws on uppercase payment method (case-sensitive)', () => {
+    expect(() => computeProjection(FE_SHAPE_PROFILE, 1500, 'CASH')).toThrow(/Invalid paymentMethod/);
+  });
+
+  it('throws on emi-N with unsupported N (e.g., emi-9)', () => {
+    expect(() => computeProjection(FE_SHAPE_PROFILE, 1500, 'emi-9')).toThrow(/Invalid paymentMethod/);
+  });
+
+  it('VALID_PAYMENT_METHODS export is frozen', () => {
+    expect(Object.isFrozen(VALID_PAYMENT_METHODS)).toBe(true);
+    expect(VALID_PAYMENT_METHODS).toEqual([
+      'cash',
+      'credit',
+      'emi-3',
+      'emi-6',
+      'emi-12',
+      'emi-24',
+      'emi-36',
+    ]);
+  });
+});

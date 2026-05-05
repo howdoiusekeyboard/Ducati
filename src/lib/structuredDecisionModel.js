@@ -4,6 +4,10 @@
  * Based on academic decision-making frameworks
  */
 
+import { computeProjection, VALID_PAYMENT_METHODS } from './postPurchaseProjection';
+
+const PAYMENT_METHODS_SET = new Set(VALID_PAYMENT_METHODS);
+
 /**
  * Classify the type of item being purchased
  * @returns {string} 'consumable', 'service', 'durable', or 'digital'
@@ -553,8 +557,15 @@ export const calculateDecisionScores = (
   frequency,
   financialProfile,
   alternative,
-  location = null
+  location = null,
+  paymentMethod = 'cash'
 ) => {
+  if (!PAYMENT_METHODS_SET.has(paymentMethod)) {
+    throw new Error(
+      `Invalid paymentMethod: ${paymentMethod}. Expected one of ${[...PAYMENT_METHODS_SET].join(', ')}.`
+    );
+  }
+
   // Get risk tolerance from profile (default to moderate)
   const riskTolerance = financialProfile?.riskTolerance || 'moderate';
 
@@ -627,11 +638,26 @@ export const calculateDecisionScores = (
   // Normalize to 0-100 scale
   const finalScore = (totalWeightedScore / totalWeight) * 10;
 
+  // Necessity floor: essentials with high necessity must not be rejected on affordability
+  // alone. Sarah's-groceries case (necessity=10, affordability=2 because cost > monthlyNet,
+  // finalScore=48) currently scores "Don't Buy" — but groceries are not optional. The floor
+  // overrides the score-only mapping when necessity >= 9.
+  const necessityScore = scores.necessity?.score ?? 0;
+  const decisionRationale =
+    necessityScore >= 9 && finalScore < 60 ? 'necessity-floor' : 'score';
+  const decision =
+    decisionRationale === 'necessity-floor' || finalScore >= 60 ? 'Buy' : "Don't Buy";
+
+  // Post-purchase projection — null when profile data is insufficient.
+  const projection = computeProjection(financialProfile, cost, paymentMethod);
+
   return {
     scores,
     finalScore,
-    decision: finalScore >= 60 ? 'Buy' : "Don't Buy", // Keep as 'decision' for backward compatibility
+    decision,
     confidence: getConfidenceLevel(finalScore),
+    decisionRationale,
+    projection,
   };
 };
 
@@ -681,7 +707,7 @@ export const generateStructuredRecommendation = (
   alternative,
   purpose
 ) => {
-  const { scores, finalScore, decision, confidence } = decisionAnalysis;
+  const { scores, finalScore, decision, confidence, decisionRationale, projection } = decisionAnalysis;
   const itemType = classifyItemType(itemName, purpose);
 
   // Find top positive and negative factors
@@ -712,7 +738,9 @@ export const generateStructuredRecommendation = (
 
   reasoning += `**Overall Assessment:** The weighted score is ${finalScore.toFixed(1)}/100 (${confidence} confidence).\n\n`;
 
-  if (decision === 'Buy') {
+  if (decisionRationale === 'necessity-floor') {
+    reasoning += `This is an essential item, so the verdict overrides the affordability-driven score.\n\n`;
+  } else if (decision === 'Buy') {
     reasoning += `This purchase appears to be well-justified based on your financial situation and the item's utility.`;
   } else {
     reasoning += `This purchase may not be optimal at this time. Consider waiting or exploring alternatives.`;
@@ -720,6 +748,26 @@ export const generateStructuredRecommendation = (
 
   if (alternative && alternative.price < cost) {
     reasoning += `\n\n**Note:** A cheaper alternative (${alternative.name}) is available for $${alternative.price}, which could save you $${(cost - alternative.price).toFixed(2)}.`;
+  }
+
+  // Phase 9: projection prose — declarative, factual, quantified.
+  if (projection) {
+    const fmt = (n, digits = 1) => Number(n).toFixed(digits);
+    reasoning += `\n\n**Projection — paying via ${formatPaymentMethodLabel(projection.paymentMethod)}:**\n`;
+    if (projection.delta.savings !== 0) {
+      reasoning += `• Savings: $${fmt(projection.projectedSavings - projection.delta.savings, 0)} → $${fmt(projection.projectedSavings, 0)}\n`;
+    } else {
+      reasoning += `• Savings: unchanged ($${fmt(projection.projectedSavings, 0)})\n`;
+    }
+    if (Math.abs(projection.delta.emergencyFundMonths) > 0.01) {
+      reasoning += `• Emergency fund: ${fmt(projection.projectedEmergencyFundMonths - projection.delta.emergencyFundMonths)} mo → ${fmt(projection.projectedEmergencyFundMonths)} mo\n`;
+    }
+    if (Math.abs(projection.delta.dtiRatio) > 0.01) {
+      reasoning += `• Debt-to-income: ${fmt(projection.projectedDtiRatio - projection.delta.dtiRatio)}% → ${fmt(projection.projectedDtiRatio)}%\n`;
+    }
+    if (Math.abs(projection.delta.healthScore) >= 1) {
+      reasoning += `• Financial health score: ${fmt(projection.projectedHealthScore - projection.delta.healthScore, 0)} → ${fmt(projection.projectedHealthScore, 0)}\n`;
+    }
   }
 
   // Generate the new summary
@@ -738,6 +786,16 @@ export const generateStructuredRecommendation = (
       },
     },
   };
+};
+
+const formatPaymentMethodLabel = (paymentMethod) => {
+  if (paymentMethod === 'cash') return 'cash';
+  if (paymentMethod === 'credit') return 'credit card';
+  if (paymentMethod.startsWith('emi-')) {
+    const months = paymentMethod.slice(4);
+    return `${months}-month installments`;
+  }
+  return paymentMethod;
 };
 
 /**
