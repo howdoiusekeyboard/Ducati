@@ -390,25 +390,33 @@ export const findCheaperAlternative = async (itemName, currentPrice, location = 
     const prompt = `Find a cheaper alternative to "${itemName}" which currently costs AED ${currentPrice}.
     ${locationContext}
 
+    CRITICAL CURRENCY RULE: All numeric values in your response MUST be in AED (UAE dirhams).
+    Do NOT return USD, EUR, or any other currency. If a product is priced abroad, convert to
+    AED at current rates and include shipping + customs in the AED total. The alternative MUST
+    be cheaper than AED ${currentPrice} when measured in AED — if no AED-cheaper alternative
+    exists, return the no-alternative shape.
+
     Suggest alternatives available locally or online with reasonable shipping. Respond in JSON format:
     {
       "name": "Alternative product name",
-      "price": estimated_total_cost_including_tax_and_shipping,
+      "price": estimated_total_cost_in_AED_including_tax_and_shipping,
+      "currency": "AED",
       "retailer": "Store name and whether it's local or online",
       "locallyAvailable": true/false,
-      "estimatedTotalCost": price_with_tax_and_shipping
+      "estimatedTotalCost": price_in_AED_with_tax_and_shipping
     }
 
-    If no good alternative exists or you cannot find one, respond with:
+    If no good alternative exists or you cannot find one cheaper in AED terms, respond with:
     {
       "name": null,
       "price": null,
+      "currency": "AED",
       "retailer": null,
       "locallyAvailable": false,
       "estimatedTotalCost": null
     }
 
-    Focus on legitimate alternatives that provide similar functionality at a lower price point.`;
+    Focus on legitimate alternatives that provide similar functionality at a lower AED price point.`;
 
     const response = await fetch('/api/chat', {
       method: 'POST',

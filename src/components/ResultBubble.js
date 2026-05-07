@@ -160,8 +160,8 @@ const ResultBubble = ({ messages = [], onClose, createGoogleSearchLink }) => {
                     <div className="alternative-product">
                       <h4>Cheaper alternative</h4>
                       <p>
-                        <strong>{msg.alternative.name}</strong> — ${msg.alternative.price} at{' '}
-                        {msg.alternative.retailer}
+                        <strong>{msg.alternative.name}</strong> —{' '}
+                        {formatAED(msg.alternative.price)} at {msg.alternative.retailer}
                       </p>
                       <p>
                         <a
