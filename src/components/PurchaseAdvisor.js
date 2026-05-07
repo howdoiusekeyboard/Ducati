@@ -233,6 +233,8 @@ const PurchaseAdvisor = () => {
   const [messages, setMessages] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageIdentifying, setImageIdentifying] = useState(false);
+  const [imageError, setImageError] = useState(null);
   const [financialProfile, setFinancialProfile] = useState(null);
   const [hasSeenProfilePrompt, setHasSeenProfilePrompt] = useState(false);
 
@@ -289,38 +291,65 @@ const PurchaseAdvisor = () => {
     [firestore]
   );
 
-  const handleImageProcessed = useCallback(async (file, preview) => {
-    setImageFile(file);
-    setImagePreview(preview);
+  const handleImageProcessed = useCallback(
+    async (file, preview) => {
+      setImageFile(file);
+      setImagePreview(preview);
+      setImageError(null);
 
-    if (file) {
+      if (!file) {
+        setImageIdentifying(false);
+        return;
+      }
+
+      // Pre-flight auth check — /api/chat is auth-gated; without a user we
+      // can't even get an idToken. Surface a user-visible message instead
+      // of silently leaving the placeholder stuck on "Identifying..." forever.
+      if (!user) {
+        setImageError('Sign in to identify items from images.');
+        return;
+      }
+
+      setImageIdentifying(true);
       try {
         const base64Image = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => {
-            const base64String = reader.result.split(',')[1];
-            resolve(base64String);
+            resolve(reader.result.split(',')[1]);
           };
           reader.readAsDataURL(file);
         });
 
-        const itemDetails = await analyzeImageWithOpenAI(base64Image);
+        const idToken = await user.getIdToken();
+        const itemDetails = await analyzeImageWithOpenAI(base64Image, idToken);
         if (itemDetails && itemDetails.name && itemDetails.name !== 'Error') {
           dispatchForm({
             type: 'SET_ITEM_FROM_IMAGE',
             name: itemDetails.name,
             cost: itemDetails.cost?.toString(),
           });
+        } else {
+          setImageError('Could not identify this image. Type the item name and cost.');
         }
       } catch (error) {
         console.error('Error analyzing image:', error);
+        if (error?.message === 'Authentication required for image analysis') {
+          setImageError('Session expired. Sign in again to identify images.');
+        } else {
+          setImageError('Image identification failed. Type the item name and cost.');
+        }
+      } finally {
+        setImageIdentifying(false);
       }
-    }
-  }, []);
+    },
+    [user],
+  );
 
   const clearImage = useCallback(() => {
     setImageFile(null);
     setImagePreview(null);
+    setImageIdentifying(false);
+    setImageError(null);
     dispatchForm({ type: 'UPDATE_FIELD', field: 'itemName', value: '' });
   }, []);
 
@@ -574,10 +603,21 @@ const PurchaseAdvisor = () => {
                   onChange={(e) =>
                     dispatchForm({ type: 'UPDATE_FIELD', field: 'itemName', value: e.target.value })
                   }
-                  placeholder={imageFile ? 'Identifying...' : 'What are you considering buying?'}
+                  placeholder={
+                    imageIdentifying
+                      ? 'Identifying...'
+                      : imageError
+                        ? 'Type the item name'
+                        : 'What are you considering buying?'
+                  }
                   disabled={uiState.loading}
                   className="input-field"
                 />
+                {imageError && (
+                  <p className="image-identify-error" role="alert">
+                    {imageError}
+                  </p>
+                )}
               </div>
 
               <div className="form-group">

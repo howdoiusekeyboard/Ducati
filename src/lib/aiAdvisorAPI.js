@@ -3,16 +3,28 @@
  */
 
 /**
- * Analyze an image using OpenAI Vision API to identify the item
+ * Analyze an image using vision API to identify the item.
+ * Requires a Firebase ID token — /api/chat is auth-gated since Phase 1.5.
+ * Mirrors the auth pattern in findCheaperAlternative + ProModeAPI: pre-flight
+ * throw on missing idToken, explicit 401 detection, re-throw of named auth
+ * error before any silent-fallback path.
  * @param {string} base64Image - Base64 encoded image
+ * @param {string} idToken - Firebase ID token from useAuth().user.getIdToken()
  * @returns {Promise<{name: string, cost: number, facts: string}>}
+ * @throws {Error} 'Authentication required for image analysis' on missing or invalid idToken
  */
-export const analyzeImageWithOpenAI = async (base64Image) => {
+const ANALYZE_IMAGE_AUTH_ERROR = 'Authentication required for image analysis';
+
+export const analyzeImageWithOpenAI = async (base64Image, idToken) => {
+  if (!idToken) {
+    throw new Error(ANALYZE_IMAGE_AUTH_ERROR);
+  }
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
       },
       body: JSON.stringify({
         message: `Analyze this image and identify the product shown. Look carefully at any text, logos, branding, or distinctive features visible in the image.
@@ -27,11 +39,15 @@ export const analyzeImageWithOpenAI = async (base64Image) => {
         Examples:
         - If you see a Coca-Cola can: {"name": "Coca-Cola Classic Can", "cost": 1.50, "facts": "Red aluminum can with Coca-Cola branding"}
         - If you see an iPhone: {"name": "Apple iPhone", "cost": 800, "facts": "Smartphone with Apple branding"}
-        
+
         Image to analyze:`,
         image: base64Image,
       }),
     });
+
+    if (response.status === 401) {
+      throw new Error(ANALYZE_IMAGE_AUTH_ERROR);
+    }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -108,6 +124,9 @@ export const analyzeImageWithOpenAI = async (base64Image) => {
       };
     }
   } catch (error) {
+    if (error && error.message === ANALYZE_IMAGE_AUTH_ERROR) {
+      throw error;
+    }
     console.error('Error analyzing image with OpenAI:', error);
     return {
       name: 'Error',
