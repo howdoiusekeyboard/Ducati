@@ -1,7 +1,7 @@
 // src/components/PurchaseAdvisor.js
 import React, { useState, useReducer, useCallback, useEffect } from 'react';
 import { User, Target, ShoppingCart } from 'lucide-react';
-import { analyzeImageWithOpenAI, findCheaperAlternative } from '../lib/aiAdvisorAPI';
+import { analyzePurchaseImage, findCheaperAlternative } from '../lib/aiAdvisorAPI';
 import { getEnhancedPurchaseRecommendation } from '../lib/enhancedAdvisorIntegration';
 import DecisionMatrix from './DecisionMatrix';
 import ProgressiveFinancialProfile from './ProgressiveFinancialProfile';
@@ -312,16 +312,18 @@ const PurchaseAdvisor = () => {
 
       setImageIdentifying(true);
       try {
-        const base64Image = await new Promise((resolve) => {
+        // /api/chat#L212 requires the FULL data URL (data:image/<mime>;base64,<payload>)
+        // for MIME validation. Don't strip the prefix — bare base64 fails with HTTP 400.
+        const dataUrl = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => {
-            resolve(reader.result.split(',')[1]);
+            resolve(reader.result);
           };
           reader.readAsDataURL(file);
         });
 
         const idToken = await user.getIdToken();
-        const itemDetails = await analyzeImageWithOpenAI(base64Image, idToken);
+        const itemDetails = await analyzePurchaseImage(dataUrl, idToken);
         if (itemDetails && itemDetails.name && itemDetails.name !== 'Error') {
           dispatchForm({
             type: 'SET_ITEM_FROM_IMAGE',

@@ -1,21 +1,29 @@
 /**
- * OpenAI API functions for purchase advisor functionality
+ * Purchase-advisor backend client functions. Backend is Gemini (Phase 1.7+);
+ * legacy "OpenAI" naming carried over from pre-migration code is being scrubbed
+ * route-by-route during Phase 10 cleanup.
  */
 
 /**
- * Analyze an image using vision API to identify the item.
- * Requires a Firebase ID token — /api/chat is auth-gated since Phase 1.5.
- * Mirrors the auth pattern in findCheaperAlternative + ProModeAPI: pre-flight
- * throw on missing idToken, explicit 401 detection, re-throw of named auth
- * error before any silent-fallback path.
- * @param {string} base64Image - Base64 encoded image
+ * Analyze an image to identify the product. Backend: /api/chat which routes
+ * to Gemini multimodal (Phase 8a). Requires a Firebase ID token because
+ * /api/chat is auth-gated since Phase 1.5. Auth pattern mirrors
+ * findCheaperAlternative + ProModeAPI: pre-flight throw on missing idToken,
+ * explicit 401 detection, re-throw of named auth error before any
+ * silent-fallback path.
+ *
+ * IMPORTANT data-URL contract: pass the FULL data URL (data:image/jpeg;base64,...)
+ * — /api/chat#L212 regex requires it for MIME validation. Stripping the prefix
+ * to bare base64 fails MIME-allowlist match with HTTP 400.
+ *
+ * @param {string} dataUrl - Full data URL `data:image/<mime>;base64,<payload>`
  * @param {string} idToken - Firebase ID token from useAuth().user.getIdToken()
  * @returns {Promise<{name: string, cost: number, facts: string}>}
  * @throws {Error} 'Authentication required for image analysis' on missing or invalid idToken
  */
 const ANALYZE_IMAGE_AUTH_ERROR = 'Authentication required for image analysis';
 
-export const analyzeImageWithOpenAI = async (base64Image, idToken) => {
+export const analyzePurchaseImage = async (dataUrl, idToken) => {
   if (!idToken) {
     throw new Error(ANALYZE_IMAGE_AUTH_ERROR);
   }
@@ -29,19 +37,19 @@ export const analyzeImageWithOpenAI = async (base64Image, idToken) => {
       body: JSON.stringify({
         message: `Analyze this image and identify the product shown. Look carefully at any text, logos, branding, or distinctive features visible in the image.
 
-        Return ONLY a JSON response in this exact format:
+        Return ONLY a JSON response in this exact format (all costs in AED — UAE dirhams):
         {
           "name": "Product name (be specific, include brand if visible)",
-          "cost": estimated_price_in_dollars_as_number,
+          "cost": estimated_retail_price_in_AED_as_number,
           "facts": "Brief description of what you see in the image"
         }
 
-        Examples:
-        - If you see a Coca-Cola can: {"name": "Coca-Cola Classic Can", "cost": 1.50, "facts": "Red aluminum can with Coca-Cola branding"}
-        - If you see an iPhone: {"name": "Apple iPhone", "cost": 800, "facts": "Smartphone with Apple branding"}
+        Examples (AED retail in UAE):
+        - If you see a Coca-Cola can: {"name": "Coca-Cola Classic Can", "cost": 4, "facts": "Red aluminum can with Coca-Cola branding"}
+        - If you see an iPhone 15: {"name": "Apple iPhone 15", "cost": 3299, "facts": "Smartphone with Apple branding"}
 
         Image to analyze:`,
-        image: base64Image,
+        image: dataUrl,
       }),
     });
 
@@ -59,7 +67,7 @@ export const analyzeImageWithOpenAI = async (base64Image, idToken) => {
       throw new Error(data.error);
     }
 
-    // Try to parse the JSON response from OpenAI
+    // Parse JSON response from Gemini
     try {
       // Clean up the response to handle potential formatting issues
       const cleanedResponse = data.response
@@ -127,7 +135,7 @@ export const analyzeImageWithOpenAI = async (base64Image, idToken) => {
     if (error && error.message === ANALYZE_IMAGE_AUTH_ERROR) {
       throw error;
     }
-    console.error('Error analyzing image with OpenAI:', error);
+    console.error('Error analyzing image:', error);
     return {
       name: 'Error',
       cost: 0,
@@ -137,7 +145,7 @@ export const analyzeImageWithOpenAI = async (base64Image, idToken) => {
 };
 
 /**
- * Get purchase recommendation from OpenAI
+ * Get purchase recommendation via /api/chat (Gemini backend).
  * @param {string} itemName - Name of the item
  * @param {number} cost - Cost of the item
  * @param {string} purpose - Purpose of the item (optional)
@@ -230,7 +238,7 @@ export const getPurchaseRecommendation = async (
       throw new Error(data.error);
     }
 
-    // Try to parse the JSON response from OpenAI
+    // Parse JSON response from Gemini
     try {
       // First try direct JSON parsing
       // Clean up the response to handle potential formatting issues
@@ -361,7 +369,7 @@ export const getPurchaseRecommendation = async (
 };
 
 /**
- * Find cheaper alternatives using OpenAI
+ * Find cheaper alternatives via /api/chat (Gemini backend) with grounding.
  * @param {string} itemName - Name of the item to find alternatives for
  * @param {number} currentPrice - Current price of the item
  * @param {Object} location - User location object (optional)
@@ -443,7 +451,7 @@ export const findCheaperAlternative = async (itemName, currentPrice, location = 
       throw new Error(data.error);
     }
 
-    // Try to parse the JSON response from OpenAI
+    // Parse JSON response from Gemini
     try {
       // Clean up the response to handle potential formatting issues
       const cleanedResponse = data.response
