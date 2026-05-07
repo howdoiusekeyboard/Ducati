@@ -4,7 +4,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background-color: #dc2626;
+  background-color: var(--color-danger);
   color: white;
   border: none;
   border-radius: 8px;
@@ -58,7 +58,7 @@
 .confirm-dialog h2 {
   margin: 0 0 24px 0;
   font-size: 24px;
-  color: #111827;
+  color: var(--color-text-strong);
   text-align: center;
 }
 
@@ -87,7 +87,7 @@
 .warning-text {
   font-size: 14px;
   text-align: center;
-  color: #dc2626 !important;
+  color: var(--color-danger) !important;
   margin-top: 16px !important;
 }
 
@@ -99,13 +99,13 @@
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .confirm-input-group input {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
@@ -115,7 +115,7 @@
 
 .confirm-input-group input:focus {
   outline: none;
-  border-color: #dc2626;
+  border-color: var(--color-danger);
 }
 
 .dialog-actions {
@@ -126,7 +126,7 @@
 
 .btn-danger {
   padding: 12px 24px;
-  background-color: #dc2626;
+  background-color: var(--color-danger);
   color: white;
   border: none;
   border-radius: 8px;
@@ -150,8 +150,8 @@
 
 .btn-cancel {
   padding: 12px 24px;
-  background-color: #e5e7eb;
-  color: #374151;
+  background-color: var(--color-border);
+  color: var(--color-text);
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -161,12 +161,12 @@
 }
 
 .btn-cancel:hover:not(:disabled) {
-  background-color: #d1d5db;
+  background-color: var(--color-border-hover);
 }
 
 .btn-primary {
   padding: 12px 24px;
-  background-color: #6366f1;
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -177,7 +177,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #4f46e5;
+  background-color: var(--color-accent);
 }
 
 /* Loading Spinner */
@@ -211,17 +211,17 @@
 .result-message h3 {
   margin: 0 0 12px 0;
   font-size: 20px;
-  color: #111827;
+  color: var(--color-text-strong);
 }
 
 .result-message p {
   margin: 8px 0;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .redirect-message {
   font-style: italic;
-  color: #6366f1 !important;
+  color: var(--color-accent) !important;
   margin-top: 16px !important;
 }
 

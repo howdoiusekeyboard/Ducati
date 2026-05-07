@@ -19,6 +19,7 @@ import ScrollToTop from './ScrollToTop';
 import { initializeOfflinePersistence } from '../lib/firestore/offline';
 import UserProfile from './UserProfile';
 import LoginPage from './LoginPage';
+import ProtectedRoute from './ProtectedRoute';
 import TermsPage from './TermsPage';
 import PrivacyPage from './PrivacyPage';
 import PurchaseAdvisor from './PurchaseAdvisor';
@@ -202,7 +203,14 @@ const App = () => {
               <main className="main-content">
                 <Routes>
                   <Route path="/" element={<PurchaseAdvisor />} />
-                  <Route path="/profile" element={<FinancialProfile />} />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <FinancialProfile />
+                      </ProtectedRoute>
+                    }
+                  />
                   <Route path="/about" element={<About />} />
                   <Route path="/pro-mode" element={<ProMode />} />
                   <Route path="/user-guide" element={<UserGuide />} />

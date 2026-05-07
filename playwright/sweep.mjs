@@ -45,52 +45,37 @@ async function signInEmail(page) {
   console.log(`[auth] goto ${BASE_URL}/login`);
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded', timeout: 45000 });
 
-  console.log('[auth] waiting for firebaseui email-provider button');
-  const emailBtn = page
-    .locator('button[data-provider-id="password"], .firebaseui-idp-password')
-    .first();
-  try {
-    await emailBtn.waitFor({ state: 'visible', timeout: 20000 });
-    await emailBtn.click();
-  } catch {
-    console.log('[auth] email-provider button not visible, trying direct email-input');
-  }
-
-  const emailInput = page.locator('input[name="email"], .firebaseui-id-email').first();
+  // Custom email/password AuthComponent (firebaseui dropped in 57282f3): single-form,
+  // no provider button pre-step. Email + password + submit, then URL leaves /login.
+  console.log('[auth] waiting for email input');
+  const emailInput = page.locator('input[type="email"]').first();
   await emailInput.waitFor({ state: 'visible', timeout: 20000 });
   await emailInput.fill(email);
-  await page.locator('.firebaseui-id-submit, button[type="submit"]').first().click();
 
-  const passwordInput = page
-    .locator('input[type="password"], input[name="password"], .firebaseui-id-password')
-    .first();
-  try {
-    await passwordInput.waitFor({ state: 'visible', timeout: 20000 });
-  } catch (e) {
-    await page.screenshot({
-      path: path.join(OUT_DIR, '_auth-debug-password-step.png'),
-      fullPage: true,
-    });
-    const inputs = await page
-      .locator('input')
-      .evaluateAll((els) =>
-        els.map((el) => ({
-          type: el.type,
-          name: el.name,
-          placeholder: el.placeholder,
-          autocomplete: el.autocomplete,
-        })),
-      );
-    console.error('[auth] password step DOM inputs:', JSON.stringify(inputs));
-    throw e;
-  }
+  const passwordInput = page.locator('input[type="password"]').first();
+  await passwordInput.waitFor({ state: 'visible', timeout: 10000 });
   await passwordInput.fill(password);
-  await page.locator('.firebaseui-id-submit, button[type="submit"]').first().click();
+
+  await page.locator('button[type="submit"]').first().click();
 
   console.log('[auth] waiting for redirect off /login');
-  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 45000 });
-  console.log('[auth] signed in');
-  return true;
+  try {
+    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 45000 });
+    console.log('[auth] signed in');
+    return true;
+  } catch (e) {
+    await page.screenshot({
+      path: path.join(OUT_DIR, '_auth-debug-after-submit.png'),
+      fullPage: true,
+    });
+    const errorText = await page
+      .locator('[role="alert"], .auth-error-msg')
+      .first()
+      .textContent()
+      .catch(() => null);
+    console.error('[auth] redirect timeout. error-text=', errorText);
+    throw e;
+  }
 }
 
 async function captureRoute(context, route, viewport, authed) {

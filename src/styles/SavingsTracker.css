@@ -14,7 +14,7 @@
 }
 
 .savings-tracker-container {
-  background-color: #f9fafb;
+  background-color: var(--color-bg);
   border-radius: 20px;
   box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
@@ -25,7 +25,7 @@
   overflow-y: auto;
   padding: 32px;
   position: relative;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   animation: slideInUp 0.4s ease-out;
 }
 
@@ -33,13 +33,13 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: #e5e7eb;
+  background: var(--color-border);
   border: none;
   border-radius: 50%;
   width: 32px;
   height: 32px;
   font-size: 1.2rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -50,8 +50,8 @@
 }
 
 .close-tracker-btn:hover {
-  background-color: #d1d5db;
-  color: #111827;
+  background-color: var(--color-border-hover);
+  color: var(--color-text-strong);
 }
 
 .tracker-header {
@@ -62,13 +62,13 @@
 .tracker-header h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 8px 0;
 }
 
 .tracker-header p {
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -80,17 +80,17 @@
 }
 
 .summary-card {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   border-radius: 16px;
   padding: 24px;
   text-align: center;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }
 
 .summary-card h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--color-text);
   margin: 0 0 8px 0;
 }
 
@@ -98,22 +98,22 @@
 .summary-card .projection-value {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #4f46e5;
+  color: var(--color-accent);
   margin: 0;
 }
 
 .summary-card span {
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .history-log h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin-bottom: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .history-list {
@@ -123,13 +123,13 @@
 }
 
 .history-item {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   border-radius: 12px;
   padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   transition: box-shadow 0.2s;
 }
 
@@ -145,12 +145,12 @@
 
 .item-date {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .item-name {
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .item-decision {

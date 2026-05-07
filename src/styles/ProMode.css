@@ -30,7 +30,7 @@
 }
 
 .pro-mode-button {
-  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  background: linear-gradient(135deg, var(--color-text-strong) 0%, var(--color-text-strong) 100%);
   color: white;
   border: none;
   padding: 14px 32px;
@@ -70,7 +70,7 @@
 
 .pro-mode-header h1 {
   font-size: 2.5rem;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 12px 0;
   display: flex;
   align-items: center;
@@ -84,7 +84,7 @@
 
 .pro-subtitle {
   font-size: 1.2rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -100,7 +100,7 @@
 
 .pro-mode-loading p {
   font-size: 1.1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 /* Error State */
@@ -115,7 +115,7 @@
 .back-button {
   margin-top: 20px;
   padding: 10px 24px;
-  background-color: #dc2626;
+  background-color: var(--color-danger);
   color: white;
   border: none;
   border-radius: 8px;
@@ -139,7 +139,7 @@
 
 .questions-section h2 {
   font-size: 1.5rem;
-  color: #111827;
+  color: var(--color-text-strong);
   margin-bottom: 30px;
 }
 
@@ -154,14 +154,14 @@
   flex-direction: column;
   gap: 12px;
   padding: 20px;
-  background-color: #f9fafb;
+  background-color: var(--color-bg);
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   transition: all 0.3s ease;
 }
 
 .question-item:hover {
-  border-color: #d1d5db;
+  border-color: var(--color-border-hover);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
@@ -175,7 +175,7 @@
 .question-item label {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text);
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -183,14 +183,14 @@
 }
 
 .question-number {
-  color: #6366f1;
+  color: var(--color-accent);
   font-size: 1.2rem;
 }
 
 .question-input {
   width: 100%;
   padding: 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-hover);
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;
@@ -201,7 +201,7 @@
 
 .question-input:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
@@ -214,7 +214,7 @@
   padding: 4px;
   border-radius: 6px;
   transition: all 0.2s ease;
-  color: #6b7280;
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -223,13 +223,13 @@
 }
 
 .hint-toggle:hover {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   transform: scale(1.1);
 }
 
 .hint-toggle:focus {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -303,7 +303,7 @@
 
 /* Copy Hint Button */
 .copy-hint-button {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -318,13 +318,13 @@
 }
 
 .copy-hint-button:hover {
-  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
 }
 
 .copy-hint-button:focus {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -342,9 +342,9 @@
 
 .cancel-button {
   padding: 14px 32px;
-  background-color: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-hover);
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
@@ -353,13 +353,13 @@
 }
 
 .cancel-button:hover:not(:disabled) {
-  background-color: #e5e7eb;
-  border-color: #9ca3af;
+  background-color: var(--color-border);
+  border-color: var(--color-text-muted);
 }
 
 .analyze-button {
   padding: 14px 32px;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -400,13 +400,13 @@
 
 .analysis-card h2 {
   font-size: 1.8rem;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 30px 0;
   display: flex;
   align-items: center;
   gap: 12px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .analysis-icon {
@@ -425,7 +425,7 @@
 .analysis-text {
   font-size: 1.1rem;
   line-height: 2; /* Adjusted for better spacing with links */
-  color: #374151;
+  color: var(--color-text);
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
@@ -433,17 +433,17 @@
 
 /* Market Insights */
 .market-insights {
-  background-color: #f0f9ff;
+  background-color: var(--color-accent-bg);
   padding: 24px;
   border-radius: 12px;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--color-accent);
   overflow: hidden;
   word-wrap: break-word;
 }
 
 .market-insights h3 {
   font-size: 1.3rem;
-  color: #1e40af;
+  color: var(--color-accent);
   margin: 0 0 16px 0;
   display: flex;
   align-items: center;
@@ -456,7 +456,7 @@
 
 .market-insights p {
   font-size: 1rem;
-  color: #1e3a8a;
+  color: var(--color-accent);
   line-height: 2; /* Adjusted for better spacing with links */
   margin: 0;
   overflow-wrap: break-word;
@@ -469,7 +469,7 @@
   background-color: #f0fdf4;
   padding: 24px;
   border-radius: 12px;
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--color-accent);
   overflow: hidden;
   word-wrap: break-word;
 }
@@ -575,7 +575,7 @@
 
 .back-to-home-button {
   padding: 14px 40px;
-  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  background: linear-gradient(135deg, var(--color-text-strong) 0%, var(--color-text-strong) 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -844,8 +844,8 @@
 /* Link Styling */
 .analysis-link {
   display: inline-block;
-  background-color: #eef2ff;
-  color: #4f46e5;
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
   padding: 2px 8px;
   border-radius: 9999px;
   font-size: 0.8rem;
@@ -858,8 +858,8 @@
 }
 
 .analysis-link:hover {
-  background-color: #e0e7ff;
-  color: #4338ca;
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }

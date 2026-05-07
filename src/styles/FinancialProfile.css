@@ -13,10 +13,10 @@
 
 /* FINANCIAL FORM */
 .financial-form {
-  background-color: var(--background-card);
+  background-color: var(--color-surface);
   padding: 32px;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-card-hover);
   margin-bottom: 30px;
   position: relative;
   z-index: 5;
@@ -27,19 +27,19 @@
 /* FORM SECTIONS */
 .form-section {
   margin-bottom: 24px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
 .form-section:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-card);
 }
 
 .section-header {
   padding: 16px 20px;
-  background-color: var(--background-light);
+  background-color: var(--color-bg);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,7 +55,7 @@
   font-size: 1.25rem;
   margin: 0;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--color-text-strong);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -67,23 +67,23 @@
 
 .toggle-icon {
   font-size: 1rem;
-  color: var(--text-medium);
+  color: var(--color-text);
   transition: transform 0.3s ease;
 }
 
 .section-content {
   padding: 24px;
-  background-color: var(--background-card);
-  border-top: 1px solid var(--border-color);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
   animation: fadeIn 0.3s ease-out;
 }
 
 .section-description {
   font-size: 0.95rem;
-  color: var(--text-light);
+  color: var(--color-text-muted);
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px dashed var(--border-color);
+  border-bottom: 1px dashed var(--color-border);
 }
 
 /* INPUT STYLES */
@@ -105,13 +105,13 @@
 .textarea-field {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   transition: all 0.3s ease;
   font-size: 16px;
-  background-color: var(--background-light);
-  color: var(--text-dark);
-  box-shadow: var(--shadow-sm);
+  background-color: var(--color-bg);
+  color: var(--color-text-strong);
+  box-shadow: var(--shadow-card);
   min-height: 100px;
   resize: vertical;
   font-family: inherit;
@@ -119,7 +119,7 @@
 
 .textarea-field:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--color-accent);
   box-shadow: var(--shadow-focus);
 }
 
@@ -127,7 +127,7 @@
 .debt-entry {
   margin-bottom: 24px;
   padding-bottom: 20px;
-  border-bottom: 1px dashed var(--border-color);
+  border-bottom: 1px dashed var(--color-border);
 }
 
 .debt-entry:last-child {
@@ -139,7 +139,7 @@
 .debt-entry h3 {
   font-size: 1.1rem;
   margin-bottom: 16px;
-  color: var(--text-dark);
+  color: var(--color-text-strong);
   font-weight: 600;
 }
 
@@ -152,7 +152,7 @@
 
 .submit-button {
   flex: 1;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
   color: white;
   padding: 16px 24px;
   border-radius: var(--radius-md);
@@ -170,9 +170,9 @@
 }
 
 .reset-button {
-  background-color: var(--background-light);
-  color: var(--text-medium);
-  border: 1px solid var(--border-color);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 16px 24px;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -183,8 +183,8 @@
 
 .reset-button:hover {
   background-color: #fee2e2;
-  color: var(--danger-color);
-  border-color: var(--danger-color);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 /* ANIMATION */

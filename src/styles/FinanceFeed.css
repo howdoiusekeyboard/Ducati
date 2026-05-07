@@ -18,12 +18,12 @@
 
 /* Video Section Wrapper */
 .video-section-wrapper {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   border-radius: 20px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   animation: slideDown 0.6s ease-out;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }
 
 /* Video Player Container - Desktop Layout */
@@ -60,8 +60,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  background-color: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  background-color: var(--color-bg);
+  border-top: 1px solid var(--color-border);
 }
 
 .control-button {
@@ -69,20 +69,20 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .control-button:hover {
-  background-color: #6366f1;
+  background-color: var(--color-accent);
   color: white;
-  border-color: #6366f1;
+  border-color: var(--color-accent);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
@@ -104,27 +104,27 @@
 .video-info h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 4px 0;
 }
 
 .video-channel {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0 0 4px 0;
 }
 
 .video-counter {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
 /* Playlist Sidebar - Desktop */
 .playlist-sidebar {
   width: 350px;
-  background-color: #f9fafb;
-  border-left: 1px solid #e5e7eb;
+  background-color: var(--color-bg);
+  border-left: 1px solid var(--color-border);
   padding: 20px;
   overflow-y: auto;
   max-height: 600px;
@@ -133,7 +133,7 @@
 .playlist-sidebar h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 16px 0;
 }
 
@@ -154,12 +154,12 @@
 }
 
 .sidebar-item:hover {
-  background-color: #e5e7eb;
+  background-color: var(--color-border);
 }
 
 .sidebar-item.active {
-  background-color: #eef2ff;
-  border-color: #6366f1;
+  background-color: var(--color-accent-bg);
+  border-color: var(--color-accent);
 }
 
 .sidebar-thumbnail {
@@ -199,7 +199,7 @@
 .sidebar-info h4 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 4px 0;
   line-height: 1.3;
   overflow: hidden;
@@ -211,18 +211,18 @@
 
 .sidebar-info p {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
 /* Playlist Section - Mobile */
 .playlist-section {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   padding: 32px;
   border-radius: 20px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   animation: fadeInUp 0.8s ease-out;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   display: none;
 }
 
@@ -233,7 +233,7 @@
 .playlist-section h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 24px 0;
   text-align: center;
 }
@@ -245,7 +245,7 @@
 }
 
 .playlist-item {
-  background-color: #f9fafb;
+  background-color: var(--color-bg);
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -256,11 +256,11 @@
 .playlist-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  border-color: #e5e7eb;
+  border-color: var(--color-border);
 }
 
 .playlist-item.active {
-  border-color: #6366f1;
+  border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
@@ -325,38 +325,38 @@
 .playlist-info h4 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 4px 0;
   line-height: 1.4;
 }
 
 .video-channel-small {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0 0 2px 0;
 }
 
 .video-type {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
 /* Educational Section */
 .educational-section {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   padding: 48px 32px;
   border-radius: 20px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   text-align: center;
   animation: fadeIn 1s ease-out;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }
 
 .educational-section h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 32px 0;
 }
 
@@ -370,7 +370,7 @@
 
 .education-card {
   padding: 24px;
-  background-color: #f9fafb;
+  background-color: var(--color-bg);
   border-radius: 12px;
   transition: all 0.3s ease;
 }
@@ -389,30 +389,30 @@
 .education-card h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 8px 0;
 }
 
 .education-card p {
   font-size: 0.95rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
   line-height: 1.5;
 }
 
 /* Tips Section */
 .tips-section {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  background: linear-gradient(135deg, var(--color-accent-bg) 0%, var(--color-accent-bg) 100%);
   padding: 48px 32px;
   border-radius: 20px;
-  border: 1px solid #bae6fd;
+  border: 1px solid var(--color-accent-bg);
   animation: slideUp 1.2s ease-out;
 }
 
 .tips-section h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #0c4a6e;
+  color: var(--color-accent);
   margin: 0 0 32px 0;
   text-align: center;
 }
@@ -457,20 +457,20 @@
 .tip-content h4 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #075985;
+  color: var(--color-accent);
   margin: 0 0 8px 0;
 }
 
 .tip-content p {
   font-size: 0.95rem;
-  color: #0c4a6e;
+  color: var(--color-accent);
   margin: 0;
   line-height: 1.5;
 }
 
 /* Feed CTA */
 .feed-cta {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
   color: white;
   padding: 48px;
   border-radius: 20px;
@@ -497,7 +497,7 @@
   gap: 8px;
   padding: 16px 32px;
   background-color: white;
-  color: #6366f1;
+  color: var(--color-accent);
   text-decoration: none;
   border-radius: 12px;
   font-size: 1.125rem;

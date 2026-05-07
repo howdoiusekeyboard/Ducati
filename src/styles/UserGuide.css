@@ -17,8 +17,8 @@
 }
 
 .intro-card {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border: 1px solid #bae6fd;
+  background: linear-gradient(135deg, var(--color-accent-bg) 0%, var(--color-accent-bg) 100%);
+  border: 1px solid var(--color-accent-bg);
   border-radius: 16px;
   padding: 32px;
   text-align: center;
@@ -27,14 +27,14 @@
 
 .intro-card h2 {
   font-size: 2rem;
-  color: #0c4a6e;
+  color: var(--color-accent);
   margin: 0 0 16px 0;
   font-weight: 700;
 }
 
 .intro-card p {
   font-size: 1.125rem;
-  color: #075985;
+  color: var(--color-accent);
   line-height: 1.7;
   max-width: 700px;
   margin: 0 auto;
@@ -49,13 +49,13 @@
 }
 
 .guide-section {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   border-radius: 16px;
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   transition: all 0.3s ease;
   animation: fadeInUp 0.6s ease-out;
 }
@@ -71,14 +71,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px 28px;
-  background-color: #f9fafb;
+  background-color: var(--color-bg);
   cursor: pointer;
   transition: background-color 0.2s ease;
   user-select: none;
 }
 
 .section-header:hover {
-  background-color: #f3f4f6;
+  background-color: var(--color-bg);
 }
 
 .section-header h3 {
@@ -87,7 +87,7 @@
   gap: 12px;
   font-size: 1.375rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0;
   flex-wrap: nowrap;
 }
@@ -98,7 +98,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  background-color: #6366f1;
+  background-color: var(--color-accent);
   color: white;
   border-radius: 50%;
   font-size: 1rem;
@@ -113,7 +113,7 @@
 
 .toggle-indicator {
   font-size: 1.5rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-weight: 300;
   transition: transform 0.3s ease;
   flex-shrink: 0;
@@ -121,13 +121,13 @@
 
 .section-content {
   padding: 32px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
   animation: fadeIn 0.3s ease-out;
 }
 
 .section-intro {
   font-size: 1rem;
-  color: #4b5563;
+  color: var(--color-text);
   line-height: 1.6;
   margin-bottom: 24px;
 }
@@ -135,7 +135,7 @@
 /* Advisor Section Styles */
 .advisor-intro {
   font-size: 1.0625rem;
-  color: #4b5563;
+  color: var(--color-text);
   line-height: 1.6;
   margin-bottom: 32px;
 }
@@ -151,7 +151,7 @@
 .advisor-tips h4 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 16px 0;
 }
 
@@ -163,11 +163,11 @@
 }
 
 .feature-card {
-  background-color: #f9fafb;
+  background-color: var(--color-bg);
   padding: 20px;
   border-radius: 12px;
   text-align: center;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   transition: all 0.3s ease;
 }
 
@@ -185,13 +185,13 @@
 .feature-card h5 {
   font-size: 1rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 8px 0;
 }
 
 .feature-card p {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
   line-height: 1.5;
 }
@@ -204,7 +204,7 @@
 
 .advisor-tips li {
   font-size: 0.95rem;
-  color: #4b5563;
+  color: var(--color-text);
   margin-bottom: 12px;
   line-height: 1.5;
 }
@@ -231,7 +231,7 @@
   top: 36px;
   bottom: -24px;
   width: 2px;
-  background-color: #e5e7eb;
+  background-color: var(--color-border);
 }
 
 .step:last-child::before {
@@ -246,7 +246,7 @@
   position: absolute;
   left: -5px;
   top: 0;
-  background-color: #6366f1;
+  background-color: var(--color-accent);
   color: white;
   padding: 4px 8px;
   border-radius: 20px;
@@ -259,13 +259,13 @@
 .step h4 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 12px 0;
 }
 
 .step p {
   font-size: 1rem;
-  color: #4b5563;
+  color: var(--color-text);
   line-height: 1.6;
   margin: 0 0 12px 0;
 }
@@ -278,13 +278,13 @@
 
 .step li {
   font-size: 0.95rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-bottom: 8px;
   line-height: 1.5;
 }
 
 .step li strong {
-  color: #374151;
+  color: var(--color-text);
 }
 
 .tip {
@@ -303,7 +303,7 @@
 .result-component {
   margin-bottom: 24px;
   padding-bottom: 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .result-component:last-child {
@@ -314,13 +314,13 @@
 .result-component h4 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 12px 0;
 }
 
 .result-component p {
   font-size: 1rem;
-  color: #4b5563;
+  color: var(--color-text);
   line-height: 1.6;
 }
 
@@ -331,7 +331,7 @@
 
 .result-component li {
   font-size: 0.95rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-bottom: 8px;
   line-height: 1.5;
 }
@@ -379,7 +379,7 @@
 .profile-privacy h4 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 12px 0;
 }
 
@@ -390,7 +390,7 @@
 
 .profile-setup li {
   font-size: 0.95rem;
-  color: #4b5563;
+  color: var(--color-text);
   margin-bottom: 8px;
   line-height: 1.5;
 }
@@ -400,7 +400,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -426,7 +426,7 @@
 .pro-mode-process h4 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 12px 0;
 }
 
@@ -438,18 +438,18 @@
 }
 
 .tip-card {
-  background-color: #f9fafb;
+  background-color: var(--color-bg);
   padding: 20px;
   border-radius: 12px;
   text-align: center;
   transition: all 0.3s ease;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }
 
 .tip-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-color: #d1d5db;
+  border-color: var(--color-border-hover);
 }
 
 .tip-icon {
@@ -461,20 +461,20 @@
 .tip-card h4 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-strong);
   margin: 0 0 8px 0;
 }
 
 .tip-card p {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
   line-height: 1.5;
 }
 
 /* CTA Section */
 .guide-cta {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
   color: white;
   padding: 48px;
   border-radius: 20px;
@@ -508,10 +508,10 @@
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm) var(--spacing-md) !important;
-  background-color: var(--bg-primary) !important;
-  border: 1px solid var(--border-light) !important;
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
   border-radius: var(--radius-md) !important;
-  color: var(--text-primary) !important;
+  color: var(--color-text-strong) !important;
   font-size: var(--font-size-sm) !important;
   font-weight: 500 !important;
   cursor: pointer;
@@ -522,11 +522,11 @@
 
 .guide-cta .cta-button:hover,
 .guide-cta a.cta-button:hover {
-  background-color: var(--primary-color) !important;
-  color: var(--text-inverse) !important;
-  border-color: var(--primary-color) !important;
+  background-color: var(--color-accent) !important;
+  color: var(--color-surface) !important;
+  border-color: var(--color-accent) !important;
   transform: translateY(-1px) !important;
-  box-shadow: var(--shadow-sm) !important;
+  box-shadow: var(--shadow-card) !important;
 }
 
 .guide-cta .cta-button .btn-icon,
@@ -539,18 +539,18 @@
 .guide-cta a.cta-button.primary,
 .guide-cta .cta-button.secondary,
 .guide-cta a.cta-button.secondary {
-  background: var(--bg-primary) !important; /* Changed from background-color to background */
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border-light) !important;
+  background: var(--color-surface) !important; /* Changed from background-color to background */
+  color: var(--color-text-strong) !important;
+  border: 1px solid var(--color-border) !important;
 }
 
 .guide-cta .cta-button.primary:hover,
 .guide-cta a.cta-button.primary:hover,
 .guide-cta .cta-button.secondary:hover,
 .guide-cta a.cta-button.secondary:hover {
-  background: var(--primary-color) !important; /* Changed from background-color to background */
-  color: var(--text-inverse) !important;
-  border-color: var(--primary-color) !important;
+  background: var(--color-accent) !important; /* Changed from background-color to background */
+  color: var(--color-surface) !important;
+  border-color: var(--color-accent) !important;
 }
 
 /* Responsive Design */
