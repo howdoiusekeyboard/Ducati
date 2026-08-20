@@ -17,7 +17,7 @@ const jetBrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-const siteUrl = 'https://ducati.kushagragolash.tech';
+const siteUrl = 'https://ducati.kushagragolash.dev';
 
 export const metadata: Metadata = {
   title: 'Ducati',
